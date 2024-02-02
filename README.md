@@ -1,4 +1,4 @@
-# 16chan: danbooru's illegitimate child
+# 16chan: if imgur & danbooru made love
 
 upload images, tag images, look at anime girls, what else could you want?
 
