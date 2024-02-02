@@ -5,6 +5,7 @@ import {
   createClientComponentClient,
   User,
 } from "@supabase/auth-helpers-nextjs";
+import { Avatar } from "@/components/Avatar";
 
 export function AccountForm({ user }: { user: User | null }) {
   const supabase = createClientComponentClient<Database>();
@@ -108,6 +109,15 @@ export function AccountForm({ user }: { user: User | null }) {
           onChange={(e) => setWebsite(e.target.value)}
         />
       </div>
+      <Avatar
+        uid={user?.id || ""}
+        url={pfpUrl}
+        size={150}
+        onUpload={(url) => {
+          setPfpUrl(url);
+          void updateProfile({ fullname, username, website, avatar_url: url });
+        }}
+      />
 
       <div>
         <button
