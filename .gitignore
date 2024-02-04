@@ -9,8 +9,7 @@
 /coverage
 
 # database
-/src/db/db.sqlite
-/src/db/db.sqlite-journal
+**/db.sqlite
 
 # next.js
 /.next/

@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "db:push": "src/db db push",
-    "db:studio": "src/db studio",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
     "dev": "next dev",
-    "postinstall": "src/db generate",
+    "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"
   },
@@ -52,8 +52,5 @@
   "ct3aMetadata": {
     "initVersion": "7.26.0"
   },
-  "packageManager": "npm@10.4.0",
-  "prisma": {
-    "schema": "src/db/schema.prisma"
-  }
+  "packageManager": "npm@10.4.0"
 }
