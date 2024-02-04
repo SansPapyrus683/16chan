@@ -1,31 +1,51 @@
 import { z } from "zod";
+import { Base64 } from "js-base64";
+import { TRPCError } from "@trpc/server";
+import { v4 as uuid } from "uuid";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
-import { currentUser } from "@clerk/nextjs";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
+import { s3Upload } from "@/lib/s3";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(
+      z.object({
+        name: z.string().min(1),
+        images: z
+          .string()
+          .refine((d) => Base64.isValid(removeDataURL(d)))
+          .array(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      const user = await currentUser();
-
-      return ctx.db.post.create({
+      const post = await ctx.db.post.create({
         data: {
-          userId: user?.id!,
+          userId: ctx.auth.userId!,
           name: input.name,
         },
       });
-    }),
 
-  getLatest: publicProcedure.query(async ({ ctx }) => {
-    const user = await currentUser();
-    return ctx.db.post.findFirst({
-      where: { userId: user?.id },
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+      for (const img of input.images) {
+        const type = img.substring("data:".length, img.indexOf(";base64"));
+        if (!ACCEPTED_IMAGE_TYPES.includes(type)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "image format not supported",
+          });
+        }
+
+        const ext = type.slice("image/".length);
+        const path = `${ctx.auth.userId}/${post.id}-${uuid()}.${ext}`;
+        await s3Upload(path, img, type);
+        void ctx.db.pic.create({
+          data: {
+            post: { connect: { id: post.id } },
+            pic: path,
+          },
+        });
+      }
+
+      return post;
+    }),
 });
