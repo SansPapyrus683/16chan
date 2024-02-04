@@ -10,11 +10,7 @@ import { removeDataURL } from "@/lib/files";
 
 export const s3 = new S3Client({});
 
-export async function s3Upload(
-  name: string,
-  data: string,
-  content: string = "",
-) {
+export async function s3Upload(name: string, data: string, content: string) {
   return await s3.send(
     new PutObjectCommand({
       Bucket: env.AWS_S3_BUCKET_NAME,
@@ -27,7 +23,7 @@ export async function s3Upload(
 
 export async function s3Retrieve(name: string) {
   const cmd = new GetObjectCommand({
-    Bucket: "auxilium-tech",
+    Bucket: env.AWS_S3_BUCKET_NAME,
     Key: name,
   });
   return getSignedUrl(s3, cmd, { expiresIn: 3600 });
