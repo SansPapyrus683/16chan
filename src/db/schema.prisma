@@ -18,6 +18,16 @@ model Post {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  pics      Pic[]
 
   @@index([name, userId])
+}
+
+model Pic {
+  id     String @id @default(uuid())
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  pic    String
+  postId Int
+
+  @@index([postId])
 }

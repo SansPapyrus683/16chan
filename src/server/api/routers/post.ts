@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { currentUser } from "@clerk/nextjs";
 
 export const postRouter = createTRPCRouter({
@@ -12,7 +16,7 @@ export const postRouter = createTRPCRouter({
       };
     }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       const user = await currentUser();
