@@ -6,15 +6,15 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum ArtSource {
   DA
   PIXIV
   TWITTER
+  OTHER
 }
 
 enum Visibility {
@@ -24,15 +24,16 @@ enum Visibility {
 }
 
 model Post {
-  id         String     @id @default(uuid())
+  id         String     @id @default(uuid()) @db.Uuid
   userId     String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-  visibility Visibility
+  visibility Visibility @default(PUBLIC)
 
   title  String
-  artist String @default("")
-  artId  String @default("")
+  src    ArtSource?
+  artist String     @default("")
+  artId  String     @default("")
   pics   Pic[]
 
   tags Tag[]
@@ -41,16 +42,14 @@ model Post {
   comments Comment[]
   albums   Album[]
 
-  @@index([title, userId])
+  @@index([userId])
 }
 
 model Pic {
-  id     String @id @default(uuid())
+  id     String @id @default(uuid()) @db.Uuid
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   pic    String
-  postId String
-
-  @@index([postId])
+  postId String @db.Uuid
 }
 
 model Tag {
@@ -60,16 +59,14 @@ model Tag {
 }
 
 model Album {
-  id    String @id @default(uuid())
+  id    String @id @default(uuid()) @db.Uuid
   name  String
   posts Post[]
 }
 
 model Comment {
-  id     String @id @default(uuid())
+  id     String @id @default(uuid()) @db.Uuid
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId String
-  text   String @db.Text
-
-  @@index([postId])
+  postId String @db.Uuid
+  text   String
 }

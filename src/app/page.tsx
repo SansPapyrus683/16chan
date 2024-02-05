@@ -10,7 +10,7 @@ export default function Home() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     createPost.mutate({
-      name: "test post lmao",
+      title: "test post lmao",
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
     });
   };

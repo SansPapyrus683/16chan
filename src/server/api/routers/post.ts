@@ -11,7 +11,7 @@ export const postRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        name: z.string().min(1),
+        title: z.string().min(1),
         images: z
           .string()
           .refine((d) => Base64.isValid(removeDataURL(d)))
@@ -22,10 +22,11 @@ export const postRouter = createTRPCRouter({
       const post = await ctx.db.post.create({
         data: {
           userId: ctx.auth.userId!,
-          name: input.name,
+          title: input.title,
         },
       });
 
+      const imgPaths = [];
       for (const img of input.images) {
         const type = img.substring("data:".length, img.indexOf(";base64"));
         if (!ACCEPTED_IMAGE_TYPES.includes(type)) {
@@ -37,14 +38,16 @@ export const postRouter = createTRPCRouter({
 
         const ext = type.slice("image/".length);
         const path = `${ctx.auth.userId}/${post.id}-${uuid()}.${ext}`;
+        imgPaths.push(path);
         void s3Upload(path, img, type);
-        await ctx.db.pic.create({
-          data: {
-            post: { connect: { id: post.id } },
-            pic: path,
-          },
-        });
       }
+
+      await ctx.db.pic.createMany({
+        data: imgPaths.map((p) => ({
+          postId: post.id,
+          pic: p,
+        })),
+      });
 
       return post;
     }),
