@@ -37,8 +37,8 @@ export const postRouter = createTRPCRouter({
 
         const ext = type.slice("image/".length);
         const path = `${ctx.auth.userId}/${post.id}-${uuid()}.${ext}`;
-        await s3Upload(path, img, type);
-        void ctx.db.pic.create({
+        void s3Upload(path, img, type);
+        await ctx.db.pic.create({
           data: {
             post: { connect: { id: post.id } },
             pic: path,

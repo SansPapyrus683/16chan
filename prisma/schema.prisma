@@ -6,28 +6,70 @@ generator client {
 }
 
 datasource db {
-  provider     = "sqlite"
-  // provider     = "mysql"
+  provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  userId    String
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  pics      Pic[]
+enum ArtSource {
+  DA
+  PIXIV
+  TWITTER
+}
 
-  @@index([name, userId])
+enum Visibility {
+  PRIVATE
+  UNLISTED
+  PUBLIC
+}
+
+model Post {
+  id         String     @id @default(uuid())
+  userId     String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  visibility Visibility
+
+  title  String
+  artist String @default("")
+  artId  String @default("")
+  pics   Pic[]
+
+  tags Tag[]
+
+  likes    Int       @default(0)
+  comments Comment[]
+  albums   Album[]
+
+  @@index([title, userId])
 }
 
 model Pic {
   id     String @id @default(uuid())
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   pic    String
-  postId Int
+  postId String
+
+  @@index([postId])
+}
+
+model Tag {
+  name     String @id
+  category String
+  posts    Post[]
+}
+
+model Album {
+  id    String @id @default(uuid())
+  name  String
+  posts Post[]
+}
+
+model Comment {
+  id     String @id @default(uuid())
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  text   String @db.Text
 
   @@index([postId])
 }
