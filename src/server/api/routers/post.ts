@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Base64 } from "js-base64";
 import { TRPCError } from "@trpc/server";
-import { v4 as uuid } from "uuid";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
@@ -27,7 +26,7 @@ export const postRouter = createTRPCRouter({
       });
 
       const imgPaths = [];
-      for (const img of input.images) {
+      for (const [v, img] of input.images.entries()) {
         const type = img.substring("data:".length, img.indexOf(";base64"));
         if (!ACCEPTED_IMAGE_TYPES.includes(type)) {
           throw new TRPCError({
@@ -37,7 +36,7 @@ export const postRouter = createTRPCRouter({
         }
 
         const ext = type.slice("image/".length);
-        const path = `${ctx.auth.userId}/${post.id}-${uuid()}.${ext}`;
+        const path = `${post.id}-p${v}.${ext}`;
         imgPaths.push(path);
         void s3Upload(path, img, type);
       }
