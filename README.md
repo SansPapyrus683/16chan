@@ -34,7 +34,7 @@ for trpc, [this](https://trpc.io/docs/client/nextjs/setup) link seems pretty han
    * `root.ts`- starts of the app router, uses the functions from the `routers` folder
    * the `routers` folder is where the procedure definitions actually are jesus christ
 
-## `db` folder
+## `prisma` folder
 
 contains the prisma schema for all our database shenanigans as well as migrations (later)
 
