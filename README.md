@@ -6,11 +6,16 @@ upload images, tag images, look at anime girls, what else could you want?
 
 1. get the env file from kevin
 2. `npm run dev`
-3. if you want webhooks to work,
-   ```shell
-   ngrok http --domain=upright-quail-vaguely.ngrok-free.app 3000
-   ```
-   this allows a database entry to be created/deleted when a user signs up/deletes their account
+3. **webhook setup**
+   1. if you want webhooks to work, which are needed for db entries to be created on user signups, you first have to [install ngrok](https://ngrok.com/)
+   2. get the auth token from kevin so you can host the domain and run this
+      ```shell
+      ngrok config add-authtoken <AUTH TOKEN HERE>
+      ``` 
+   3. and then just run this and you chillin (if you use a port other than 3000, put that there instead)
+      ```shell
+      ngrok http --domain=upright-quail-vaguely.ngrok-free.app 3000
+      ```
 
 ## ok how does this actually work
 
