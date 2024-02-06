@@ -18,7 +18,7 @@ function getPrisma() {
             include: { ...args.include, images: true },
           });
           for (const img of deleted.images ?? []) {
-            await s3Delete(img.img!);
+            void s3Delete(img.img!);
           }
           return deleted;
         },
