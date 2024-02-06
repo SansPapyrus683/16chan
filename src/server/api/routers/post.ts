@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
-import { s3Upload } from "@/lib/s3";
+import { s3Delete, s3Upload } from "@/lib/s3";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -38,16 +38,31 @@ export const postRouter = createTRPCRouter({
         const ext = type.slice("image/".length);
         const path = `${post.id}-p${v}.${ext}`;
         imgPaths.push(path);
-        void s3Upload(path, img, type);
+        try {
+          await s3Upload(path, img, type);
+        } catch (e) {
+          for (const prev of imgPaths) {
+            await s3Delete(prev);
+          }
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: String(e),
+          });
+        }
       }
 
       await ctx.db.image.createMany({
         data: imgPaths.map((p) => ({
           postId: post.id,
-          pic: p,
+          img: p,
         })),
       });
 
       return post;
+    }),
+  delete: protectedProcedure
+    .input(z.string().uuid())
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.post.delete({ where: { id: input } });
     }),
 });

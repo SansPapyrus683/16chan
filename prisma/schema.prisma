@@ -46,7 +46,7 @@ model Post {
   src    ArtSource?
   artist String     @default("")
   artId  String     @default("")
-  pics   Image[]
+  images Image[]
 
   likes    User[]    @relation("LikedPosts")
   comments Comment[]
@@ -58,7 +58,7 @@ model Post {
 model Image {
   id     String @id @default(uuid()) @db.Uuid
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-  pic    String
+  img    String
   postId String @db.Uuid
 }
 

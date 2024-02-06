@@ -6,6 +6,7 @@ import { toBase64 } from "@/lib/files";
 export default function Home() {
   const [pics, setPics] = useState<File[]>([]);
   const createPost = api.post.create.useMutation();
+  const deletePost = api.post.delete.useMutation();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,6 +30,14 @@ export default function Home() {
         />
         <button type="submit">submit</button>
       </form>
+      <button
+        onClick={async (e) => {
+          e.preventDefault();
+          deletePost.mutate("660351ed-5b3f-4a55-8f3f-470c3f374486");
+        }}
+      >
+        delete a post
+      </button>
     </div>
   );
 }
