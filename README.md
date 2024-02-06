@@ -6,7 +6,11 @@ upload images, tag images, look at anime girls, what else could you want?
 
 1. get the env file from kevin
 2. `npm run dev`
-3. that's literally it
+3. if you want webhooks to work,
+   ```shell
+   ngrok http --domain=upright-quail-vaguely.ngrok-free.app 3000
+   ```
+   this allows a database entry to be created/deleted when a user signs up/deletes their account
 
 ## ok how does this actually work
 

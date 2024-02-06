@@ -17,6 +17,7 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     CLERK_SECRET_KEY: z.string(),
+    WEBHOOK_SECRET: z.string(),
     AWS_S3_BUCKET_NAME: z.string(),
   },
 
@@ -37,6 +38,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
