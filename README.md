@@ -8,31 +8,6 @@ upload images, tag images, look at anime girls, what else could you want?
 2. `npm run dev`
 3. that's literally it
 
-## mysql/sqlite
-
-planetscale has row read/write limits so if you wanna do some sus stuff without bricking ratelimits use sqlite
-
-to change from mysql to sqlite it's p easy:
-1. change `DATABASE_URL` to `file:./db.sqlite` instead of the mysql connection url
-2. turn this:
-    ```prisma
-    datasource db {
-      provider = "mysql"
-      // ...
-    }
-    ```
-    into this:
-    ```prisma
-    datasource db {
-      provider = "sqlite"
-      // ...
-    }
-    ```
-3. comment out all `db.Text` annotations bc sqlitle doesn't support them
-   (see [this issue](https://github.com/prisma/prisma/issues/9012))
-4. run `npx prisma db push`
-
-
 ## ok how does this actually work
 
 ok let's see how this crappy t3 thing actually works
@@ -59,7 +34,7 @@ for trpc, [this](https://trpc.io/docs/client/nextjs/setup) link seems pretty han
    * `root.ts`- starts of the app router, uses the functions from the `routers` folder
    * the `routers` folder is where the procedure definitions actually are jesus christ
 
-## `db` folder
+## `prisma` folder
 
 contains the prisma schema for all our database shenanigans as well as migrations (later)
 
