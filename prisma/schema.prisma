@@ -23,29 +23,39 @@ enum Visibility {
   PUBLIC
 }
 
+model User {
+  id     String  @id
+  posts  Post[]
+  likes  Post[]  @relation("LikedPosts")
+  albums Album[]
+
+  @@index([id])
+}
+
 model Post {
   id         String     @id @default(uuid()) @db.Uuid
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   visibility Visibility @default(PUBLIC)
 
-  title  String
+  title String
+  tags  Tag[]
+
   src    ArtSource?
   artist String     @default("")
   artId  String     @default("")
-  pics   Pic[]
+  pics   Image[]
 
-  tags Tag[]
-
-  likes    Int       @default(0)
+  likes    User[]    @relation("LikedPosts")
   comments Comment[]
   albums   Album[]
 
   @@index([userId])
 }
 
-model Pic {
+model Image {
   id     String @id @default(uuid()) @db.Uuid
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   pic    String
@@ -59,13 +69,17 @@ model Tag {
 }
 
 model Album {
-  id    String @id @default(uuid()) @db.Uuid
-  name  String
-  posts Post[]
+  id     String @id @default(uuid()) @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  name   String
+  posts  Post[]
 }
 
 model Comment {
-  id     String @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.Uuid
   text   String

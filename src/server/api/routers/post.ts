@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { s3Upload } from "@/lib/s3";
+import { userTest } from "@/lib/user";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -18,6 +19,7 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      void userTest(ctx);
       const post = await ctx.db.post.create({
         data: {
           userId: ctx.auth.userId!,
@@ -41,7 +43,7 @@ export const postRouter = createTRPCRouter({
         void s3Upload(path, img, type);
       }
 
-      await ctx.db.pic.createMany({
+      await ctx.db.image.createMany({
         data: imgPaths.map((p) => ({
           postId: post.id,
           pic: p,
