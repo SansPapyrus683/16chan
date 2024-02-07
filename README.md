@@ -16,6 +16,7 @@ upload images, tag images, look at anime girls, what else could you want?
       ```shell
       ngrok http --domain=upright-quail-vaguely.ngrok-free.app 3000
       ```
+      if you don't wanna type that out it's also stored as a script- just do `npm run starthook`
 
 ## ok how does this actually work
 

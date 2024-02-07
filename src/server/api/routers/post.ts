@@ -65,4 +65,13 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.post.delete({ where: { id: input } });
     }),
+  like: protectedProcedure.input(z.string().uuid()).mutation(async function ({
+    ctx,
+    input,
+  }) {
+    await ctx.db.post.update({
+      where: { id: input },
+      data: { likes: { connect: { id: ctx.auth.userId! } } },
+    });
+  }),
 });

@@ -6,6 +6,7 @@ import { toBase64 } from "@/lib/files";
 export default function Home() {
   const createPost = api.post.create.useMutation();
   const deletePost = api.post.delete.useMutation();
+  const likePost = api.post.like.useMutation();
   const { data: posts } = api.user.userPosts.useQuery();
 
   const [pics, setPics] = useState<File[]>([]);
@@ -35,20 +36,31 @@ export default function Home() {
           <input value={name} onChange={(e) => setName(e.target.value)} />
           <button type="submit">submit</button>
         </form>
-        <button
-          onClick={async (e) => {
-            e.preventDefault();
-            deletePost.mutate("c3f974b1-40d3-4e88-91e4-9b24afed028f");
-          }}
-        >
-          delete a post
-        </button>
       </div>
+      <br />
       <div>
         <ul>
           {(posts ?? []).map((v) => (
             <li key={v.id}>
-              {v.title} | {v.images.map((i) => i.img).join(", ")}
+              {v.title} | {v.images.map((i) => i.img).join(", ")} |{" "}
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  deletePost.mutate(v.id);
+                }}
+                className="border-2"
+              >
+                delete
+              </button>{" "}
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  likePost.mutate(v.id);
+                }}
+                className="border-2"
+              >
+                like
+              </button>
             </li>
           ))}
         </ul>
