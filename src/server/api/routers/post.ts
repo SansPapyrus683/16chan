@@ -42,7 +42,7 @@ export const postRouter = createTRPCRouter({
           await s3Upload(path, img, type);
         } catch (e) {
           for (const prev of imgPaths) {
-            await s3Delete(prev);
+            void s3Delete(prev);
           }
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
