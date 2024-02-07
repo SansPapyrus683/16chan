@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,18 +21,19 @@ enum Visibility {
 }
 
 model User {
-  id     String  @id
-  posts  Post[]
-  likes  Post[]  @relation("LikedPosts")
-  albums Album[]
+  id      String    @id
+  posts   Post[]
+  likes   Post[]    @relation("LikedPosts")
+  albums  Album[]
+  Comment Comment[]
 
   @@index([id])
 }
 
 model Post {
   id         String     @id @default(uuid()) @db.Uuid
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
+  user       User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId     String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   visibility Visibility @default(PUBLIC)
@@ -79,6 +77,9 @@ model Album {
 model Comment {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
+
+  by   User?   @relation(fields: [byId], references: [id], onDelete: SetNull)
+  byId String?
 
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.Uuid

@@ -33,7 +33,7 @@ export default function Home() {
       <button
         onClick={async (e) => {
           e.preventDefault();
-          deletePost.mutate("660351ed-5b3f-4a55-8f3f-470c3f374486");
+          deletePost.mutate("c3f974b1-40d3-4e88-91e4-9b24afed028f");
         }}
       >
         delete a post
