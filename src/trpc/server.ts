@@ -1,7 +1,8 @@
 import "server-only";
 
 import {
-  createTRPCProxyClient,
+  createTRPCClient,
+  httpBatchLink,
   loggerLink,
   TRPCClientError,
 } from "@trpc/client";
@@ -13,7 +14,7 @@ import { cache } from "react";
 
 import { appRouter, type AppRouter } from "@/server/api/root";
 import { createTRPCContext } from "@/server/api/trpc";
-import { transformer } from "./shared";
+import { getUrl, transformer } from "./shared";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -28,13 +29,16 @@ const createContext = cache(() => {
   });
 });
 
-export const api = createTRPCProxyClient<AppRouter>({
-  transformer,
+export const api = createTRPCClient<AppRouter>({
   links: [
     loggerLink({
       enabled: (op) =>
         process.env.NODE_ENV === "development" ||
         (op.direction === "down" && op.result instanceof Error),
+    }),
+    httpBatchLink({
+      url: getUrl(),
+      transformer,
     }),
     /**
      * Custom RSC link that lets us invoke procedures without using http requests. Since Server
@@ -48,7 +52,7 @@ export const api = createTRPCProxyClient<AppRouter>({
               return callProcedure({
                 procedures: appRouter._def.procedures,
                 path: op.path,
-                rawInput: op.input,
+                getRawInput: async () => op.input,
                 ctx,
                 type: op.type,
               });
