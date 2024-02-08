@@ -3,7 +3,8 @@ import { type FormEvent, useState } from "react";
 import { api } from "@/trpc/react";
 import { toBase64 } from "@/lib/files";
 import { Button } from "@/components/ui/button"
-
+import { Input } from "@/components/ui/input"
+ 
 export default function Home() {
   const createPost = api.post.create.useMutation();
   const deletePost = api.post.delete.useMutation();
@@ -26,7 +27,7 @@ export default function Home() {
       <div>
         16chan.
         <form onSubmit={onSubmit}>
-          <input
+          <Input
             type="file"
             accept="image/*"
             multiple
@@ -34,7 +35,7 @@ export default function Home() {
               setPics(Array.from(e.target.files!));
             }}
           />
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
           <Button type="submit">submit</Button>
         </form>
       </div>
