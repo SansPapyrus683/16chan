@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <>
       <div>
-        16chan.
+        16chan. (this home page is supposed to contain the trending tab)
         <form onSubmit={onSubmit}>
           <input
             type="file"
@@ -33,7 +33,11 @@ export default function Home() {
               setPics(Array.from(e.target.files!));
             }}
           />
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border-2"
+          />
           <button type="submit">submit</button>
         </form>
       </div>
