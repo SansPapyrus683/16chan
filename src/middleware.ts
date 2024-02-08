@@ -9,6 +9,7 @@ export default authMiddleware({
     "/new",
     "/search",
     "/album",
+    "/tag/(.*)",
     "/post/((?!create).*(?<!/edit)$)",
     "/api/webhooks(.*)",
   ],
