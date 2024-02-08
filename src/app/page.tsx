@@ -2,6 +2,7 @@
 import { type FormEvent, useState } from "react";
 import { api } from "@/trpc/react";
 import { toBase64 } from "@/lib/files";
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   const createPost = api.post.create.useMutation();
@@ -34,7 +35,7 @@ export default function Home() {
             }}
           />
           <input value={name} onChange={(e) => setName(e.target.value)} />
-          <button type="submit">submit</button>
+          <Button type="submit">submit</Button>
         </form>
       </div>
       <br />
