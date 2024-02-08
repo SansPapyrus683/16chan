@@ -21,13 +21,37 @@ enum Visibility {
 }
 
 model User {
-  id      String    @id
-  posts   Post[]
-  likes   Post[]    @relation("LikedPosts")
-  albums  Album[]
-  Comment Comment[]
+  id     String  @id
+  isMod  Boolean @default(false)
+  posts  Post[]
+  albums Album[]
+
+  comments  Comment[]
+  likes     UserLikes[]
+  followers UserFollowing[] @relation("UserFollowers")
+  idols     UserFollowing[] @relation("UserIdols")
 
   @@index([id])
+}
+
+model UserFollowing {
+  idol       User     @relation("UserFollowers", fields: [idolId], references: [id])
+  idolId     String
+  follower   User     @relation("UserIdols", fields: [followerId], references: [id])
+  followerId String
+  followedAt DateTime @default(now())
+
+  @@id([idolId, followerId])
+}
+
+model UserLikes {
+  post    Post     @relation(fields: [postId], references: [id])
+  postId  String   @db.Uuid
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+  likedAt DateTime @default(now())
+
+  @@id([postId, userId])
 }
 
 model Post {
@@ -46,9 +70,9 @@ model Post {
   artId  String     @default("")
   images Image[]
 
-  likes    User[]    @relation("LikedPosts")
   comments Comment[]
   albums   Album[]
+  likes    UserLikes[]
 
   @@index([userId])
 }
@@ -67,11 +91,13 @@ model Tag {
 }
 
 model Album {
-  id     String @id @default(uuid()) @db.Uuid
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  name   String
-  posts  Post[]
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  name  String
+  posts Post[]
 }
 
 model Comment {
