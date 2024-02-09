@@ -1,9 +1,20 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
+import { clerkClient } from "@clerk/nextjs";
 
 export const userRouter = createTRPCRouter({
-  userPosts: protectedProcedure
-    .input(z.enum(["date", "likes", "alpha"]).default("date"))
+  profile: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => await clerkClient.users.getUser(input)),
+  userPosts: publicProcedure
+    .input(
+      z
+        .object({
+          user: z.string().optional(),
+          sortBy: z.enum(["date", "likes", "alpha"]).default("date"),
+        })
+        .default({}),
+    )
     .query(async function ({ ctx, input }) {
       // typescript sucks buttcheeks
       const order: {
@@ -11,7 +22,7 @@ export const userRouter = createTRPCRouter({
         likes?: { _count: "desc" };
         title?: "desc";
       } = {};
-      switch (input) {
+      switch (input.sortBy) {
         case "date":
           order.createdAt = "desc";
           break;
@@ -23,7 +34,7 @@ export const userRouter = createTRPCRouter({
       }
 
       return ctx.db.post.findMany({
-        where: { userId: ctx.auth.userId! },
+        where: { userId: input.user ?? ctx.auth.userId! },
         orderBy: order,
         include: { images: true },
       });

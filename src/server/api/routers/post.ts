@@ -2,9 +2,13 @@ import { z } from "zod";
 import { Base64 } from "js-base64";
 import { TRPCError } from "@trpc/server";
 
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
-import { s3Delete, s3Upload } from "@/lib/s3";
+import { s3Delete, s3Retrieve, s3Upload } from "@/lib/s3";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -60,6 +64,27 @@ export const postRouter = createTRPCRouter({
 
       return post;
     }),
+  get: publicProcedure.input(z.string().uuid()).query(async function ({
+    ctx,
+    input,
+  }) {
+    const post = await ctx.db.post.findUnique({
+      where: { id: input },
+      include: { images: true },
+    });
+    if (post === null) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `post w/ id ${input} not found`,
+      });
+    }
+    return {
+      ...post,
+      images: await Promise.all(
+        post.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
+      ),
+    };
+  }),
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
