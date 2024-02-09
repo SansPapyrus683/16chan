@@ -13,6 +13,7 @@ export default authMiddleware({
     "/tag/(.*)",
     "/post/((?!create).*(?<!/edit)$)",
     "/api/webhooks(.*)",
+    "/api/trpc/(.*)",
   ],
 });
 

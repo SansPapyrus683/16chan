@@ -96,7 +96,7 @@ export const postRouter = createTRPCRouter({
   }) {
     await ctx.db.post.update({
       where: { id: input },
-      data: { likes: { connect: { id: ctx.auth.userId! } } },
+      data: { likes: { create: [{ userId: ctx.auth.userId! }] } },
     });
   }),
 });

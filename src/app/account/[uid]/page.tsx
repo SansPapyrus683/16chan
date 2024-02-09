@@ -1,6 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
 import { api } from "@/trpc/server";
-import { CreatePost } from "@/components/CreatePost";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
 import { PostList } from "@/components/PostList";
@@ -21,8 +20,7 @@ export default async function Account({ params }: { params: { uid: string } }) {
   return (
     <>
       <UserButton />
-      <CreatePost username={profile.username!} />
-      <br />
+      <div>account page for {profile.username}</div>
       <div>
         <PostList initPosts={posts} uid={params.uid} />
       </div>

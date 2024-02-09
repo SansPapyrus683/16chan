@@ -1,3 +1,10 @@
-export default function CreatePost() {
-  return <div>create a post here</div>;
+import { CreatePost } from "@/components/CreatePost";
+
+export default function PostCreation() {
+  return (
+    <>
+      <div>create a post here</div>
+      <CreatePost />
+    </>
+  );
 }

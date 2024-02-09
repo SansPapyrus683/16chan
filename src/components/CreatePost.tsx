@@ -1,26 +1,36 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { toBase64 } from "@/lib/files";
 import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
-export function CreatePost({ username }: { username: string }) {
+export function CreatePost() {
+  const router = useRouter();
+
   const createPost = api.post.create.useMutation();
 
   const [pics, setPics] = useState<File[]>([]);
   const [name, setName] = useState("");
+  const [buttonText, setButtonText] = useState("submit");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setButtonText("creating...");
     createPost.mutate({
       title: name,
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
     });
   };
+  useEffect(() => {
+    if (createPost.isSuccess) {
+      setButtonText("success!");
+      router.push(`/post/${createPost.data.id}`);
+    }
+  }, [createPost.isSuccess]);
 
   return (
     <div>
-      account page for user {username}
       <form onSubmit={onSubmit}>
         <input
           type="file"
@@ -35,7 +45,7 @@ export function CreatePost({ username }: { username: string }) {
           onChange={(e) => setName(e.target.value)}
           className="border-2"
         />
-        <button type="submit">submit</button>
+        <button type="submit">{buttonText}</button>
       </form>
     </div>
   );
