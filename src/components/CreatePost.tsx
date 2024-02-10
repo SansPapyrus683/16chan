@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { toBase64 } from "@/lib/files";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,12 @@ import { useRouter } from "next/navigation";
 export function CreatePost() {
   const router = useRouter();
 
-  const createPost = api.post.create.useMutation();
+  const createPost = api.post.create.useMutation({
+    onSuccess: (data) => {
+      setButtonText("success!");
+      router.push(`/post/${data.id}`);
+    },
+  });
 
   const [pics, setPics] = useState<File[]>([]);
   const [name, setName] = useState("");
@@ -22,12 +27,6 @@ export function CreatePost() {
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
     });
   };
-  useEffect(() => {
-    if (createPost.isSuccess) {
-      setButtonText("success!");
-      router.push(`/post/${createPost.data.id}`);
-    }
-  }, [createPost.isSuccess]);
 
   return (
     <div>
