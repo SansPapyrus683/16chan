@@ -12,7 +12,7 @@ const comicNeue = Comic_Neue({
 
 export const metadata = {
   title: "16chan",
-  description: "If Imgur & Danbooru made love",
+  description: "if imgur & danbooru made love",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

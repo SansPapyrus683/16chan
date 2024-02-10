@@ -9,7 +9,6 @@ export default async function Account({ params }: { params: { uid: string } }) {
   try {
     profile = await api.user.profile(params.uid);
   } catch (e) {
-    // console.log(e.code);
     if (e instanceof TRPCError && e.code === "NOT_FOUND") {
       return notFound();
     }
@@ -21,6 +20,7 @@ export default async function Account({ params }: { params: { uid: string } }) {
     <>
       <UserButton />
       <div>account page for {profile.username}</div>
+      <br />
       <div>
         <PostList initPosts={posts} uid={params.uid} />
       </div>
