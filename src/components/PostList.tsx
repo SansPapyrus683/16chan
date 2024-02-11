@@ -36,6 +36,7 @@ export function PostList({
             >
               delete
             </button>{" "}
+            S
             <button
               onClick={async (e) => {
                 e.preventDefault();
@@ -62,10 +63,12 @@ export function PostList({
         </button>
         <button
           onClick={async (e) => {
-            if (nextCursor !== undefined && !isPlaceholderData) {
-              e.preventDefault();
-              setAt(nextCursor);
-            }
+            console.assert(
+              nextCursor !== undefined && !isPlaceholderData,
+              "what the hell?",
+            );
+            e.preventDefault();
+            setAt(nextCursor);
           }}
           className="ml-3 border-4"
           disabled={isPlaceholderData || nextCursor === undefined}

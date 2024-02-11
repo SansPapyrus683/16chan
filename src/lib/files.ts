@@ -1,18 +1,9 @@
-import { z } from "zod";
-
 export const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
   "image/png",
   "image/webp",
 ];
-
-export const imageType = z
-  .string()
-  .refine(
-    (type) => ACCEPTED_IMAGE_TYPES.includes(type),
-    "Only .jpg, .jpeg, .png and .webp formats are supported.",
-  );
 
 // https://stackoverflow.com/a/38935990/12128483
 export function base64ToFile(dataurl: string, filename: string) {

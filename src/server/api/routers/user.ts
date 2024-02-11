@@ -2,7 +2,7 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
-import { env } from "@/env";
+import { PageSize, postPages } from "@/lib/pages";
 
 export const userRouter = createTRPCRouter({
   profile: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -25,6 +25,7 @@ export const userRouter = createTRPCRouter({
         .object({
           user: z.string().optional(),
           sortBy: z.enum(["date", "likes", "alpha"]).default("date"),
+          limit: PageSize,
           cursor: z.string().optional(),
         })
         .default({}),
@@ -53,27 +54,6 @@ export const userRouter = createTRPCRouter({
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
 
-      // https://trpc.io/docs/client/react/useInfiniteQuery
-      const nextPosts = await ctx.db.post.findMany({
-        take: env.NEXT_PUBLIC_PAGE_SIZE + 1,
-        ...params,
-        include: { images: true },
-      });
-      const nextCursor =
-        nextPosts.length > env.NEXT_PUBLIC_PAGE_SIZE
-          ? nextPosts.pop()!.id
-          : undefined;
-
-      const prevPosts = await ctx.db.post.findMany({
-        take: -env.NEXT_PUBLIC_PAGE_SIZE - 1,
-        ...params,
-      });
-      let prevCursor = prevPosts.length >= 1 ? prevPosts[0]!.id : undefined;
-
-      return {
-        posts: nextPosts,
-        prevCursor,
-        nextCursor,
-      };
+      return postPages(params, { include: { images: true } }, input.limit);
     }),
 });
