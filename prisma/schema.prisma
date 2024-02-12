@@ -35,9 +35,9 @@ model User {
 }
 
 model UserFollowing {
-  idol       User     @relation("UserFollowers", fields: [idolId], references: [id])
+  idol       User     @relation("UserFollowers", fields: [idolId], references: [id], onDelete: Cascade)
   idolId     String
-  follower   User     @relation("UserIdols", fields: [followerId], references: [id])
+  follower   User     @relation("UserIdols", fields: [followerId], references: [id], onDelete: Cascade)
   followerId String
   followedAt DateTime @default(now())
 
@@ -45,9 +45,9 @@ model UserFollowing {
 }
 
 model UserLikes {
-  post    Post     @relation(fields: [postId], references: [id])
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId  String   @db.Uuid
-  user    User     @relation(fields: [userId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  String
   likedAt DateTime @default(now())
 

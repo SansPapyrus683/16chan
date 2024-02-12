@@ -3,11 +3,7 @@ import { env } from "@/env";
 import { db } from "@/server/db";
 import { Prisma } from "@prisma/client";
 
-export const PageSize = z
-  .number()
-  .min(1)
-  .max(1000)
-  .default(env.NEXT_PUBLIC_PAGE_SIZE);
+export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
 
 export async function postPages(
   params: Prisma.User$postsArgs,
@@ -28,6 +24,7 @@ export async function postPages(
   });
   let prevCursor = prevPosts.length >= 1 ? prevPosts[0]!.id : undefined;
 
+  console.log(posts);
   return {
     posts,
     prevCursor,

@@ -15,6 +15,7 @@ export default async function Account({ params }: { params: { uid: string } }) {
     return <div>something terrible has happened</div>;
   }
   const posts = await api.user.userPosts({ user: params.uid });
+  const likes = await api.user.userPosts({ user: params.uid, what: "likes" });
 
   return (
     <>
@@ -22,7 +23,12 @@ export default async function Account({ params }: { params: { uid: string } }) {
       <div>account page for {profile.username}</div>
       <br />
       <div>
+        <b>all their posts are here</b>
         <PostList initPosts={posts} uid={params.uid} />
+      </div>
+      <div>
+        <b>and all their likes</b>
+        <PostList initPosts={likes} uid={params.uid} getLikes />
       </div>
     </>
   );

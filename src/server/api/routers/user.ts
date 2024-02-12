@@ -25,6 +25,7 @@ export const userRouter = createTRPCRouter({
       z
         .object({
           user: z.string().optional(),
+          what: z.enum(["posts", "likes"]).default("posts"),
           sortBy: z.enum(["date", "likes", "alpha"]).default("date"),
           limit: PageSize,
           cursor: z.string().optional(),
@@ -32,7 +33,8 @@ export const userRouter = createTRPCRouter({
         .default({}),
     )
     .query(async function ({ ctx, input }) {
-      if (!ctx.auth.userId && !input.user) {
+      const id = input.user ?? ctx.auth.userId;
+      if (!id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "you need to provide a user id or be logged in",
@@ -56,9 +58,19 @@ export const userRouter = createTRPCRouter({
           order.title = "desc";
       }
 
+      let what;
+      switch (input.what) {
+        case "posts":
+          what = { userId: id };
+          break;
+        case "likes":
+          what = { likes: { some: { userId: id } } };
+          break;
+      }
+
       const params = {
         where: {
-          userId: input.user ?? ctx.auth.userId,
+          ...what,
           OR: [
             {
               visibility: Visibility.PUBLIC,
@@ -66,11 +78,16 @@ export const userRouter = createTRPCRouter({
             {
               userId: ctx.auth.userId,
             },
+            ...(input.what === "likes" && id === ctx.auth.userId
+              ? [{ visibility: Visibility.UNLISTED }]
+              : []),
           ],
         },
         orderBy: order,
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
+
+      console.log(params);
 
       return postPages(params, { include: { images: true } }, input.limit);
     }),
