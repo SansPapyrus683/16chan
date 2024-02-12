@@ -36,7 +36,6 @@ export function PostList({
             >
               delete
             </button>{" "}
-            S
             <button
               onClick={async (e) => {
                 e.preventDefault();

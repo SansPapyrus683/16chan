@@ -19,6 +19,7 @@ export const postRouter = createTRPCRouter({
           .string()
           .refine((d) => Base64.isValid(removeDataURL(d)))
           .array(),
+        visibility: z.enum(["PUBLIC", "PRIVATE", "UNLISTED"]).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -26,6 +27,7 @@ export const postRouter = createTRPCRouter({
         data: {
           userId: ctx.auth.userId!,
           title: input.title,
+          visibility: input.visibility,
         },
       });
 

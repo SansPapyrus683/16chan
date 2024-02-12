@@ -34,6 +34,9 @@ export default async function PostView({
           />
         ))}
       </div>
+      <div>
+        <a href={`/post/${params.pid}/edit`}>edit ur post here</a>
+      </div>
     </>
   );
 }

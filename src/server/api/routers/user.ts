@@ -3,6 +3,7 @@ import { z } from "zod";
 import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
 import { PageSize, postPages } from "@/lib/pages";
+import { Visibility } from "@prisma/client";
 
 export const userRouter = createTRPCRouter({
   profile: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -31,6 +32,13 @@ export const userRouter = createTRPCRouter({
         .default({}),
     )
     .query(async function ({ ctx, input }) {
+      if (!ctx.auth.userId && !input.user) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "you need to provide a user id or be logged in",
+        });
+      }
+
       // typescript sucks buttcheeks
       const order: {
         createdAt?: "desc";
@@ -49,7 +57,17 @@ export const userRouter = createTRPCRouter({
       }
 
       const params = {
-        where: { userId: input.user ?? ctx.auth.userId! },
+        where: {
+          userId: input.user ?? ctx.auth.userId,
+          OR: [
+            {
+              visibility: Visibility.PUBLIC,
+            },
+            {
+              userId: ctx.auth.userId,
+            },
+          ],
+        },
         orderBy: order,
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
