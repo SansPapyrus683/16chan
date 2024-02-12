@@ -24,7 +24,11 @@ export function PostList({
   const deletePost = api.post.delete.useMutation({
     onSuccess: (data) => {
       if (data.id === at) {
-        setAt(posts![1]?.id);
+        if (posts!.length > 1) {
+          setAt(posts![1]?.id);
+        } else {
+          setAt(prevCursor);
+        }
       }
       utils.user.userPosts.invalidate();
     },
