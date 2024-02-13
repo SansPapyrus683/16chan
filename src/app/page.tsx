@@ -21,50 +21,6 @@ export default function Browsing({
 
   return (
     <>
-<<<<<<< HEAD
-      <div>
-        16chan.
-        <form onSubmit={onSubmit}>
-          <Input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              setPics(Array.from(e.target.files!));
-            }}
-          />
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-          <Button type="submit">submit</Button>
-        </form>
-      </div>
-      <br />
-      <div>
-        <ul>
-          {(posts ?? []).map((v) => (
-            <li key={v.id}>
-              {v.title} | {v.images.map((i) => i.img).join(", ")} |{" "}
-              <button
-                onClick={async (e) => {
-                  e.preventDefault();
-                  deletePost.mutate(v.id);
-                }}
-                className="border-2"
-              >
-                delete
-              </button>{" "}
-              <button
-                onClick={async (e) => {
-                  e.preventDefault();
-                  likePost.mutate(v.id);
-                }}
-                className="border-2"
-              >
-                like
-              </button>
-            </li>
-          ))}
-        </ul>
-=======
       <div className="space-y-4">
         16chan. right now the results for the search query "{query}"
         <br />
@@ -86,7 +42,6 @@ export default function Browsing({
             </>
           )}
         </div>
->>>>>>> main
       </div>
     </>
   );
