@@ -1,14 +1,23 @@
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
+import { z } from "zod";
+
+const SortOrder = z.enum(["new", "trending", "likes"]).catch("new");
 
 export default function Browsing({
   searchParams,
 }: {
-  searchParams: { q: string | string[] | undefined };
+  searchParams: {
+    q: string | string[] | undefined;
+    sort: string | string[] | undefined;
+  };
 }) {
   const { userId } = auth();
   const rawQ = searchParams.q;
   const query = Array.isArray(rawQ) ? rawQ.join(" ") : rawQ;
+
+  const rawSort = searchParams.sort;
+  const sort = SortOrder.parse(Array.isArray(rawSort) ? rawSort[0]! : rawSort);
 
   return (
     <>
@@ -17,7 +26,7 @@ export default function Browsing({
         <br />
         if it's empty, it should show all posts
         <br />
-        by default, posts are sorted by new but there should be options to change that
+        these posts should be sorted by {sort}
         <div>
           {userId ? (
             <>
