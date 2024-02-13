@@ -24,7 +24,6 @@ export async function postPages(
   });
   let prevCursor = prevPosts.length >= 1 ? prevPosts[0]!.id : undefined;
 
-  console.log(posts);
   return {
     posts,
     prevCursor,

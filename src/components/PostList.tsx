@@ -21,18 +21,6 @@ export function PostList({
     { placeholderData: (prevRes) => prevRes ?? initPosts },
   );
   const { posts, prevCursor, nextCursor } = data || {};
-  const deletePost = api.post.delete.useMutation({
-    onSuccess: (data) => {
-      if (data.id === at) {
-        if (posts!.length > 1) {
-          setAt(posts![1]?.id);
-        } else {
-          setAt(prevCursor);
-        }
-      }
-      utils.user.userPosts.invalidate();
-    },
-  });
   const likePost = api.post.like.useMutation({
     onSuccess: () => utils.user.userPosts.invalidate(),
   });
@@ -49,15 +37,6 @@ export function PostList({
                 <button
                   onClick={async (e) => {
                     e.preventDefault();
-                    deletePost.mutate(v.id);
-                  }}
-                  className="border-2"
-                >
-                  delete
-                </button>{" "}
-                <button
-                  onClick={async (e) => {
-                    e.preventDefault();
                     likePost.mutate(v.id);
                   }}
                   className="border-2"
@@ -69,7 +48,6 @@ export function PostList({
           </li>
         ))}
       </ul>
-      <br />
       <div>
         <button
           onClick={async (e) => {

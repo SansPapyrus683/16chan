@@ -87,8 +87,6 @@ export const userRouter = createTRPCRouter({
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
 
-      console.log(params);
-
       return postPages(params, { include: { images: true } }, input.limit);
     }),
 });
