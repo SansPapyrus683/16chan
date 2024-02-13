@@ -19,16 +19,16 @@ export default async function Account({ params }: { params: { uid: string } }) {
   const posts = await api.user.userPosts({ user: uid });
 
   return (
-    <>
+    <div className="space-y-4">
       <UserButton />
       <div>account page for {profile.username}</div>
       <div>
-        <a href={`/account/${uid}/likes`}></a>
+        <a href={`/account/${uid}/likes`}>see their likes</a>
       </div>
-      <br />
       <div>
         <PostList initPosts={posts} uid={uid} />
       </div>
-    </>
+      <div>TODO: also have a list of their albums here</div>
+    </div>
   );
 }

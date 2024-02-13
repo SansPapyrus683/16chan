@@ -28,13 +28,7 @@ export default function Browsing({
         <br />
         these posts should be sorted by {sort}
         <div>
-          {userId ? (
-            <>
-              <a href={`/account/${userId}`}>account page</a>
-              <br />
-              <a href="/post/create">create post</a>
-            </>
-          ) : (
+          {!userId && (
             <>
               you aren't signed in lol
               <br />
@@ -42,6 +36,22 @@ export default function Browsing({
             </>
           )}
         </div>
+        <ol>
+          <b>links (check the discord channel for how they should be arranged):</b>
+          <li>
+            <a href="/">browser (this page)</a>
+          </li>
+          <li>
+            <a href="/following">following</a>
+          </li>
+          <li>
+            <a href="/account">account page</a>
+          </li>
+          <li>
+            <a href="/post/create">create post</a>
+          </li>
+          <li></li>
+        </ol>
       </div>
     </>
   );
