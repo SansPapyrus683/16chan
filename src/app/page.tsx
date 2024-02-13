@@ -1,29 +1,27 @@
-"use client";
-import { type FormEvent, useState } from "react";
-import { api } from "@/trpc/react";
-import { toBase64 } from "@/lib/files";
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
- 
-export default function Home() {
-  const createPost = api.post.create.useMutation();
-  const deletePost = api.post.delete.useMutation();
-  const likePost = api.post.like.useMutation();
-  const { data: posts } = api.user.userPosts.useQuery();
+import { auth } from "@clerk/nextjs/server";
+import { SignInButton } from "@clerk/nextjs";
+import { z } from "zod";
 
-  const [pics, setPics] = useState<File[]>([]);
-  const [name, setName] = useState("");
+const SortOrder = z.enum(["new", "trending", "likes"]).catch("new");
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    createPost.mutate({
-      title: name,
-      images: await Promise.all(pics.map(async (p) => await toBase64(p))),
-    });
+export default function Browsing({
+  searchParams,
+}: {
+  searchParams: {
+    q: string | string[] | undefined;
+    sort: string | string[] | undefined;
   };
+}) {
+  const { userId } = auth();
+  const rawQ = searchParams.q;
+  const query = Array.isArray(rawQ) ? rawQ.join(" ") : rawQ;
+
+  const rawSort = searchParams.sort;
+  const sort = SortOrder.parse(Array.isArray(rawSort) ? rawSort[0]! : rawSort);
 
   return (
     <>
+<<<<<<< HEAD
       <div>
         16chan.
         <form onSubmit={onSubmit}>
@@ -66,6 +64,29 @@ export default function Home() {
             </li>
           ))}
         </ul>
+=======
+      <div className="space-y-4">
+        16chan. right now the results for the search query "{query}"
+        <br />
+        if it's empty, it should show all posts
+        <br />
+        these posts should be sorted by {sort}
+        <div>
+          {userId ? (
+            <>
+              <a href={`/account/${userId}`}>account page</a>
+              <br />
+              <a href="/post/create">create post</a>
+            </>
+          ) : (
+            <>
+              you aren't signed in lol
+              <br />
+              <SignInButton>do it here</SignInButton>
+            </>
+          )}
+        </div>
+>>>>>>> main
       </div>
     </>
   );
