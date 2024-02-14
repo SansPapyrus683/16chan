@@ -1,7 +1,8 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
+import { checkPerms, findAlbum } from "@/lib/data";
 
-export const albumRouter = createTRPCRouter({
+export const albumRouter = createRouter({
   create: protectedProcedure
     .input(z.string().optional())
     .mutation(async ({ ctx, input }) => {
@@ -22,4 +23,9 @@ export const albumRouter = createTRPCRouter({
         },
       });
     }),
+  get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
+    const album = await findAlbum(input);
+    checkPerms(album, ctx.auth.userId, "view");
+    return album;
+  }),
 });

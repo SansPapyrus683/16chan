@@ -47,8 +47,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -69,7 +68,9 @@ const isAuthed = t.middleware(({ next, ctx }) => {
 
 export const createCallerFactory = t.createCallerFactory;
 
-export const createTRPCRouter = t.router;
+export const createRouter = t.router;
+
+export const mergeRouter = t.mergeRouters;
 
 export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(isAuthed);

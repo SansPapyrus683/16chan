@@ -1,14 +1,11 @@
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import Image from "next/image";
+import { AddToAlbum } from "@/components/AddToAlbum";
 
-export default async function PostView({
-  params,
-}: {
-  params: { pid: string };
-}) {
-  let error = null;
-  let post;
+export default async function PostView({ params }: { params: { pid: string } }) {
+  let post,
+    error = null;
   try {
     post = await api.post.get(params.pid);
   } catch (e) {
@@ -41,6 +38,9 @@ export default async function PostView({
       </div>
       <div>
         <a href={`/post/${params.pid}/edit`}>edit ur post here</a>
+      </div>
+      <div>
+        <AddToAlbum pid={params.pid} />
       </div>
     </>
   );

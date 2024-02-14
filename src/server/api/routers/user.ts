@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
@@ -25,7 +25,7 @@ function prismaOrder(order: "date" | "likes" | "alpha") {
   return ret;
 }
 
-export const userRouter = createTRPCRouter({
+export const userRouter = createRouter({
   profile: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     try {
       return await clerkClient.users.getUser(input);

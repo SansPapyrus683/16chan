@@ -2,17 +2,12 @@ import { z } from "zod";
 import { Base64 } from "js-base64";
 import { TRPCError } from "@trpc/server";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { s3Delete, s3Retrieve, s3Upload } from "@/lib/s3";
-import { Visibility } from "@prisma/client";
-import { checkPerms, findAlbum, findPost } from "@/lib/data";
+import { checkPerms, findPost } from "@/lib/data";
 
-export const postRouter = createTRPCRouter({
+export const postCrudRouter = createRouter({
   create: protectedProcedure
     .input(
       z.object({
@@ -71,15 +66,6 @@ export const postRouter = createTRPCRouter({
   get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
     const post = await findPost(input);
     checkPerms(post, ctx.auth.userId, "view");
-    if (
-      post.visibility === Visibility.PRIVATE &&
-      (!ctx.auth.userId || ctx.auth.userId !== post.userId)
-    ) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "this post is private.",
-      });
-    }
 
     return {
       ...post,
@@ -94,32 +80,5 @@ export const postRouter = createTRPCRouter({
       const post = await findPost(input, false);
       checkPerms(post, ctx.auth.userId, "change");
       return ctx.db.post.delete({ where: { id: input } });
-    }),
-  like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
-    const post = await findPost(input, false);
-    // liking doesn't really change the post- as long as the user can view it it's fine
-    checkPerms(post, ctx.auth.userId, "view");
-    await ctx.db.post.update({
-      where: { id: input },
-      data: { likes: { create: [{ userId: ctx.auth.userId! }] } },
-    });
-  }),
-  addToAlbum: protectedProcedure
-    .input(
-      z.object({
-        post: z.string().uuid(),
-        album: z.string().uuid(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const post = await findPost(input.post, false);
-      checkPerms(post, ctx.auth.userId, "view");
-      const album = await findAlbum(input.album, false);
-      checkPerms(album, ctx.auth.userId, "change");
-
-      await ctx.db.album.update({
-        where: { id: input.album },
-        data: { posts: { connect: { id: input.post } } },
-      });
     }),
 });
