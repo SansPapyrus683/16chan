@@ -5,9 +5,12 @@ import { notFound } from "next/navigation";
 import { PostList } from "@/components/PostList";
 import { CreateAlbum } from "@/components/CreateAlbum";
 import { AlbumList } from "@/components/AlbumList";
+import { FollowButton } from "@/components/FollowButton";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function Account({ params }: { params: { uid: string } }) {
   const uid = params.uid;
+  const { userId } = auth();
 
   let profile;
   try {
@@ -25,6 +28,7 @@ export default async function Account({ params }: { params: { uid: string } }) {
     <div className="space-y-4">
       <UserButton />
       <div>account page for {profile.username}</div>
+      {params.uid !== userId && <FollowButton uid={params.uid} />}
       <div>
         <a href={`/account/${uid}/likes`}>see their likes</a>
       </div>

@@ -31,7 +31,7 @@ export const albumRouter = createRouter({
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const album = await findAlbum(input);
+      const album = await findAlbum(input, false, false);
       if (album !== null) {
         checkPerms(album!, ctx.auth.userId, "change");
         return ctx.db.album.delete({ where: { id: input } });

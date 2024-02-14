@@ -7,9 +7,18 @@ export const postInteractRouter = createRouter({
     const post = await findPost(input, false);
     // liking doesn't really change the post- as long as the user can view it it's fine
     checkPerms(post!, ctx.auth.userId, "view");
-    await ctx.db.post.update({
-      where: { id: input },
-      data: { likes: { create: [{ userId: ctx.auth.userId! }] } },
+    await ctx.db.userLikes.upsert({
+      where: {
+        postId_userId: {
+          userId: ctx.auth.userId!,
+          postId: post!.id,
+        },
+      },
+      create: {
+        userId: ctx.auth.userId!,
+        postId: post!.id,
+      },
+      update: {},
     });
   }),
   unlike: protectedProcedure

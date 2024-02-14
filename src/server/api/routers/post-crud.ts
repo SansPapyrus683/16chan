@@ -77,7 +77,7 @@ export const postCrudRouter = createRouter({
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(input, false);
+      const post = await findPost(input, false, false);
       if (post !== null) {
         checkPerms(post, ctx.auth.userId, "change");
         return ctx.db.post.delete({ where: { id: input } });

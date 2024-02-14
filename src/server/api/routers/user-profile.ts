@@ -4,6 +4,7 @@ import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
 import { albumPages, PageSize, postPages } from "@/lib/pages";
 import { Visibility } from "@prisma/client";
+import { findUser } from "@/lib/data";
 
 function prismaOrder(order: "date" | "likes" | "alpha") {
   const ret: {
@@ -60,6 +61,7 @@ export const userProfileRouter = createRouter({
           message: "you need to provide a user id or be logged in",
         });
       }
+      await findUser(id);
 
       let what;
       switch (input.what) {
@@ -107,6 +109,7 @@ export const userProfileRouter = createRouter({
           message: "you need to provide a user id or be logged in",
         });
       }
+      await findUser(id);
 
       const params = {
         where: {

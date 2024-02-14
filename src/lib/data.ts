@@ -38,6 +38,17 @@ export async function findAlbum(
   return album;
 }
 
+export async function findUser(uid: string, mustExist: boolean = true) {
+  const user = db.user.findUnique({ where: { id: uid } });
+  if (user === null && mustExist) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `user w/ id ${uid} not found`,
+    });
+  }
+  return user;
+}
+
 export function checkPerms(
   post: { visibility: Visibility; userId: string | null },
   userId: string | null,
