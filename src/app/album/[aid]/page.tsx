@@ -2,8 +2,8 @@ import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 
 export default async function AlbumView({ params }: { params: { aid: string } }) {
-  let album,
-    error = null;
+  let album;
+  let error = null;
   try {
     album = await api.album.get(params.aid);
   } catch (e) {
@@ -12,7 +12,7 @@ export default async function AlbumView({ params }: { params: { aid: string } })
       if (e.code == "NOT_FOUND") {
         error = "this post wasn't found";
       } else if (e.code === "UNAUTHORIZED") {
-        error = "you ar en't authorized to see this post";
+        error = "you aren't authorized to see this post";
       }
     }
   }

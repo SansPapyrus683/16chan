@@ -65,12 +65,12 @@ export const postCrudRouter = createRouter({
     }),
   get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
     const post = await findPost(input);
-    checkPerms(post, ctx.auth.userId, "view");
+    checkPerms(post!, ctx.auth.userId, "view");
 
     return {
       ...post,
       images: await Promise.all(
-        post.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
+        post!.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
       ),
     };
   }),
@@ -78,7 +78,10 @@ export const postCrudRouter = createRouter({
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
       const post = await findPost(input, false);
-      checkPerms(post, ctx.auth.userId, "change");
-      return ctx.db.post.delete({ where: { id: input } });
+      if (post !== null) {
+        checkPerms(post, ctx.auth.userId, "change");
+        return ctx.db.post.delete({ where: { id: input } });
+      }
+      return null;
     }),
 });

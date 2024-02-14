@@ -2,12 +2,16 @@ import { db } from "@/server/db";
 import { TRPCError } from "@trpc/server";
 import { Visibility } from "@prisma/client";
 
-export async function findPost(postId: string, includeImg: boolean = true) {
+export async function findPost(
+  postId: string,
+  includeImg: boolean = true,
+  mustExist: boolean = true,
+) {
   const post = await db.post.findUnique({
     where: { id: postId },
     include: { images: includeImg },
   });
-  if (post === null) {
+  if (post === null && mustExist) {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: `post w/ id ${postId} not found`,
@@ -16,15 +20,19 @@ export async function findPost(postId: string, includeImg: boolean = true) {
   return post;
 }
 
-export async function findAlbum(albumId: string, includePosts: boolean = true) {
+export async function findAlbum(
+  albumId: string,
+  includePosts: boolean = true,
+  mustExist: boolean = true,
+) {
   const album = await db.album.findUnique({
     where: { id: albumId },
     include: { posts: includePosts },
   });
-  if (album === null) {
+  if (album === null && mustExist) {
     throw new TRPCError({
       code: "NOT_FOUND",
-      message: `post w/ id ${albumId} not found`,
+      message: `album w/ id ${albumId} not found`,
     });
   }
   return album;

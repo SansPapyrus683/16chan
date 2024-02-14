@@ -6,6 +6,7 @@ import { api } from "@/trpc/react";
 export function AddToAlbum({ pid }: { pid: string }) {
   const [aid, setAid] = useState("");
   const addPost = api.post.addToAlbum.useMutation();
+  const deleteAlbum = api.album.delete.useMutation();
 
   return (
     <>
@@ -27,6 +28,14 @@ export function AddToAlbum({ pid }: { pid: string }) {
           className="border-2 p-0.5"
         >
           submit
+        </button>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            deleteAlbum.mutate(aid);
+          }}
+        >
+          delete album or smth
         </button>
       </form>
     </>

@@ -4,8 +4,8 @@ import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
-  let post,
-    error = null;
+  let post;
+  let error = null;
   try {
     post = await api.post.get(params.pid);
   } catch (e) {

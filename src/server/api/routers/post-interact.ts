@@ -6,12 +6,25 @@ export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
     const post = await findPost(input, false);
     // liking doesn't really change the post- as long as the user can view it it's fine
-    checkPerms(post, ctx.auth.userId, "view");
+    checkPerms(post!, ctx.auth.userId, "view");
     await ctx.db.post.update({
       where: { id: input },
       data: { likes: { create: [{ userId: ctx.auth.userId! }] } },
     });
   }),
+  unlike: protectedProcedure
+    .input(z.string().uuid())
+    .mutation(async ({ ctx, input }) => {
+      const post = await findPost(input, false);
+      if (post !== null) {
+        // liking doesn't really change the post- as long as the user can view it it's fine
+        checkPerms(post, ctx.auth.userId, "view");
+        // apparently delete throws an error if it doesn't exist??
+        await ctx.db.userLikes.deleteMany({
+          where: { postId: input, userId: ctx.auth.userId! },
+        });
+      }
+    }),
   addToAlbum: protectedProcedure
     .input(
       z.object({
@@ -21,13 +34,11 @@ export const postInteractRouter = createRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const post = await findPost(input.post, false);
-      checkPerms(post, ctx.auth.userId, "view");
+      checkPerms(post!, ctx.auth.userId, "view");
       const album = await findAlbum(input.album, false);
-      checkPerms(album, ctx.auth.userId, "change");
-
-      await ctx.db.album.update({
-        where: { id: input.album },
-        data: { posts: { connect: { id: input.post } } },
+      checkPerms(album!, ctx.auth.userId, "change");
+      await ctx.db.albumPosts.create({
+        data: { postId: input.post, albumId: input.album },
       });
     }),
 });

@@ -70,8 +70,8 @@ model Post {
   images Image[]
 
   comments Comment[]
-  albums   Album[]
   likes    UserLikes[]
+  albums   AlbumPosts[]
 
   @@index([userId])
 }
@@ -98,7 +98,17 @@ model Album {
   visibility Visibility @default(PUBLIC)
 
   name  String
-  posts Post[]
+  posts AlbumPosts[]
+}
+
+model AlbumPosts {
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId  String   @db.Uuid
+  album   Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String   @db.Uuid
+  addedAt DateTime @default(now())
+
+  @@id([postId, albumId])
 }
 
 model Comment {

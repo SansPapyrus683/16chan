@@ -25,7 +25,7 @@ function prismaOrder(order: "date" | "likes" | "alpha") {
   return ret;
 }
 
-export const userRouter = createRouter({
+export const userProfileRouter = createRouter({
   profile: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     try {
       return await clerkClient.users.getUser(input);

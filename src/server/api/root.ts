@@ -1,12 +1,13 @@
 import { postCrudRouter } from "@/server/api/routers/post-crud";
 import { createRouter, mergeRouter } from "@/server/api/trpc";
-import { userRouter } from "@/server/api/routers/user";
+import { userProfileRouter } from "@/server/api/routers/user-profile";
 import { albumRouter } from "@/server/api/routers/albums";
 import { postInteractRouter } from "@/server/api/routers/post-interact";
+import { userInteractionRouter } from "@/server/api/routers/user-interaction";
 
 export const appRouter = createRouter({
   post: mergeRouter(postCrudRouter, postInteractRouter),
-  user: userRouter,
+  user: mergeRouter(userProfileRouter, userInteractionRouter),
   album: albumRouter,
 });
 
