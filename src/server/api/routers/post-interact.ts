@@ -4,7 +4,7 @@ import { checkPerms, findAlbum, findPost } from "@/lib/data";
 
 export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
-    const post = await findPost(input, false);
+    const post = await findPost(ctx, input, false);
     // liking doesn't really change the post- as long as the user can view it it's fine
     checkPerms(post!, ctx.auth.userId, "view");
     await ctx.db.userLikes.upsert({
@@ -24,7 +24,7 @@ export const postInteractRouter = createRouter({
   unlike: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(input, false);
+      const post = await findPost(ctx, input, false);
       if (post !== null) {
         // liking doesn't really change the post- as long as the user can view it it's fine
         checkPerms(post, ctx.auth.userId, "view");
@@ -42,9 +42,9 @@ export const postInteractRouter = createRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(input.post, false);
+      const post = await findPost(ctx, input.post, false);
       checkPerms(post!, ctx.auth.userId, "view");
-      const album = await findAlbum(input.album, false);
+      const album = await findAlbum(ctx, input.album, false);
       checkPerms(album!, ctx.auth.userId, "change");
       await ctx.db.albumPosts.create({
         data: { postId: input.post, albumId: input.album },

@@ -10,8 +10,8 @@ export function PostList({
   getWhat,
 }: {
   initPosts: RouterOutputs["user"]["userPosts"];
-  uid: string;
-  getWhat: "likes" | "posts";
+  uid?: string;
+  getWhat: "likes" | "posts" | "following";
 }) {
   const utils = api.useUtils();
   const [at, setAt] = useState<undefined | string>(initPosts.posts[0]?.id);
@@ -27,10 +27,13 @@ export function PostList({
       query = api.user.userPosts;
       params = { user: uid, what: "likes", cursor: at };
       break;
+    case "following":
+      query = api.user.followedPosts;
   }
 
   //@ts-ignore
   const { data, isPlaceholderData } = query.useQuery(params, {
+    //@ts-ignore
     placeholderData: (prevRes) => prevRes ?? initPosts,
   });
   const { posts, prevCursor, nextCursor } = data || {};
@@ -41,7 +44,7 @@ export function PostList({
   return (
     <>
       <ul>
-        {(posts ?? []).map((v) => (
+        {((posts as { id: string; title: string }[]) ?? []).map((v) => (
           <li key={v.id}>
             <a href={`/post/${v.id}`}>{v.title}</a> | {v.id}
             {getWhat !== "likes" && (

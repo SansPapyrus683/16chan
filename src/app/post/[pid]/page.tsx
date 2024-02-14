@@ -13,7 +13,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
     if (e instanceof TRPCError) {
       if (e.code == "NOT_FOUND") {
         error = "this post wasn't found";
-      } else if (e.code === "UNAUTHORIZED") {
+      } else if (e.code === "FORBIDDEN") {
         error = "you aren't authorized to see this post";
       }
     }

@@ -11,7 +11,7 @@ export default async function AlbumView({ params }: { params: { aid: string } })
     if (e instanceof TRPCError) {
       if (e.code == "NOT_FOUND") {
         error = "this post wasn't found";
-      } else if (e.code === "UNAUTHORIZED") {
+      } else if (e.code === "FORBIDDEN") {
         error = "you aren't authorized to see this post";
       }
     }
@@ -24,8 +24,8 @@ export default async function AlbumView({ params }: { params: { aid: string } })
       <h1>{album!.name}</h1>
       <ol>
         {album!.posts.map((p) => (
-          <li key={p.id}>
-            <a href={`/post/${p.id}`}>{p.title}</a> | {p.id}
+          <li key={p.postId}>
+            <a href={`/post/${p.postId}`}>{p.post.title}</a> | {p.postId}
           </li>
         ))}
       </ol>

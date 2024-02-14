@@ -38,7 +38,7 @@ export const userProfileRouter = createRouter({
           message: `the user ${input} doesn't exist`,
         });
       }
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: String(e) });
     }
   }),
   userPosts: publicProcedure
@@ -61,7 +61,7 @@ export const userProfileRouter = createRouter({
           message: "you need to provide a user id or be logged in",
         });
       }
-      await findUser(id);
+      await findUser(ctx, id);
 
       let what;
       switch (input.what) {
@@ -109,7 +109,7 @@ export const userProfileRouter = createRouter({
           message: "you need to provide a user id or be logged in",
         });
       }
-      await findUser(id);
+      await findUser(ctx, id);
 
       const params = {
         where: {

@@ -1,13 +1,16 @@
 import { db } from "@/server/db";
 import { TRPCError } from "@trpc/server";
 import { Visibility } from "@prisma/client";
+import { s3Retrieve } from "@/lib/s3";
+import { Context } from "@/server/api/trpc";
 
 export async function findPost(
+  ctx: { db: Context["db"] },
   postId: string,
   includeImg: boolean = true,
   mustExist: boolean = true,
 ) {
-  const post = await db.post.findUnique({
+  const post = await ctx.db.post.findUnique({
     where: { id: postId },
     include: { images: includeImg },
   });
@@ -17,17 +20,23 @@ export async function findPost(
       message: `post w/ id ${postId} not found`,
     });
   }
+  if (post !== null && includeImg) {
+    post.images = await Promise.all(
+      post!.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
+    );
+  }
   return post;
 }
 
 export async function findAlbum(
+  ctx: { db: Context["db"] },
   albumId: string,
   includePosts: boolean = true,
   mustExist: boolean = true,
 ) {
-  const album = await db.album.findUnique({
+  const album = await ctx.db.album.findUnique({
     where: { id: albumId },
-    include: { posts: includePosts },
+    include: { posts: { include: { post: includePosts } } },
   });
   if (album === null && mustExist) {
     throw new TRPCError({
@@ -38,8 +47,12 @@ export async function findAlbum(
   return album;
 }
 
-export async function findUser(uid: string, mustExist: boolean = true) {
-  const user = db.user.findUnique({ where: { id: uid } });
+export async function findUser(
+  ctx: { db: Context["db"] },
+  uid: string,
+  mustExist: boolean = true,
+) {
+  const user = ctx.db.user.findUnique({ where: { id: uid } });
   if (user === null && mustExist) {
     throw new TRPCError({
       code: "NOT_FOUND",
@@ -65,7 +78,7 @@ export function checkPerms(
   }
   if (!hasPerms) {
     throw new TRPCError({
-      code: "UNAUTHORIZED",
+      code: "FORBIDDEN",
       message: "you don't have the permissions to execute this action.",
     });
   }
