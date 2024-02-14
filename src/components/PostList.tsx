@@ -7,19 +7,32 @@ import { useState } from "react";
 export function PostList({
   initPosts,
   uid,
-  getLikes = false,
+  getWhat,
 }: {
   initPosts: RouterOutputs["user"]["userPosts"];
   uid: string;
-  getLikes?: boolean;
+  getWhat: "likes" | "posts";
 }) {
   const utils = api.useUtils();
   const [at, setAt] = useState<undefined | string>(initPosts.posts[0]?.id);
 
-  const { data, isPlaceholderData } = api.user.userPosts.useQuery(
-    { user: uid, what: getLikes ? "likes" : "posts", cursor: at },
-    { placeholderData: (prevRes) => prevRes ?? initPosts },
-  );
+  let query;
+  let params;
+  switch (getWhat) {
+    case "posts":
+      query = api.user.userPosts;
+      params = { user: uid, what: "posts", cursor: at };
+      break;
+    case "likes":
+      query = api.user.userPosts;
+      params = { user: uid, what: "likes", cursor: at };
+      break;
+  }
+
+  //@ts-ignore
+  const { data, isPlaceholderData } = query.useQuery(params, {
+    placeholderData: (prevRes) => prevRes ?? initPosts,
+  });
   const { posts, prevCursor, nextCursor } = data || {};
   const likePost = api.post.like.useMutation({
     onSuccess: () => utils.user.userPosts.invalidate(),
@@ -31,7 +44,7 @@ export function PostList({
         {(posts ?? []).map((v) => (
           <li key={v.id}>
             <a href={`/post/${v.id}`}>{v.title}</a> | {v.id}
-            {!getLikes && (
+            {getWhat !== "likes" && (
               <>
                 {" | "}
                 <button
@@ -39,7 +52,7 @@ export function PostList({
                     e.preventDefault();
                     likePost.mutate(v.id);
                   }}
-                  className="border-2"
+                  className="border-2 p-0.5"
                 >
                   like
                 </button>
@@ -55,7 +68,7 @@ export function PostList({
             setAt(prevCursor);
           }}
           disabled={prevCursor === undefined}
-          className="border-4"
+          className="border-4 p-1"
         >
           prev page
         </button>
@@ -68,7 +81,7 @@ export function PostList({
             e.preventDefault();
             setAt(nextCursor);
           }}
-          className="ml-3 border-4"
+          className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
         >
           next page

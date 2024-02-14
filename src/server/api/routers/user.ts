@@ -2,8 +2,28 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
-import { PageSize, postPages } from "@/lib/pages";
+import { albumPages, PageSize, postPages } from "@/lib/pages";
 import { Visibility } from "@prisma/client";
+
+function prismaOrder(order: "date" | "likes" | "alpha") {
+  const ret: {
+    createdAt?: "desc";
+    likes?: { _count: "desc" };
+    title?: "desc";
+  } = {};
+  switch (order) {
+    case "date":
+      ret.createdAt = "desc";
+      break;
+    case "likes":
+      ret.likes = { _count: "desc" };
+      break;
+    case "alpha":
+      ret.title = "desc";
+      break;
+  }
+  return ret;
+}
 
 export const userRouter = createTRPCRouter({
   profile: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -32,30 +52,13 @@ export const userRouter = createTRPCRouter({
         })
         .default({}),
     )
-    .query(async function ({ ctx, input }) {
+    .query(async ({ ctx, input }) => {
       const id = input.user ?? ctx.auth.userId;
       if (!id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "you need to provide a user id or be logged in",
         });
-      }
-
-      // typescript sucks buttcheeks
-      const order: {
-        createdAt?: "desc";
-        likes?: { _count: "desc" };
-        title?: "desc";
-      } = {};
-      switch (input.sortBy) {
-        case "date":
-          order.createdAt = "desc";
-          break;
-        case "likes":
-          order.likes = { _count: "desc" };
-          break;
-        case "alpha":
-          order.title = "desc";
       }
 
       let what;
@@ -72,21 +75,55 @@ export const userRouter = createTRPCRouter({
         where: {
           ...what,
           OR: [
-            {
-              visibility: Visibility.PUBLIC,
-            },
-            {
-              userId: ctx.auth.userId,
-            },
+            { visibility: Visibility.PUBLIC },
+            ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
             ...(input.what === "likes" && id === ctx.auth.userId
               ? [{ visibility: Visibility.UNLISTED }]
               : []),
           ],
         },
-        orderBy: order,
+        orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
 
       return postPages(params, { include: { images: true } }, input.limit);
+    }),
+  userAlbums: publicProcedure
+    .input(
+      z
+        .object({
+          user: z.string().optional(),
+          sortBy: z.enum(["date", "alpha"]).default("date"),
+          limit: PageSize,
+          cursor: z.string().optional(),
+        })
+        .default({}),
+    )
+    .query(async ({ ctx, input }) => {
+      const id = input.user ?? ctx.auth.userId;
+      if (!id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "you need to provide a user id or be logged in",
+        });
+      }
+
+      const params = {
+        where: {
+          userId: id,
+          OR: [
+            { visibility: Visibility.PUBLIC },
+            ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
+            ...(id === ctx.auth.userId ? [{ visibility: Visibility.UNLISTED }] : []),
+          ],
+        },
+        orderBy: prismaOrder(input.sortBy) as {
+          createdAt?: "desc";
+          title?: "desc";
+        },
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+      };
+
+      return albumPages(params, { include: { posts: true } }, input.limit);
     }),
 });

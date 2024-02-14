@@ -55,11 +55,11 @@ model UserLikes {
 }
 
 model Post {
-  id         String     @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   user       User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId     String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
   visibility Visibility @default(PUBLIC)
 
   title String
@@ -91,9 +91,11 @@ model Tag {
 
 model Album {
   id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
   createdAt DateTime @default(now())
+
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?
+  visibility Visibility @default(PUBLIC)
 
   name  String
   posts Post[]

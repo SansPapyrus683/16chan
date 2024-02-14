@@ -3,6 +3,7 @@ import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
 import { PostList } from "@/components/PostList";
+import { CreateAlbum } from "@/components/CreateAlbum";
 
 export default async function Account({ params }: { params: { uid: string } }) {
   const uid = params.uid;
@@ -26,9 +27,14 @@ export default async function Account({ params }: { params: { uid: string } }) {
         <a href={`/account/${uid}/likes`}>see their likes</a>
       </div>
       <div>
-        <PostList initPosts={posts} uid={uid} />
+        <PostList initPosts={posts} uid={uid} getWhat="posts" />
       </div>
-      <div>TODO: also have a list of their albums here</div>
+
+      <div>
+        <CreateAlbum />
+        <br />
+        TODO: also have a list of their albums here
+      </div>
     </div>
   );
 }

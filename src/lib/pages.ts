@@ -6,8 +6,8 @@ import { Prisma } from "@prisma/client";
 export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
 
 export async function postPages(
-  params: Prisma.User$postsArgs,
-  takeParams: Prisma.User$postsArgs,
+  params: Prisma.PostFindManyArgs,
+  takeParams: Prisma.PostFindManyArgs,
   limit: z.infer<typeof PageSize>,
 ) {
   const posts = await db.post.findMany({
@@ -32,8 +32,8 @@ export async function postPages(
 }
 
 export async function albumPages(
-  params: Prisma.User$albumsArgs,
-  takeParams: Prisma.User$albumsArgs,
+  params: Prisma.AlbumFindManyArgs,
+  takeParams: Prisma.AlbumFindManyArgs,
   limit: z.infer<typeof PageSize>,
 ) {
   const albums = await db.album.findMany({

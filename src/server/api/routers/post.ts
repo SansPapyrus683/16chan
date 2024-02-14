@@ -27,16 +27,11 @@ async function findPost(postId: string) {
   return post;
 }
 
-function checkPostPerms(
-  post: Post,
-  userId: string | null,
-  type: "view" | "change",
-) {
+function checkPostPerms(post: Post, userId: string | null, type: "view" | "change") {
   let hasPerms;
   switch (type) {
     case "view":
-      hasPerms =
-        post.visibility !== Visibility.PRIVATE || userId === post.userId;
+      hasPerms = post.visibility !== Visibility.PRIVATE || userId === post.userId;
       break;
     case "change":
       hasPerms = userId === post.userId;
@@ -106,10 +101,7 @@ export const postRouter = createTRPCRouter({
 
       return post;
     }),
-  get: publicProcedure.input(z.string().uuid()).query(async function ({
-    ctx,
-    input,
-  }) {
+  get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
     const post = await findPost(input);
     checkPostPerms(post, ctx.auth.userId, "view");
     if (
@@ -136,10 +128,7 @@ export const postRouter = createTRPCRouter({
       checkPostPerms(post, ctx.auth.userId, "change");
       return ctx.db.post.delete({ where: { id: input } });
     }),
-  like: protectedProcedure.input(z.string().uuid()).mutation(async function ({
-    ctx,
-    input,
-  }) {
+  like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
     const post = await findPost(input);
     // liking doesn't really change the post- as long as the user can view it it's fine
     checkPostPerms(post, ctx.auth.userId, "view");
@@ -148,4 +137,12 @@ export const postRouter = createTRPCRouter({
       data: { likes: { create: [{ userId: ctx.auth.userId! }] } },
     });
   }),
+  addToAlbum: protectedProcedure
+    .input(
+      z.object({
+        post: z.string().uuid(),
+        album: z.string().uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {}),
 });
