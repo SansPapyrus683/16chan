@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
 import { PostList } from "@/components/PostList";
 import { CreateAlbum } from "@/components/CreateAlbum";
+import { AlbumList } from "@/components/AlbumList";
 
 export default async function Account({ params }: { params: { uid: string } }) {
   const uid = params.uid;
@@ -18,6 +19,7 @@ export default async function Account({ params }: { params: { uid: string } }) {
     return <div>something terrible has happened</div>;
   }
   const posts = await api.user.userPosts({ user: uid });
+  const albums = await api.user.userAlbums({ user: uid });
 
   return (
     <div className="space-y-4">
@@ -33,7 +35,7 @@ export default async function Account({ params }: { params: { uid: string } }) {
       <div>
         <CreateAlbum />
         <br />
-        TODO: also have a list of their albums here
+        <AlbumList initAlbums={albums} uid={uid} />
       </div>
     </div>
   );

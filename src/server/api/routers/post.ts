@@ -9,41 +9,8 @@ import {
 } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { s3Delete, s3Retrieve, s3Upload } from "@/lib/s3";
-import { Post, Visibility } from "@prisma/client";
-
-import { db } from "@/server/db";
-
-async function findPost(postId: string) {
-  const post = await db.post.findUnique({
-    where: { id: postId },
-    include: { images: true },
-  });
-  if (post === null) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `post w/ id ${postId} not found`,
-    });
-  }
-  return post;
-}
-
-function checkPostPerms(post: Post, userId: string | null, type: "view" | "change") {
-  let hasPerms;
-  switch (type) {
-    case "view":
-      hasPerms = post.visibility !== Visibility.PRIVATE || userId === post.userId;
-      break;
-    case "change":
-      hasPerms = userId === post.userId;
-      break;
-  }
-  if (!hasPerms) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "you don't have the permissions to execute this action.",
-    });
-  }
-}
+import { Visibility } from "@prisma/client";
+import { checkPerms, findAlbum, findPost } from "@/lib/data";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -103,7 +70,7 @@ export const postRouter = createTRPCRouter({
     }),
   get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
     const post = await findPost(input);
-    checkPostPerms(post, ctx.auth.userId, "view");
+    checkPerms(post, ctx.auth.userId, "view");
     if (
       post.visibility === Visibility.PRIVATE &&
       (!ctx.auth.userId || ctx.auth.userId !== post.userId)
@@ -124,14 +91,14 @@ export const postRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(input);
-      checkPostPerms(post, ctx.auth.userId, "change");
+      const post = await findPost(input, false);
+      checkPerms(post, ctx.auth.userId, "change");
       return ctx.db.post.delete({ where: { id: input } });
     }),
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
-    const post = await findPost(input);
+    const post = await findPost(input, false);
     // liking doesn't really change the post- as long as the user can view it it's fine
-    checkPostPerms(post, ctx.auth.userId, "view");
+    checkPerms(post, ctx.auth.userId, "view");
     await ctx.db.post.update({
       where: { id: input },
       data: { likes: { create: [{ userId: ctx.auth.userId! }] } },
@@ -144,5 +111,15 @@ export const postRouter = createTRPCRouter({
         album: z.string().uuid(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {}),
+    .mutation(async ({ ctx, input }) => {
+      const post = await findPost(input.post, false);
+      checkPerms(post, ctx.auth.userId, "view");
+      const album = await findAlbum(input.album, false);
+      checkPerms(album, ctx.auth.userId, "change");
+
+      await ctx.db.album.update({
+        where: { id: input.album },
+        data: { posts: { connect: { id: input.post } } },
+      });
+    }),
 });
