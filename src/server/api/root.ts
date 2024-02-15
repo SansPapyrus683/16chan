@@ -1,11 +1,14 @@
-import { postRouter } from "@/server/api/routers/post";
-import { createTRPCRouter } from "@/server/api/trpc";
-import { userRouter } from "@/server/api/routers/user";
+import { postCrudRouter } from "@/server/api/routers/post-crud";
+import { createRouter, mergeRouter } from "@/server/api/trpc";
+import { userProfileRouter } from "@/server/api/routers/user-profile";
+import { albumRouter } from "@/server/api/routers/albums";
+import { postInteractRouter } from "@/server/api/routers/post-interact";
+import { userInteractionRouter } from "@/server/api/routers/user-interaction";
 
-export const appRouter = createTRPCRouter({
-  post: postRouter,
-  user: userRouter,
+export const appRouter = createRouter({
+  post: mergeRouter(postCrudRouter, postInteractRouter),
+  user: mergeRouter(userProfileRouter, userInteractionRouter),
+  album: albumRouter,
 });
 
-// export type definition of API
 export type AppRouter = typeof appRouter;

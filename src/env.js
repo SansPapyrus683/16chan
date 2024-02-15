@@ -1,21 +1,17 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const DatabaseUrl = z.string().refine((s) => s.startsWith("postgresql://"));
+
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z
-      .string()
-      .refine(
-        (str) => !str.includes("YOUR_SQL_URL_HERE"),
-        "You forgot to change the default URL",
-      ),
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
+    DB_URL: DatabaseUrl,
+    TESTING_DB_URL: DatabaseUrl,
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     CLERK_SECRET_KEY: z.string(),
     WEBHOOK_SECRET: z.string(),
     AWS_S3_BUCKET_NAME: z.string(),
@@ -36,14 +32,14 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
+    DB_URL: process.env.DB_URL,
+    TESTING_DB_URL: process.env.TESTING_DB_URL,
     NODE_ENV: process.env.NODE_ENV,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
     AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
 
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
-      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_PAGE_SIZE: process.env.NEXT_PUBLIC_PAGE_SIZE,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },

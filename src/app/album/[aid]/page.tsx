@@ -1,5 +1,34 @@
-export default function AlbumView({ params }: { params: { aid: string } }) {
-  return (
-    <div>this page is supposed to show the info for album {params.aid}</div>
+import { api } from "@/trpc/server";
+import { TRPCError } from "@trpc/server";
+
+export default async function AlbumView({ params }: { params: { aid: string } }) {
+  let album;
+  let error = null;
+  try {
+    album = await api.album.get(params.aid);
+  } catch (e) {
+    error = "something screwed up";
+    if (e instanceof TRPCError) {
+      if (e.code == "NOT_FOUND") {
+        error = "this post wasn't found";
+      } else if (e.code === "FORBIDDEN") {
+        error = "you aren't authorized to see this post";
+      }
+    }
+  }
+
+  return error ? (
+    <div>{error}</div>
+  ) : (
+    <>
+      <h1>{album!.name}</h1>
+      <ol>
+        {album!.posts.map((p) => (
+          <li key={p.postId}>
+            <a href={`/post/${p.postId}`}>{p.post.title}</a> | {p.postId}
+          </li>
+        ))}
+      </ol>
+    </>
   );
 }

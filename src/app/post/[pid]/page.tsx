@@ -1,14 +1,11 @@
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import Image from "next/image";
+import { AddToAlbum } from "@/components/AddToAlbum";
 
-export default async function PostView({
-  params,
-}: {
-  params: { pid: string };
-}) {
-  let error = null;
+export default async function PostView({ params }: { params: { pid: string } }) {
   let post;
+  let error = null;
   try {
     post = await api.post.get(params.pid);
   } catch (e) {
@@ -16,7 +13,7 @@ export default async function PostView({
     if (e instanceof TRPCError) {
       if (e.code == "NOT_FOUND") {
         error = "this post wasn't found";
-      } else if (e.code === "UNAUTHORIZED") {
+      } else if (e.code === "FORBIDDEN") {
         error = "you aren't authorized to see this post";
       }
     }
@@ -41,6 +38,9 @@ export default async function PostView({
       </div>
       <div>
         <a href={`/post/${params.pid}/edit`}>edit ur post here</a>
+      </div>
+      <div>
+        <AddToAlbum pid={params.pid} />
       </div>
     </>
   );

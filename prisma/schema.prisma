@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DB_URL")
 }
 
 enum ArtSource {
@@ -55,11 +55,11 @@ model UserLikes {
 }
 
 model Post {
-  id         String     @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+
   user       User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId     String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
   visibility Visibility @default(PUBLIC)
 
   title String
@@ -70,8 +70,8 @@ model Post {
   images Image[]
 
   comments Comment[]
-  albums   Album[]
   likes    UserLikes[]
+  albums   AlbumPosts[]
 
   @@index([userId])
 }
@@ -91,12 +91,24 @@ model Tag {
 
 model Album {
   id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
   createdAt DateTime @default(now())
 
+  user       User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?
+  visibility Visibility @default(PUBLIC)
+
   name  String
-  posts Post[]
+  posts AlbumPosts[]
+}
+
+model AlbumPosts {
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId  String   @db.Uuid
+  album   Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String   @db.Uuid
+  addedAt DateTime @default(now())
+
+  @@id([postId, albumId])
 }
 
 model Comment {
