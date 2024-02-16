@@ -4,30 +4,10 @@ import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
 import { albumPages, PageSize, postPages } from "@/lib/pages";
 import { Visibility } from "@prisma/client";
-import { findUser } from "@/lib/data";
-
-function prismaOrder(order: "date" | "likes" | "alpha") {
-  const ret: {
-    createdAt?: "desc";
-    likes?: { _count: "desc" };
-    title?: "desc";
-  } = {};
-  switch (order) {
-    case "date":
-      ret.createdAt = "desc";
-      break;
-    case "likes":
-      ret.likes = { _count: "desc" };
-      break;
-    case "alpha":
-      ret.title = "desc";
-      break;
-  }
-  return ret;
-}
+import { findUser, prismaOrder } from "@/lib/db";
 
 export const userProfileRouter = createRouter({
-  profile: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  profile: publicProcedure.input(z.string()).query(async ({ input }) => {
     try {
       return await clerkClient.users.getUser(input);
     } catch (e) {
@@ -47,9 +27,9 @@ export const userProfileRouter = createRouter({
         .object({
           user: z.string().optional(),
           what: z.enum(["posts", "likes"]).default("posts"),
-          sortBy: z.enum(["date", "likes", "alpha"]).default("date"),
+          sortBy: z.enum(["new", "likes", "alpha"]).default("new"),
           limit: PageSize,
-          cursor: z.string().optional(),
+          cursor: z.string().uuid().optional(),
         })
         .default({}),
     )
@@ -88,16 +68,16 @@ export const userProfileRouter = createRouter({
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
 
-      return postPages(params, { include: { images: true } }, input.limit);
+      return postPages(ctx, params, { include: { images: true } }, input.limit);
     }),
   userAlbums: publicProcedure
     .input(
       z
         .object({
           user: z.string().optional(),
-          sortBy: z.enum(["date", "alpha"]).default("date"),
+          sortBy: z.enum(["new", "alpha"]).default("new"),
           limit: PageSize,
-          cursor: z.string().optional(),
+          cursor: z.string().uuid().optional(),
         })
         .default({}),
     )
@@ -120,13 +100,10 @@ export const userProfileRouter = createRouter({
             ...(id === ctx.auth.userId ? [{ visibility: Visibility.UNLISTED }] : []),
           ],
         },
-        orderBy: prismaOrder(input.sortBy) as {
-          createdAt?: "desc";
-          title?: "desc";
-        },
+        orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
 
-      return albumPages(params, { include: { posts: true } }, input.limit);
+      return albumPages(ctx, params, { include: { posts: true } }, input.limit);
     }),
 });

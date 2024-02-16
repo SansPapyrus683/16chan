@@ -1,6 +1,6 @@
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-import { checkPerms, findAlbum } from "@/lib/data";
+import { checkPerms, findAlbum } from "@/lib/db";
 
 export const albumRouter = createRouter({
   create: protectedProcedure

@@ -33,7 +33,12 @@ export default async function Account({ params }: { params: { uid: string } }) {
         <a href={`/account/${uid}/likes`}>see their likes</a>
       </div>
       <div>
-        <PostList initPosts={posts} uid={uid} getWhat="posts" />
+        <PostList
+          getWhat="userPosts"
+          initPosts={posts}
+          additional={{ user: params.uid, what: "posts" }}
+          likeButton
+        />
       </div>
 
       <div>

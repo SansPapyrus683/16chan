@@ -1,10 +1,11 @@
 import { type Context, createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { findUser } from "@/lib/data";
+import { findUser } from "@/lib/db";
 import { db } from "@/server/db";
 import { postPages } from "@/lib/pages";
 import { env } from "@/env";
+import { Prisma } from "@prisma/client";
 
 async function getFollowing(ctx: Context) {
   if (!ctx.auth.userId) {
@@ -56,17 +57,29 @@ export const userInteractionRouter = createRouter({
   following: protectedProcedure.input(z.void()).query(async ({ ctx }) => {
     return getFollowing(ctx);
   }),
-  followedPosts: protectedProcedure.input(z.void()).query(async ({ ctx }) => {
-    const followed = await getFollowing(ctx);
-    return postPages(
-      {
+  followedPosts: protectedProcedure
+    .input(
+      z
+        .object({
+          cursor: z.string().uuid().optional(),
+        })
+        .default({}),
+    )
+    .query(async ({ ctx, input }) => {
+      const followed = await getFollowing(ctx);
+      // if you remove the type annotation typescript throws a tantrum
+      const params: Prisma.PostFindManyArgs = {
         where: {
           userId: { in: followed.map((f) => f.idolId) },
         },
         orderBy: { createdAt: "desc" },
-      },
-      { include: { images: true } },
-      env.NEXT_PUBLIC_PAGE_SIZE,
-    );
-  }),
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+      };
+      return postPages(
+        ctx,
+        params,
+        { include: { images: true } },
+        env.NEXT_PUBLIC_PAGE_SIZE,
+      );
+    }),
 });

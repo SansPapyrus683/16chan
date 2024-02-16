@@ -1,6 +1,6 @@
 import { createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-import { checkPerms, findAlbum, findPost } from "@/lib/data";
+import { checkPerms, findAlbum, findPost } from "@/lib/db";
 
 export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {

@@ -1,4 +1,3 @@
-import { db } from "@/server/db";
 import { TRPCError } from "@trpc/server";
 import { Visibility } from "@prisma/client";
 import { s3Retrieve } from "@/lib/s3";

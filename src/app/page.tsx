@@ -1,10 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
 import { z } from "zod";
+import { PostList } from "@/components/PostList";
+import { api } from "@/trpc/server";
 
-const SortOrder = z.enum(["new", "trending", "likes"]).catch("new");
+const SortOrder = z.enum(["new", "likes"]).catch("new");
 
-export default function Browsing({
+export default async function Browsing({
   searchParams,
 }: {
   searchParams: {
@@ -15,18 +17,20 @@ export default function Browsing({
   const { userId } = auth();
   const rawQ = searchParams.q;
   const query = Array.isArray(rawQ) ? rawQ.join(" ") : rawQ;
-
   const rawSort = searchParams.sort;
-  const sort = SortOrder.parse(Array.isArray(rawSort) ? rawSort[0]! : rawSort);
+  const sortBy = SortOrder.parse(Array.isArray(rawSort) ? rawSort[0]! : rawSort);
+
+  const res = await api.browse.browse({ query, sortBy });
 
   return (
     <>
+      <h1>16chan.</h1>
       <div className="space-y-4">
-        16chan. right now the results for the search query "{query}"
-        <br />
-        if it's empty, it should show all posts
-        <br />
-        these posts should be sorted by {sort}
+        results for the search query "{query}"
+        <div>
+          <PostList initPosts={res} getWhat="search" additional={{ query, sortBy }} />
+        </div>
+        these posts should be sorted by {sortBy}
         <div>
           {!userId && (
             <>

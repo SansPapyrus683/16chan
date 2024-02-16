@@ -6,30 +6,30 @@ import { useState } from "react";
 
 export function PostList({
   initPosts,
-  uid,
   getWhat,
+  additional,
+  likeButton = false,
 }: {
   initPosts: RouterOutputs["user"]["userPosts"];
-  uid?: string;
-  getWhat: "likes" | "posts" | "following";
+  getWhat: "userPosts" | "following" | "search";
+  additional?: object;
+  likeButton?: boolean;
 }) {
   const utils = api.useUtils();
   const [at, setAt] = useState<undefined | string>(initPosts.posts[0]?.id);
 
   let query;
-  let params;
   switch (getWhat) {
-    case "posts":
+    case "userPosts":
       query = api.user.userPosts;
-      params = { user: uid, what: "posts", cursor: at };
-      break;
-    case "likes":
-      query = api.user.userPosts;
-      params = { user: uid, what: "likes", cursor: at };
       break;
     case "following":
       query = api.user.followedPosts;
+      break;
+    case "search":
+      query = api.browse.browse;
   }
+  const params = { cursor: at, ...additional };
 
   //@ts-ignore
   const { data, isPlaceholderData } = query.useQuery(params, {
@@ -47,7 +47,7 @@ export function PostList({
         {((posts as { id: string; title: string }[]) ?? []).map((v) => (
           <li key={v.id}>
             <a href={`/post/${v.id}`}>{v.title}</a> | {v.id}
-            {getWhat !== "likes" && (
+            {likeButton && (
               <>
                 {" | "}
                 <button

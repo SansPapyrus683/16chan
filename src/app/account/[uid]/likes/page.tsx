@@ -22,7 +22,11 @@ export default async function userLikes({ params }: { params: { uid: string } })
       <div>{profile.username}'s likes</div>
       <br />
       <div>
-        <PostList initPosts={likes} uid={params.uid} getWhat="likes" />
+        <PostList
+          getWhat="userPosts"
+          initPosts={likes}
+          additional={{ user: params.uid, what: "likes" }}
+        />
       </div>
     </>
   );

@@ -12,7 +12,12 @@ export default async function NewPage() {
       <UserButton />
       <div>posts by users u follow</div>
       <div>
-        <PostList initPosts={posts} uid={userId!} getWhat="following" />
+        <PostList
+          initPosts={posts}
+          getWhat="following"
+          additional={{ user: userId! }}
+          likeButton
+        />
       </div>
     </div>
   );
