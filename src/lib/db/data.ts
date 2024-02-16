@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { s3Retrieve } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
+import { db } from "@/server/db";
 
 export async function findPost(
   ctx: { db: Context["db"] },
@@ -47,6 +48,23 @@ export async function findAlbum(
   return album;
 }
 
+export async function findComment(
+  ctx: { db: Context["db"] },
+  commentId: string,
+  mustExist: boolean = true,
+) {
+  const comm = await ctx.db.comment.findUnique({
+    where: { id: commentId },
+  });
+  if (comm === null && mustExist) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `comment w/ id ${commentId} not found`,
+    });
+  }
+  return comm;
+}
+
 export async function findUser(
   ctx: { db: Context["db"] },
   uid: string,
@@ -67,19 +85,16 @@ export async function isMod(ctx: { db: Context["db"]; auth: Context["auth"] }) {
   return user === null ? false : user.isMod;
 }
 
-export async function findComment(
-  ctx: { db: Context["db"] },
-  commentId: string,
-  mustExist: boolean = true,
-) {
-  const comm = await ctx.db.comment.findUnique({
-    where: { id: commentId },
-  });
-  if (comm === null && mustExist) {
+export async function getFollowing(ctx: Context) {
+  if (!ctx.auth.userId) {
     throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `comment w/ id ${commentId} not found`,
+      code: "UNAUTHORIZED",
+      message: "not logged in",
     });
   }
-  return comm;
+  return db.userFollowing.findMany({
+    where: {
+      followerId: ctx.auth.userId!,
+    },
+  });
 }

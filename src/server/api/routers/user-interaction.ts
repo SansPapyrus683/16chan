@@ -1,25 +1,10 @@
-import { type Context, createRouter, protectedProcedure } from "@/server/api/trpc";
+import { createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { findUser } from "@/lib/db";
-import { db } from "@/server/db";
+import { findUser, getFollowing } from "@/lib/db";
 import { postPages } from "@/lib/pages";
 import { env } from "@/env";
 import { Prisma } from "@prisma/client";
-
-async function getFollowing(ctx: Context) {
-  if (!ctx.auth.userId) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "not logged in",
-    });
-  }
-  return db.userFollowing.findMany({
-    where: {
-      followerId: ctx.auth.userId!,
-    },
-  });
-}
 
 export const userInteractionRouter = createRouter({
   follow: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
