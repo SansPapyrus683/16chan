@@ -20,6 +20,13 @@ enum Visibility {
   PUBLIC
 }
 
+enum TagCategory {
+  CHARACTER
+  LOCATION
+  MEDIA
+  OTHER
+}
+
 model User {
   id     String  @id
   isMod  Boolean @default(false)
@@ -84,8 +91,8 @@ model Image {
 }
 
 model Tag {
-  name     String @id
-  category String
+  name     String      @id
+  category TagCategory
   posts    Post[]
 }
 

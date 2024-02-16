@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { s3Delete, s3Upload } from "@/lib/s3";
-import { checkPerms, findPost, isMod } from "@/lib/db";
+import { checkPerms, findPost, isMod, Tag } from "@/lib/db";
 
 export const postCrudRouter = createRouter({
   create: protectedProcedure
@@ -17,6 +17,7 @@ export const postCrudRouter = createRouter({
           .refine((d) => Base64.isValid(removeDataURL(d)))
           .array(),
         visibility: z.enum(["PUBLIC", "PRIVATE", "UNLISTED"]).optional(),
+        tags: Tag.array().default([]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -34,7 +35,7 @@ export const postCrudRouter = createRouter({
         if (!ACCEPTED_IMAGE_TYPES.includes(type)) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "image format not supported",
+            message: `${type} image format not supported`,
           });
         }
 

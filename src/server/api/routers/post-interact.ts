@@ -1,6 +1,6 @@
 import { createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-import { checkPerms, findAlbum, findPost } from "@/lib/db";
+import { checkPerms, findAlbum, findPost, isMod, Tag } from "@/lib/db";
 
 export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
@@ -67,6 +67,45 @@ export const postInteractRouter = createRouter({
         where: {
           postId: input.post,
           albumId: input.album,
+        },
+      });
+    }),
+  tag: protectedProcedure
+    .input(z.object({ post: z.string().uuid(), tag: Tag }))
+    .mutation(async ({ ctx, input }) => {
+      await findPost(ctx, input.post, false);
+      return ctx.db.post.update({
+        where: { id: input.post },
+        data: {
+          tags: {
+            connectOrCreate: {
+              where: {
+                name: input.tag.name,
+              },
+              create: {
+                name: input.tag.name,
+                category: input.tag.category,
+              },
+            },
+          },
+        },
+      });
+    }),
+  untag: protectedProcedure
+    .input(z.object({ post: z.string().uuid(), tag: Tag }))
+    .mutation(async ({ ctx, input }) => {
+      const post = await findPost(ctx, input.post, false);
+      if (!(await isMod(ctx))) {
+        checkPerms(post!, ctx.auth.userId, "change");
+      }
+      return ctx.db.post.update({
+        where: { id: input.post },
+        data: {
+          tags: {
+            disconnect: {
+              name: input.tag.name,
+            },
+          },
         },
       });
     }),
