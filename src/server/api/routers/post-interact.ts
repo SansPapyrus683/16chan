@@ -63,10 +63,12 @@ export const postInteractRouter = createRouter({
         return null;
       }
       checkPerms(album, ctx.auth.userId, "change");
-      await ctx.db.albumPosts.deleteMany({
+      await ctx.db.albumPosts.delete({
         where: {
-          postId: input.post,
-          albumId: input.album,
+          postId_albumId: {
+            postId: input.post,
+            albumId: input.album,
+          },
         },
       });
     }),
