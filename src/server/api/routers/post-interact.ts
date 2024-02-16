@@ -7,17 +7,14 @@ export const postInteractRouter = createRouter({
     const post = await findPost(ctx, input, false);
     // liking doesn't really change the post- as long as the user can view it it's fine
     checkPerms(post!, ctx.auth.userId, "view");
+
+    const ids = {
+      postId: post!.id,
+      userId: ctx.auth.userId!,
+    };
     await ctx.db.userLikes.upsert({
-      where: {
-        postId_userId: {
-          userId: ctx.auth.userId!,
-          postId: post!.id,
-        },
-      },
-      create: {
-        userId: ctx.auth.userId!,
-        postId: post!.id,
-      },
+      where: { liking: ids },
+      create: ids,
       update: {},
     });
   }),
@@ -40,18 +37,15 @@ export const postInteractRouter = createRouter({
       checkPerms(post!, ctx.auth.userId, "view");
       const album = await findAlbum(ctx, input.album, false);
       checkPerms(album!, ctx.auth.userId, "change");
+
+      const ids = {
+        postId: input.post,
+        albumId: input.album,
+      };
       // i want to just barf my eyes out looking at this jesus christ
       await ctx.db.albumPosts.upsert({
-        where: {
-          postId_albumId: {
-            postId: input.post,
-            albumId: input.album,
-          },
-        },
-        create: {
-          postId: input.post,
-          albumId: input.album,
-        },
+        where: { postAlbum: ids },
+        create: ids,
         update: {},
       });
     }),
@@ -65,7 +59,7 @@ export const postInteractRouter = createRouter({
       checkPerms(album, ctx.auth.userId, "change");
       await ctx.db.albumPosts.delete({
         where: {
-          postId_albumId: {
+          postAlbum: {
             postId: input.post,
             albumId: input.album,
           },
@@ -76,21 +70,15 @@ export const postInteractRouter = createRouter({
     .input(z.object({ post: z.string().uuid(), tag: Tag }))
     .mutation(async ({ ctx, input }) => {
       await findPost(ctx, input.post, false);
-      return ctx.db.post.update({
-        where: { id: input.post },
-        data: {
-          tags: {
-            connectOrCreate: {
-              where: {
-                name: input.tag.name,
-              },
-              create: {
-                name: input.tag.name,
-                category: input.tag.category,
-              },
-            },
-          },
-        },
+      const ids = {
+        postId: input.post,
+        tagName: input.tag.name,
+        tagCat: input.tag.category,
+      };
+      return ctx.db.postTags.upsert({
+        where: { taggingId: ids },
+        create: ids,
+        update: {},
       });
     }),
   untag: protectedProcedure
@@ -100,14 +88,11 @@ export const postInteractRouter = createRouter({
       if (!(await isMod(ctx))) {
         checkPerms(post!, ctx.auth.userId, "change");
       }
-      return ctx.db.post.update({
-        where: { id: input.post },
-        data: {
-          tags: {
-            disconnect: {
-              name: input.tag.name,
-            },
-          },
+      await ctx.db.postTags.deleteMany({
+        where: {
+          postId: input.post,
+          tagName: input.tag.name,
+          tagCat: input.tag.category,
         },
       });
     }),

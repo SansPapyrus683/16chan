@@ -48,7 +48,7 @@ model UserFollowing {
   followerId String
   followedAt DateTime @default(now())
 
-  @@id([idolId, followerId])
+  @@id(name: "following", [idolId, followerId])
 }
 
 model UserLikes {
@@ -58,7 +58,7 @@ model UserLikes {
   userId  String
   likedAt DateTime @default(now())
 
-  @@id([postId, userId])
+  @@id(name: "liking", [postId, userId])
 }
 
 model Post {
@@ -70,7 +70,7 @@ model Post {
   visibility Visibility @default(PUBLIC)
 
   title String
-  tags  Tag[]
+  tags  PostTags[]
 
   src    ArtSource?
   artId  String     @default("")
@@ -90,10 +90,23 @@ model Image {
   postId String @db.Uuid
 }
 
+model PostTags {
+  post     Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String      @db.Uuid
+  tag      Tag         @relation(fields: [tagName, tagCat], references: [name, category], onDelete: Cascade)
+  tagName  String
+  tagCat   TagCategory
+  taggedAt DateTime    @default(now())
+
+  @@id(name: "taggingId", [postId, tagName, tagCat])
+}
+
 model Tag {
-  name     String      @id
+  name     String
   category TagCategory
-  posts    Post[]
+  posts    PostTags[]
+
+  @@id(name: "id", [name, category])
 }
 
 model Album {
@@ -115,7 +128,7 @@ model AlbumPosts {
   albumId String   @db.Uuid
   addedAt DateTime @default(now())
 
-  @@id([postId, albumId])
+  @@id(name: "postAlbum", [postId, albumId])
 }
 
 model Comment {

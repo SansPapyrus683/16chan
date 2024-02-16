@@ -31,18 +31,13 @@ export const userInteractionRouter = createRouter({
     }
     await findUser(ctx, input);
 
-    // SOMEONE PLEASE TELL ME THERE'S A MORE EFFICIENT WAY TO DO THIS ~KS
+    const ids = {
+      followerId: ctx.auth.userId!,
+      idolId: input,
+    };
     await ctx.db.userFollowing.upsert({
-      where: {
-        idolId_followerId: {
-          followerId: ctx.auth.userId!,
-          idolId: input,
-        },
-      },
-      create: {
-        followerId: ctx.auth.userId!,
-        idolId: input,
-      },
+      where: { following: ids },
+      create: ids,
       update: {},
     });
   }),

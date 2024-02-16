@@ -22,7 +22,7 @@ export const browseRouter = createRouter({
           // this is probably-no, definitely HORRIBLY inefficient
           AND: [
             ...tags.map((t) => ({
-              tags: { some: { name: t } },
+              tags: { some: { tagName: t } },
             })),
             ...other.map((o) => ({
               title: { contains: o },
