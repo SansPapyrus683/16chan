@@ -115,8 +115,8 @@ model Comment {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
 
-  by   User?   @relation(fields: [byId], references: [id], onDelete: SetNull)
-  byId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
 
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.Uuid

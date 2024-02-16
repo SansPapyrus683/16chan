@@ -32,10 +32,10 @@ export const albumRouter = createRouter({
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
       const album = await findAlbum(ctx, input, false, false);
-      if (album !== null) {
-        checkPerms(album!, ctx.auth.userId, "change");
-        return ctx.db.album.delete({ where: { id: input } });
+      if (album === null) {
+        return null;
       }
-      return null;
+      checkPerms(album!, ctx.auth.userId, "change");
+      return ctx.db.album.delete({ where: { id: input } });
     }),
 });

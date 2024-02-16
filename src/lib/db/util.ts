@@ -1,3 +1,6 @@
+import { Visibility } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+
 export function prismaOrder(order: "new" | "likes" | "alpha") {
   const ret: {
     createdAt?: "desc";
@@ -16,6 +19,28 @@ export function prismaOrder(order: "new" | "likes" | "alpha") {
       break;
   }
   return ret;
+}
+
+export function checkPerms(
+  item: { visibility?: Visibility; userId: string | null },
+  userId: string | null,
+  type: "view" | "change" | "delete",
+) {
+  let hasPerms;
+  switch (type) {
+    case "view":
+      hasPerms = item.visibility !== Visibility.PRIVATE || userId === item.userId;
+      break;
+    case "change":
+      hasPerms = userId === item.userId;
+      break;
+  }
+  if (!hasPerms) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "you don't have the permissions to execute this action.",
+    });
+  }
 }
 
 export function parseSearch(query: string): [string[], string[]] {

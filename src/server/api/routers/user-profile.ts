@@ -11,8 +11,7 @@ export const userProfileRouter = createRouter({
     try {
       return await clerkClient.users.getUser(input);
     } catch (e) {
-      // @ts-ignore
-      if (e && Object.hasOwn(e, "status") && e.status === 404) {
+      if ((e as { status: any })?.status === 404) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `the user ${input} doesn't exist`,

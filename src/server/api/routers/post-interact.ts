@@ -24,15 +24,9 @@ export const postInteractRouter = createRouter({
   unlike: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(ctx, input, false);
-      if (post !== null) {
-        // liking doesn't really change the post- as long as the user can view it it's fine
-        checkPerms(post, ctx.auth.userId, "view");
-        // apparently delete throws an error if it doesn't exist??
-        await ctx.db.userLikes.deleteMany({
-          where: { postId: input, userId: ctx.auth.userId! },
-        });
-      }
+      await ctx.db.userLikes.deleteMany({
+        where: { postId: input, userId: ctx.auth.userId! },
+      });
     }),
   addToAlbum: protectedProcedure
     .input(
@@ -46,8 +40,34 @@ export const postInteractRouter = createRouter({
       checkPerms(post!, ctx.auth.userId, "view");
       const album = await findAlbum(ctx, input.album, false);
       checkPerms(album!, ctx.auth.userId, "change");
-      await ctx.db.albumPosts.create({
-        data: { postId: input.post, albumId: input.album },
+      // i want to just barf my eyes out looking at this jesus christ
+      await ctx.db.albumPosts.upsert({
+        where: {
+          postId_albumId: {
+            postId: input.post,
+            albumId: input.album,
+          },
+        },
+        create: {
+          postId: input.post,
+          albumId: input.album,
+        },
+        update: {},
+      });
+    }),
+  deleteFromAlbum: protectedProcedure
+    .input(z.object({ post: z.string().uuid(), album: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const album = await findAlbum(ctx, input.album, false, false);
+      if (album === null) {
+        return null;
+      }
+      checkPerms(album, ctx.auth.userId, "change");
+      await ctx.db.albumPosts.deleteMany({
+        where: {
+          postId: input.post,
+          albumId: input.album,
+        },
       });
     }),
 });

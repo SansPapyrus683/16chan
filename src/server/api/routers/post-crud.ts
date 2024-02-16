@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { s3Delete, s3Upload } from "@/lib/s3";
-import { checkPerms, findPost } from "@/lib/db";
+import { checkPerms, findPost, isMod } from "@/lib/db";
 
 export const postCrudRouter = createRouter({
   create: protectedProcedure
@@ -72,10 +72,12 @@ export const postCrudRouter = createRouter({
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
       const post = await findPost(ctx, input, false, false);
-      if (post !== null) {
-        checkPerms(post, ctx.auth.userId, "change");
-        return ctx.db.post.delete({ where: { id: input } });
+      if (post === null) {
+        return null;
       }
-      return null;
+      if (!(await isMod(ctx))) {
+        checkPerms(post, ctx.auth.userId, "change");
+      }
+      await ctx.db.post.delete({ where: { id: input } });
     }),
 });
