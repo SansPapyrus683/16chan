@@ -25,7 +25,26 @@ export default function RootLayout({
     <html lang="en">
       <body className={comicNeue.className}>
         <TRPCReactProvider>
-          <ClerkProvider>{children}</ClerkProvider>
+          <ClerkProvider>
+            <div className="bg-green-300 flex-1 space-y-2 p-8 pt-6">
+              <div className="bg-green-400 flex items-center justify-between space-y-2">
+                <h2 className="bg-green-500 text-3xl font-bold tracking-tight">Djshboard</h2>
+                <h2 className="bg-green-500 text-3xl font-bold tracking-tight">Ajasdf</h2>
+                <h2 className="bg-green-500 text-3xl font-bold tracking-tight">Asdfasd asdf</h2>
+                <h2 className="bg-green-500 text-3xl font-bold tracking-tight">Asdfasd asdf</h2>
+                <div className="bg-green-500 flex items-center space-x-2">
+                  <div>adsf</div>
+                  <div>adsf</div>
+                  <div>adsf</div>
+                </div>
+              </div>
+              hello
+            </div>
+            <div className="container mx-auto">
+              header
+            </div>
+            {children}
+          </ClerkProvider>
         </TRPCReactProvider>
       </body>
     </html>
