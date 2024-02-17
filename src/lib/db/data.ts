@@ -1,8 +1,7 @@
-import { db } from "@/server/db";
 import { TRPCError } from "@trpc/server";
-import { Visibility } from "@prisma/client";
 import { s3Retrieve } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
+import { db } from "@/server/db";
 
 export async function findPost(
   ctx: { db: Context["db"] },
@@ -36,7 +35,9 @@ export async function findAlbum(
 ) {
   const album = await ctx.db.album.findUnique({
     where: { id: albumId },
-    include: { posts: { include: { post: includePosts } } },
+    include: {
+      posts: { include: { post: includePosts }, orderBy: { addedAt: "desc" } },
+    },
   });
   if (album === null && mustExist) {
     throw new TRPCError({
@@ -45,6 +46,23 @@ export async function findAlbum(
     });
   }
   return album;
+}
+
+export async function findComment(
+  ctx: { db: Context["db"] },
+  commentId: string,
+  mustExist: boolean = true,
+) {
+  const comm = await ctx.db.comment.findUnique({
+    where: { id: commentId },
+  });
+  if (comm === null && mustExist) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `comment w/ id ${commentId} not found`,
+    });
+  }
+  return comm;
 }
 
 export async function findUser(
@@ -62,24 +80,21 @@ export async function findUser(
   return user;
 }
 
-export function checkPerms(
-  post: { visibility: Visibility; userId: string | null },
-  userId: string | null,
-  type: "view" | "change",
-) {
-  let hasPerms;
-  switch (type) {
-    case "view":
-      hasPerms = post.visibility !== Visibility.PRIVATE || userId === post.userId;
-      break;
-    case "change":
-      hasPerms = userId === post.userId;
-      break;
-  }
-  if (!hasPerms) {
+export async function isMod(ctx: { db: Context["db"]; auth: Context["auth"] }) {
+  const user = await ctx.db.user.findUnique({ where: { id: ctx.auth.userId! } });
+  return user === null ? false : user.isMod;
+}
+
+export async function getFollowing(ctx: Context) {
+  if (!ctx.auth.userId) {
     throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "you don't have the permissions to execute this action.",
+      code: "UNAUTHORIZED",
+      message: "not logged in",
     });
   }
+  return db.userFollowing.findMany({
+    where: {
+      followerId: ctx.auth.userId!,
+    },
+  });
 }

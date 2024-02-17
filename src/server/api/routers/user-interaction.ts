@@ -1,24 +1,10 @@
-import { type Context, createRouter, protectedProcedure } from "@/server/api/trpc";
+import { createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { findUser } from "@/lib/data";
-import { db } from "@/server/db";
+import { findUser, getFollowing } from "@/lib/db";
 import { postPages } from "@/lib/pages";
 import { env } from "@/env";
-
-async function getFollowing(ctx: Context) {
-  if (!ctx.auth.userId) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "not logged in",
-    });
-  }
-  return db.userFollowing.findMany({
-    where: {
-      followerId: ctx.auth.userId!,
-    },
-  });
-}
+import { Prisma } from "@prisma/client";
 
 export const userInteractionRouter = createRouter({
   follow: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
@@ -30,18 +16,13 @@ export const userInteractionRouter = createRouter({
     }
     await findUser(ctx, input);
 
-    // SOMEONE PLEASE TELL ME THERE'S A MORE EFFICIENT WAY TO DO THIS ~KS
+    const ids = {
+      followerId: ctx.auth.userId!,
+      idolId: input,
+    };
     await ctx.db.userFollowing.upsert({
-      where: {
-        idolId_followerId: {
-          followerId: ctx.auth.userId!,
-          idolId: input,
-        },
-      },
-      create: {
-        followerId: ctx.auth.userId!,
-        idolId: input,
-      },
+      where: { following: ids },
+      create: ids,
       update: {},
     });
   }),
@@ -56,17 +37,29 @@ export const userInteractionRouter = createRouter({
   following: protectedProcedure.input(z.void()).query(async ({ ctx }) => {
     return getFollowing(ctx);
   }),
-  followedPosts: protectedProcedure.input(z.void()).query(async ({ ctx }) => {
-    const followed = await getFollowing(ctx);
-    return postPages(
-      {
+  followedPosts: protectedProcedure
+    .input(
+      z
+        .object({
+          cursor: z.string().uuid().optional(),
+        })
+        .default({}),
+    )
+    .query(async ({ ctx, input }) => {
+      const followed = await getFollowing(ctx);
+      // if you remove the type annotation typescript throws a tantrum
+      const params: Prisma.PostFindManyArgs = {
         where: {
           userId: { in: followed.map((f) => f.idolId) },
         },
         orderBy: { createdAt: "desc" },
-      },
-      { include: { images: true } },
-      env.NEXT_PUBLIC_PAGE_SIZE,
-    );
-  }),
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+      };
+      return postPages(
+        ctx,
+        params,
+        { include: { images: true } },
+        env.NEXT_PUBLIC_PAGE_SIZE,
+      );
+    }),
 });
