@@ -16,7 +16,8 @@ export const postCrudRouter = createRouter({
         images: z
           .string()
           .refine((d) => Base64.isValid(removeDataURL(d)))
-          .array(),
+          .array()
+          .min(1),
         visibility: Vis,
         tags: Tag.array().default([]),
       }),
