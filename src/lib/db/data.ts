@@ -11,7 +11,7 @@ export async function findPost(
 ) {
   const post = await ctx.db.post.findUnique({
     where: { id: postId },
-    include: { images: includeImg },
+    include: { images: includeImg, tags: true },
   });
   if (post === null && mustExist) {
     throw new TRPCError({

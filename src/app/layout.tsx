@@ -1,4 +1,7 @@
 import "@/globals.css";
+import Link from 'next/link'
+
+import { Button } from "@/components/ui/button"
 
 import { Comic_Neue } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -26,13 +29,21 @@ export default function RootLayout({
       <body className={comicNeue.className}>
         <TRPCReactProvider>
           <ClerkProvider>
-            <div className="bg-green-300 space-x-2 p-8">
-              <div>header</div>
-              <div className="bg-green-400 flex justify-between">
-                <div className="bg-green-600">first</div>
-                <div className="bg-green-600">second</div>
-                <div className="bg-green-600">third</div>
+            <nav className="bg-gray-200 flex p-6 pl-12 pr-12 justify-between text-xl">
+              <div className="flex space-x-16">
+                <div className="">
+                  <Link href="/following">Following</Link>
+                </div>
+                <div className="">
+                  <Link href="/post/create">New Post</Link>
+                </div>
               </div>
+              <div className="flex space-x-16">
+                <div className="">
+                  <Link href="/account">Account</Link>
+                </div>
+              </div>
+            </nav>
               {/*
               <div className="bg-green-400 flex items-center justify-between space-y-2">
                 <h2 className="bg-green-500 text-3xl font-bold tracking-tight">Djshboard</h2>
@@ -46,10 +57,6 @@ export default function RootLayout({
                 </div>
               </div>
   */}
-            </div>
-            <div className="container mx-auto">
-              header
-            </div>
             {children}
           </ClerkProvider>
         </TRPCReactProvider>

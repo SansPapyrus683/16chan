@@ -1,6 +1,7 @@
 import { createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-import { checkPerms, findAlbum, findPost, isMod, Tag } from "@/lib/db";
+import { checkPerms, findAlbum, findPost, isMod } from "@/lib/db";
+import { Tag } from "@/lib/types";
 
 export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
@@ -67,18 +68,23 @@ export const postInteractRouter = createRouter({
       });
     }),
   tag: protectedProcedure
-    .input(z.object({ post: z.string().uuid(), tag: Tag }))
+    .input(z.object({ post: z.string().uuid(), tags: Tag.array() }))
     .mutation(async ({ ctx, input }) => {
       await findPost(ctx, input.post, false);
-      const ids = {
+
+      await ctx.db.tag.createMany({
+        data: input.tags,
+        skipDuplicates: true,
+      });
+
+      const ids = input.tags.map((t) => ({
         postId: input.post,
-        tagName: input.tag.name,
-        tagCat: input.tag.category,
-      };
-      return ctx.db.postTags.upsert({
-        where: { taggingId: ids },
-        create: ids,
-        update: {},
+        tagName: t.name,
+        tagCat: t.category,
+      }));
+      return ctx.db.postTags.createMany({
+        data: ids,
+        skipDuplicates: true,
       });
     }),
   untag: protectedProcedure

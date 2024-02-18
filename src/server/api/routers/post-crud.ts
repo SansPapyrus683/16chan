@@ -5,7 +5,8 @@ import { TRPCError } from "@trpc/server";
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { s3Delete, s3Upload } from "@/lib/s3";
-import { checkPerms, findPost, isMod, Tag } from "@/lib/db";
+import { checkPerms, findPost, isMod } from "@/lib/db";
+import { Tag, Vis } from "@/lib/types";
 
 export const postCrudRouter = createRouter({
   create: protectedProcedure
@@ -16,16 +17,29 @@ export const postCrudRouter = createRouter({
           .string()
           .refine((d) => Base64.isValid(removeDataURL(d)))
           .array(),
-        visibility: z.enum(["PUBLIC", "PRIVATE", "UNLISTED"]).optional(),
+        visibility: Vis,
         tags: Tag.array().default([]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      await ctx.db.tag.createMany({
+        data: input.tags.map((t) => ({
+          name: t.name,
+          category: t.category,
+        })),
+        skipDuplicates: true,
+      });
       const post = await ctx.db.post.create({
         data: {
           userId: ctx.auth.userId!,
           title: input.title,
           visibility: input.visibility,
+          tags: {
+            create: input.tags.map((t) => ({
+              tagName: t.name,
+              tagCat: t.category,
+            })),
+          },
         },
       });
 
