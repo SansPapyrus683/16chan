@@ -32,6 +32,11 @@ export const browseRouter = createRouter({
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: prismaOrder(input.sortBy),
       };
-      return postPages(ctx, params, {}, env.NEXT_PUBLIC_PAGE_SIZE);
+      return postPages(
+        ctx,
+        params,
+        { include: { images: true } },
+        env.NEXT_PUBLIC_PAGE_SIZE,
+      );
     }),
 });

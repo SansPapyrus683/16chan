@@ -3,7 +3,7 @@
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
 import { useState } from "react";
-import Image from "next/image";
+import { Image as PrismaImage } from "@prisma/client";
 
 export function PostList({
   initPosts,
@@ -45,13 +45,16 @@ export function PostList({
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
-        {((posts as { id: string; title: string }[]) ?? []).map((v) => (
+        {(
+          (posts as {
+            id: string;
+            title: string;
+            images: PrismaImage[];
+          }[]) ?? []
+        ).map((v) => (
           <div key={v.id} className="flex flex-col">
             <a href={`/post/${v.id}`}>
-              <img
-                src="https://imgs.search.brave.com/fL2ympGnFQZv3t2lxmFLfoF1Dorf89wgmz8lIwobE6M/rs:fit:500:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAyLzE3LzM0LzY3/LzM2MF9GXzIxNzM0/Njc4Ml83WHBDVHQ4/YkxOSnF2VkFhRFpK/d3Zaam0wZXBRbWo2/ai5qcGc"
-                alt="Placeholder"
-              />
+              <img src={v.images[0].img} alt="Image" />
             </a>
             <a href={`/post/${v.id}`}>{v.title}</a> | {v.id}
             {likeButton && (
