@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { env } from "@/env";
-import { Prisma } from "@prisma/client";
+import { Image, Post, Prisma } from "@prisma/client";
 import { Context } from "@/server/api/trpc";
+import { s3Retrieve } from "@/lib/s3";
 
 export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
 
@@ -11,11 +12,19 @@ export async function postPages(
   takeParams: Prisma.PostFindManyArgs,
   limit: z.infer<typeof PageSize>,
 ) {
-  const posts = await ctx.db.post.findMany({
+  const posts: (Post & { images?: Image[] })[] = await ctx.db.post.findMany({
     take: limit + 1,
     ...params,
     ...takeParams,
   });
+  for (const p of posts) {
+    if (p.images) {
+      p.images = await Promise.all(
+        p.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
+      );
+    }
+  }
+
   const nextCursor =
     posts.length > env.NEXT_PUBLIC_PAGE_SIZE ? posts.pop()!.id : undefined;
 
@@ -25,7 +34,7 @@ export async function postPages(
         ...params,
       })
     : [];
-  let prevCursor = prevPosts.length > 1 ? prevPosts[0]!.id : undefined;
+  const prevCursor = prevPosts.length > 1 ? prevPosts[0]!.id : undefined;
 
   return {
     posts,
