@@ -1,10 +1,18 @@
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { checkPerms, findAlbum } from "@/lib/db";
+import { Vis } from "@/lib/types";
 
 export const albumRouter = createRouter({
   create: protectedProcedure
-    .input(z.string().optional())
+    .input(
+      z
+        .object({
+          name: z.string().optional(),
+          visibility: Vis,
+        })
+        .default({}),
+    )
     .mutation(async ({ ctx, input }) => {
       const user = ctx.db.user.findUnique({
         where: { id: ctx.auth.userId! },
@@ -12,14 +20,15 @@ export const albumRouter = createRouter({
           albums: true,
         },
       });
-      if (input === undefined) {
-        input = `new album ${user.albums.length + 1}`;
+      if (!input.name) {
+        input.name = `new album ${user.albums.length + 1}`;
       }
 
       return ctx.db.album.create({
         data: {
           userId: ctx.auth.userId!,
-          name: input,
+          name: input.name,
+          visibility: input.visibility,
         },
       });
     }),

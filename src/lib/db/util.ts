@@ -1,16 +1,5 @@
-import { TagCategory, Visibility } from "@prisma/client";
+import { Visibility } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-
-// maybe this is a bit too short for a centralized definition, but oh well
-export const Tag = z.object({
-  name: z.string().refine(validTag),
-  category: z.custom<TagCategory>(), // zod, please play nice with prisma
-});
-
-export function validTag(tag: string) {
-  return /^[-a-z]+$/.test(tag);
-}
 
 export function prismaOrder(order: "new" | "likes" | "alpha") {
   const ret: {
