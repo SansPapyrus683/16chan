@@ -2,7 +2,7 @@ import { UserButton } from "@clerk/nextjs";
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
-import { PostList } from "@/components/PostList";
+import { PaginatedPostList } from "@/components/PostList";
 import { CreateAlbum } from "@/components/CreateAlbum";
 import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
@@ -33,7 +33,7 @@ export default async function Account({ params }: { params: { handle: string } }
         <a href={`/account/${handle}/likes`}>see their likes</a>
       </div>
       <div>
-        <PostList
+        <PaginatedPostList
           getWhat="userPosts"
           initPosts={posts}
           additional={{ user: profile.id, what: "posts" }}
@@ -44,7 +44,7 @@ export default async function Account({ params }: { params: { handle: string } }
       <div>
         <CreateAlbum />
         <br />
-        <AlbumList initAlbums={albums} uid={handle} />
+        <AlbumList initAlbums={albums} uid={profile.id} />
       </div>
     </div>
   );

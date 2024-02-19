@@ -1,7 +1,7 @@
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
-import { PostList } from "@/components/PostList";
+import { PaginatedPostList } from "@/components/PostList";
 import { UserButton } from "@clerk/nextjs";
 
 export default async function userLikes({ params }: { params: { handle: string } }) {
@@ -23,7 +23,7 @@ export default async function userLikes({ params }: { params: { handle: string }
       <div>{profile.username}'s likes</div>
       <br />
       <div>
-        <PostList
+        <PaginatedPostList
           getWhat="userPosts"
           initPosts={likes}
           additional={{ user: profile.id, what: "likes" }}

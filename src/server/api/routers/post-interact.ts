@@ -43,7 +43,6 @@ export const postInteractRouter = createRouter({
         postId: input.post,
         albumId: input.album,
       };
-      // i want to just barf my eyes out looking at this jesus christ
       await ctx.db.albumPosts.upsert({
         where: { postAlbum: ids },
         create: ids,

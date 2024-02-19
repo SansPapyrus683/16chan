@@ -36,9 +36,20 @@ export async function findAlbum(
   const album = await ctx.db.album.findUnique({
     where: { id: albumId },
     include: {
-      posts: { include: { post: includePosts }, orderBy: { addedAt: "desc" } },
+      posts: {
+        include: { post: { include: { images: includePosts } } },
+        orderBy: { addedAt: "desc" },
+      },
     },
   });
+  if (album !== null && includePosts) {
+    for (const p of album.posts) {
+      p.post.images = await Promise.all(
+        p.post.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
+      );
+    }
+  }
+
   if (album === null && mustExist) {
     throw new TRPCError({
       code: "NOT_FOUND",

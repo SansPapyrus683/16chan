@@ -3,20 +3,22 @@
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
 import { useState } from "react";
-import { Image as PrismaImage } from "@prisma/client";
+import Image from "next/image";
+import Link from "next/link";
 
-export function PostList({
+type PostData = RouterOutputs["user"]["userPosts"];
+
+export function PaginatedPostList({
   initPosts,
   getWhat,
   additional,
   likeButton = false,
 }: {
-  initPosts: RouterOutputs["user"]["userPosts"];
+  initPosts: PostData;
   getWhat: "userPosts" | "following" | "search";
   additional?: object;
   likeButton?: boolean;
 }) {
-  const utils = api.useUtils();
   const [at, setAt] = useState<undefined | string>(initPosts.posts[0]?.id);
 
   let query;
@@ -29,6 +31,7 @@ export function PostList({
       break;
     case "search":
       query = api.browse.browse;
+      break;
   }
   const params = { cursor: at, ...additional };
 
@@ -38,42 +41,10 @@ export function PostList({
     placeholderData: (prevRes) => prevRes ?? initPosts,
   });
   const { posts, prevCursor, nextCursor } = data || {};
-  const likePost = api.post.like.useMutation({
-    onSuccess: () => utils.user.userPosts.invalidate(),
-  });
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
-        {(
-          (posts as {
-            id: string;
-            title: string;
-            images: PrismaImage[];
-          }[]) ?? []
-        ).map((v) => (
-          <div key={v.id} className="flex flex-col">
-            <a href={`/post/${v.id}`}>
-              <img src={v.images[0].img} alt="Image" />
-            </a>
-            <a href={`/post/${v.id}`}>{v.title}</a> | {v.id}
-            {likeButton && (
-              <>
-                {" | "}
-                <button
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    likePost.mutate(v.id);
-                  }}
-                  className="border-2 p-0.5"
-                >
-                  like
-                </button>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+      <PostList posts={posts as PostData["posts"]} likeButton={likeButton} />
       <div>
         <button
           onClick={async (e) => {
@@ -101,5 +72,50 @@ export function PostList({
         </button>
       </div>
     </>
+  );
+}
+
+export function PostList({
+  posts,
+  likeButton = false,
+}: {
+  posts: PostData["posts"];
+  likeButton: boolean;
+}) {
+  const utils = api.useUtils();
+  const likePost = api.post.like.useMutation({
+    onSuccess: () => utils.user.userPosts.invalidate({ what: "likes" }),
+  });
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {posts.map((v) => (
+        <div key={v.id} className="flex flex-col">
+          <Link href={`/post/${v.id}`}>
+            <Image
+              key={v.id}
+              className="w-auto"
+              src={v.images![0]!.img}
+              alt="post preview"
+              width={200}
+              height={200}
+            />
+          </Link>
+          <Link href={`/post/${v.id}`}>{v.title}</Link>
+          {v.id}
+          {likeButton && (
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                likePost.mutate(v.id);
+              }}
+              className="border-2 p-0.5"
+            >
+              like
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

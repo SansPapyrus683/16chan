@@ -55,21 +55,17 @@ export const userProfileRouter = createRouter({
       }
 
       const params = {
-        where: {
-          ...what,
-          OR: [
-            { visibility: Visibility.PUBLIC },
-            ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
-            ...(input.what === "likes" && id === ctx.auth.userId
-              ? [{ visibility: Visibility.UNLISTED }]
-              : []),
-          ],
-        },
+        where: what,
         orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
-
-      return postPages(ctx, params, { include: { images: true } }, input.limit);
+      return postPages(
+        ctx,
+        params,
+        { include: { images: true } },
+        input.limit,
+        input.what === "likes" && ctx.auth.userId == id,
+      );
     }),
   userAlbums: publicProcedure
     .input(
