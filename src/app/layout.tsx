@@ -1,5 +1,5 @@
 import "@/globals.css";
-import Link from 'next/link'
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 
@@ -32,15 +32,26 @@ export default function RootLayout({
             <nav className="bg-gray-200 flex p-6 pl-12 pr-12 justify-between text-xl">
               <div className="flex space-x-16">
                 <div className="">
-                  <Link href="/following">Following</Link>
+                  <Link href="/">
+                    16chan
+                  </Link>
                 </div>
                 <div className="">
-                  <Link href="/post/create">New Post</Link>
+                  <Link href="/following">
+                    Following
+                  </Link>
+                </div>
+                <div className="">
+                  <Link href="/post/create">
+                    New Post
+                  </Link>
                 </div>
               </div>
               <div className="flex space-x-16">
                 <div className="">
-                  <Link href="/account">Account</Link>
+                  <Link href="/account">
+                    Account
+                  </Link>
                 </div>
               </div>
             </nav>
