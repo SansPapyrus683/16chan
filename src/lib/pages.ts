@@ -2,7 +2,7 @@ import { z } from "zod";
 import { env } from "@/env";
 import { Image, Post, Prisma, Visibility } from "@prisma/client";
 import { Context } from "@/server/api/trpc";
-import { s3Retrieve } from "@/lib/s3";
+import { s3RawUrl } from "@/lib/s3";
 
 export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
 
@@ -29,9 +29,7 @@ export async function postPages(
   });
   for (const p of posts) {
     if (p.images) {
-      p.images = await Promise.all(
-        p.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
-      );
+      p.images.forEach((i) => (i.img = s3RawUrl(i.img)));
     }
   }
 

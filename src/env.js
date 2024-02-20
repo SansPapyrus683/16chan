@@ -14,7 +14,8 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     CLERK_SECRET_KEY: z.string(),
     WEBHOOK_SECRET: z.string(),
-    AWS_S3_BUCKET_NAME: z.string(),
+    AWS_BUCKET_NAME: z.string(),
+    AWS_REGION: z.string(),
   },
 
   /**
@@ -37,7 +38,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
-    AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
+    AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
+    AWS_REGION: process.env.AWS_REGION,
 
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_PAGE_SIZE: process.env.NEXT_PUBLIC_PAGE_SIZE,

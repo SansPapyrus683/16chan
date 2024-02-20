@@ -9,12 +9,12 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/env.js";
 import { removeDataURL } from "@/lib/files";
 
-export const s3 = new S3Client({});
+const s3 = new S3Client({});
 
 export async function s3Upload(name: string, data: string, content: string) {
   return s3.send(
     new PutObjectCommand({
-      Bucket: env.AWS_S3_BUCKET_NAME,
+      Bucket: env.AWS_BUCKET_NAME,
       Key: name,
       ContentType: content,
       Body: Buffer.from(removeDataURL(data), "base64"),
@@ -22,18 +22,23 @@ export async function s3Upload(name: string, data: string, content: string) {
   );
 }
 
+// shouldn't need this after i made all objects public, but just in case
 export async function s3Retrieve(name: string) {
   const cmd = new GetObjectCommand({
-    Bucket: env.AWS_S3_BUCKET_NAME,
+    Bucket: env.AWS_BUCKET_NAME,
     Key: name,
   });
   return getSignedUrl(s3, cmd, { expiresIn: 3600 });
 }
 
+export function s3RawUrl(name: string) {
+  return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${name}`;
+}
+
 export async function s3Delete(name: string) {
   return s3.send(
     new DeleteObjectCommand({
-      Bucket: env.AWS_S3_BUCKET_NAME,
+      Bucket: env.AWS_BUCKET_NAME,
       Key: name,
     }),
   );
