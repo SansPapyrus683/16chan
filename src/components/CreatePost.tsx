@@ -38,6 +38,7 @@ export function CreatePost() {
           return parseTag(name!, category);
         }),
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
+      sauce: parseSauce(sauce),
     });
   };
 

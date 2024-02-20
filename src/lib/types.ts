@@ -26,10 +26,12 @@ export function validTag(tag: string) {
   return /^[-a-z]+$/.test(tag);
 }
 
-export const Sauce = z.object({
-  src: z.custom<ArtSource>(),
-  id: z.string(),
-});
+export const Sauce = z
+  .object({
+    src: z.custom<ArtSource>(),
+    id: z.string(),
+  })
+  .optional();
 
 export function parseSauce(url: string): z.infer<typeof Sauce> {
   if (!isValidHttpUrl(url)) {

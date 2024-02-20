@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { checkPerms, findPost, isMod, s3Delete, s3Upload } from "@/lib/db";
-import { Tag, Vis } from "@/lib/types";
+import { Sauce, Tag, Vis } from "@/lib/types";
 
 export const postCrudRouter = createRouter({
   create: protectedProcedure
@@ -18,6 +18,7 @@ export const postCrudRouter = createRouter({
           .array()
           .min(1),
         visibility: Vis,
+        sauce: Sauce,
         tags: Tag.array().default([]),
       }),
     )
@@ -40,6 +41,8 @@ export const postCrudRouter = createRouter({
               tagCat: t.category,
             })),
           },
+          src: input.sauce?.src,
+          artId: input.sauce?.id,
         },
       });
 
