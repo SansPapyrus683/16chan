@@ -22,6 +22,7 @@ export async function s3Upload(name: string, data: string, content: string) {
   );
 }
 
+// shouldn't need this after i made all objects public, but just in case
 export async function s3Retrieve(name: string) {
   const cmd = new GetObjectCommand({
     Bucket: env.AWS_BUCKET_NAME,

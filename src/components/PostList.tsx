@@ -46,7 +46,7 @@ export function PaginatedPostList({
   }
   const params = { cursor: searchParams.get("cursor") ?? undefined, ...additional };
   //@ts-ignore
-  const { data, isPlaceholderData } = query.useQuery(params, {
+  const { data } = query.useQuery(params, {
     initialData: initPosts,
   });
   const { posts, prevCursor, nextCursor } = data || {};
@@ -67,15 +67,11 @@ export function PaginatedPostList({
         </button>
         <button
           onClick={async (e) => {
-            console.assert(
-              nextCursor !== undefined && !isPlaceholderData,
-              "what the hell?",
-            );
             e.preventDefault();
             router.push(`${pathname}?${modParams("cursor", nextCursor)}`);
           }}
           className="ml-3 border-4 p-1"
-          disabled={isPlaceholderData || nextCursor === undefined}
+          disabled={nextCursor === undefined}
         >
           next page
         </button>
