@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 import { toBase64 } from "@/lib/files";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
-import { parseTag } from "@/lib/types";
+import { parseSauce, parseTag } from "@/lib/types";
 
 export function CreatePost() {
   const router = useRouter();
@@ -42,7 +42,7 @@ export function CreatePost() {
   };
 
   return (
-    <div>
+    <div className="space-y-2">
       <form onSubmit={onSubmit} className="space-y-2">
         <input
           type="file"
@@ -62,16 +62,17 @@ export function CreatePost() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="name..."
-          className="border-2"
+          className="block border-2"
         />
         <input
           value={sauce}
           onChange={(e) => setSauce(e.target.value)}
           placeholder="sauce..."
-          className="border-2"
+          className="block border-2"
         />
         <button type="submit">{buttonText}</button>
       </form>
+      <div>parsed sauce: {JSON.stringify(parseSauce(sauce))}</div>
     </div>
   );
 }

@@ -72,8 +72,8 @@ model Post {
   title String
   tags  PostTags[]
 
-  src    ArtSource?
-  artId  String     @default("")
+  src    ArtSource @default(OTHER)
+  artId  String    @default("")
   images Image[]
 
   comments Comment[]
