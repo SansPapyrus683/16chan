@@ -20,7 +20,7 @@ export async function findPost(
     });
   }
   if (post !== null && includeImg) {
-    post.images = post.images.map((i) => ({ ...i, img: s3RawUrl(i.img) }));
+    post.images.forEach((i) => (i.img = s3RawUrl(i.img)));
   }
   return post;
 }
@@ -41,9 +41,7 @@ export async function findAlbum(
     },
   });
   if (album !== null && includePosts) {
-    for (const p of album.posts) {
-      p.post.images = p.post.images.map((i) => ({ ...i, img: s3RawUrl(i.img) }));
-    }
+    album.posts.forEach((p) => p.post.images.forEach((i) => (i.img = s3RawUrl(i.img))));
   }
 
   if (album === null && mustExist) {

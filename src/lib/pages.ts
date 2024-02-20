@@ -29,7 +29,7 @@ export async function postPages(
   });
   for (const p of posts) {
     if (p.images) {
-      p.images.map((i) => ({ ...i, img: s3RawUrl(i.img) }));
+      p.images.forEach((i) => (i.img = s3RawUrl(i.img)));
     }
   }
 
