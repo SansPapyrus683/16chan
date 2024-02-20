@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { s3Retrieve } from "@/lib/s3";
+import { s3RawUrl } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 
@@ -20,9 +20,7 @@ export async function findPost(
     });
   }
   if (post !== null && includeImg) {
-    post.images = await Promise.all(
-      post!.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
-    );
+    post.images = post.images.map((i) => ({ ...i, img: s3RawUrl(i.img) }));
   }
   return post;
 }
@@ -44,9 +42,7 @@ export async function findAlbum(
   });
   if (album !== null && includePosts) {
     for (const p of album.posts) {
-      p.post.images = await Promise.all(
-        p.post.images.map(async (i) => ({ ...i, img: await s3Retrieve(i.img) })),
-      );
+      p.post.images = p.post.images.map((i) => ({ ...i, img: s3RawUrl(i.img) }));
     }
   }
 
@@ -103,9 +99,5 @@ export async function getFollowing(ctx: Context) {
       message: "not logged in",
     });
   }
-  return db.userFollowing.findMany({
-    where: {
-      followerId: ctx.auth.userId!,
-    },
-  });
+  return db.userFollowing.findMany({ where: { followerId: ctx.auth.userId! } });
 }
