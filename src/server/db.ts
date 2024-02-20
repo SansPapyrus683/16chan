@@ -1,13 +1,12 @@
 import { PrismaClient as BasePrismaClient } from "@prisma/client";
 
 import { env } from "@/env";
-import { s3Delete } from "@/lib/s3";
+import { s3Delete } from "@/lib/db";
 
 /** sauce: https://www.answeroverflow.com/m/1122213580608131163 */
 function getPrisma() {
   return new BasePrismaClient({
-    log:
-      env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    log: env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   }).$extends({
     name: "s3 delete",
     query: {

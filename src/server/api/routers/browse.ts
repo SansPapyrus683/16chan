@@ -1,8 +1,7 @@
 import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { Visibility } from "@prisma/client";
-import { parseSearch, prismaOrder } from "@/lib/db";
-import { postPages } from "@/lib/pages";
+import { parseSearch, postPages, prismaOrder } from "@/lib/db";
 import { env } from "@/env";
 
 export const browseRouter = createRouter({

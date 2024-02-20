@@ -2,7 +2,7 @@ import { z } from "zod";
 import { env } from "@/env";
 import { Image, Post, Prisma, Visibility } from "@prisma/client";
 import { Context } from "@/server/api/trpc";
-import { s3RawUrl } from "@/lib/s3";
+import { s3RawUrl } from "@/lib/db";
 
 export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
 

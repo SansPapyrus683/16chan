@@ -1,8 +1,7 @@
 import { createRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { findUser, getFollowing } from "@/lib/db";
-import { postPages } from "@/lib/pages";
+import { findUser, getFollowing, postPages } from "@/lib/db";
 import { env } from "@/env";
 import { Prisma } from "@prisma/client";
 

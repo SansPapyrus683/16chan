@@ -22,6 +22,7 @@ export function CreatePost() {
   const [pics, setPics] = useState<File[]>([]);
   const [name, setName] = useState("");
   const [tags, setTags] = useState("");
+  const [sauce, setSauce] = useState("");
   const [buttonText, setButtonText] = useState("submit");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -61,6 +62,12 @@ export function CreatePost() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="name..."
+          className="border-2"
+        />
+        <input
+          value={sauce}
+          onChange={(e) => setSauce(e.target.value)}
+          placeholder="sauce..."
           className="border-2"
         />
         <button type="submit">{buttonText}</button>
