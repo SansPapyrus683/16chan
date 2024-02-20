@@ -2,9 +2,10 @@
 
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
-import { useState } from "react";
+import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -19,7 +20,17 @@ export function PaginatedPostList({
   additional?: object;
   likeButton?: boolean;
 }) {
-  const [at, setAt] = useState<undefined | string>(initPosts.posts[0]?.id);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const modParams = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+      return params.toString();
+    },
+    [searchParams],
+  );
 
   let query;
   switch (getWhat) {
@@ -33,23 +44,21 @@ export function PaginatedPostList({
       query = api.browse.browse;
       break;
   }
-  const params = { cursor: at, ...additional };
-
+  const params = { cursor: searchParams.get("cursor") ?? undefined, ...additional };
   //@ts-ignore
   const { data, isPlaceholderData } = query.useQuery(params, {
-    //@ts-ignore
-    placeholderData: (prevRes) => prevRes ?? initPosts,
+    initialData: initPosts,
   });
   const { posts, prevCursor, nextCursor } = data || {};
 
   return (
     <>
-      <PostList posts={posts as PostData["posts"]} likeButton={likeButton} />
+      <PostList posts={(posts as PostData["posts"]) ?? []} likeButton={likeButton} />
       <div>
         <button
           onClick={async (e) => {
             e.preventDefault();
-            setAt(prevCursor);
+            router.push(`${pathname}?${modParams("cursor", prevCursor)}`);
           }}
           disabled={prevCursor === undefined}
           className="border-4 p-1"
@@ -63,7 +72,7 @@ export function PaginatedPostList({
               "what the hell?",
             );
             e.preventDefault();
-            setAt(nextCursor);
+            router.push(`${pathname}?${modParams("cursor", nextCursor)}`);
           }}
           className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}

@@ -7,21 +7,20 @@ import { api } from "@/trpc/server";
 const SortOrder = z.enum(["new", "likes"]).catch("new");
 
 export default async function Browsing({
-  searchParams,
+  searchParams: sp,
 }: {
   searchParams: {
     q: string | string[] | undefined;
     sort: string | string[] | undefined;
+    cursor: string | string[] | undefined;
   };
 }) {
   const { userId } = auth();
-  const rawQ = searchParams.q;
-  const query = Array.isArray(rawQ) ? rawQ.join(" ") : rawQ;
-  const rawSort = searchParams.sort;
-  const sortBy = SortOrder.parse(Array.isArray(rawSort) ? rawSort[0] : rawSort);
+  const query = Array.isArray(sp.q) ? sp.q.join(" ") : sp.q;
+  const sortBy = SortOrder.parse(Array.isArray(sp.sort) ? sp.sort[0] : sp.sort);
+  const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
 
-  const res = await api.browse.browse({ query, sortBy });
-
+  const res = await api.browse.browse({ query, sortBy, cursor });
   return (
     <>
       <div className="space-y-4">
