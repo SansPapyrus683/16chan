@@ -46,9 +46,7 @@ export function PaginatedPostList({
   }
   const params = { cursor: searchParams.get("cursor") ?? undefined, ...additional };
   //@ts-ignore
-  const { data } = query.useQuery(params, {
-    initialData: initPosts,
-  });
+  const { data } = query.useQuery(params, { initialData: initPosts });
   const { posts, prevCursor, nextCursor } = data || {};
 
   return (
@@ -63,7 +61,7 @@ export function PaginatedPostList({
           disabled={prevCursor === undefined}
           className="border-4 p-1"
         >
-          prev page
+          prev
         </button>
         <button
           onClick={async (e) => {
@@ -73,7 +71,7 @@ export function PaginatedPostList({
           className="ml-3 border-4 p-1"
           disabled={nextCursor === undefined}
         >
-          next page
+          next
         </button>
       </div>
     </>
@@ -91,7 +89,6 @@ export function PostList({
   const likePost = api.post.like.useMutation({
     onSuccess: () => utils.user.userPosts.invalidate({ what: "likes" }),
   });
-
   return (
     <div className="grid grid-cols-3 gap-4">
       {posts.map((v) => (
