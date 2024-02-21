@@ -4,7 +4,8 @@ import { TRPCError } from "@trpc/server";
 
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
-import { checkPerms, findPost, isMod, s3Delete, s3Upload } from "@/lib/db";
+import { checkPerms, findPost, isMod } from "@/lib/db";
+import { s3Delete, s3Upload } from "@/lib/s3";
 import { Sauce, Tag, Vis } from "@/lib/types";
 
 export const postCrudRouter = createRouter({

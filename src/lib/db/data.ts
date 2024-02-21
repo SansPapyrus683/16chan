@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { s3RawUrl } from "@/lib/db";
+import { s3RawUrl } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 

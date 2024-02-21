@@ -1,7 +1,7 @@
 import { PrismaClient as BasePrismaClient } from "@prisma/client";
 
 import { env } from "@/env";
-import { s3Delete } from "@/lib/db";
+import { s3Delete } from "@/lib/s3";
 
 /** sauce: https://www.answeroverflow.com/m/1122213580608131163 */
 function getPrisma() {
