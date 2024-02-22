@@ -71,7 +71,9 @@ export function CreatePost() {
           placeholder="sauce..."
           className="block border-2"
         />
-        <button type="submit">{buttonText}</button>
+        <button type="submit" className="block border-2 p-0.5">
+          {buttonText}
+        </button>
       </form>
       <div>parsed sauce: {JSON.stringify(parseSauce(sauce))}</div>
     </div>
