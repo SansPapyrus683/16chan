@@ -2,9 +2,8 @@ import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { TRPCError } from "@trpc/server";
-import { albumPages, PageSize, postPages } from "@/lib/pages";
 import { Visibility } from "@prisma/client";
-import { findUser, prismaOrder } from "@/lib/db";
+import { albumPages, findUser, PageSize, postPages, prismaOrder } from "@/lib/db";
 
 export const userProfileRouter = createRouter({
   profile: publicProcedure.input(z.string()).query(async ({ input }) => {

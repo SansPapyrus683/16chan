@@ -4,6 +4,7 @@ import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
 import { TagPost } from "@/components/TagPost";
 import Link from "next/link";
+import { sauceUrl } from "@/lib/utils";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   let post;
@@ -20,10 +21,12 @@ export default async function PostView({ params }: { params: { pid: string } }) 
       }
     }
   }
+  if (!post) {
+    return <div>{error}</div>;
+  }
 
-  return !post ? (
-    <div>{error}</div>
-  ) : (
+  const src = sauceUrl(post.src, post.artId);
+  return (
     <div className="space-y-4">
       <h1>{post.title}</h1>
       <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
@@ -39,6 +42,8 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           />
         ))}
       </div>
+
+      <div>source: {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}</div>
 
       <div>
         tags:{" "}
