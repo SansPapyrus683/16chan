@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 import { toBase64 } from "@/lib/files";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
-import { parseSauce, parseTag } from "@/lib/types";
+import { parseSauce, Tag } from "@/lib/types";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -45,7 +45,8 @@ export function CreatePost() {
         .filter((t) => t)
         .map((t) => {
           const [category, name] = t.split(":");
-          return parseTag(name!, category);
+          // the "as" is just to get ts to stop yapping LOL
+          return Tag.parse({ category, name });
         }),
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
       sauce: parseSauce(sauceType, sauce),

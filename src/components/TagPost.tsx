@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Tag } from "@/lib/types";
 import { api } from "@/trpc/react";
-import { parseTag } from "@/lib/types";
 
 export function TagPost({ pid }: { pid: string }) {
   const [tag, setTag] = useState("");
@@ -20,7 +20,7 @@ export function TagPost({ pid }: { pid: string }) {
         e.preventDefault();
         const tagList = tag.split(/\s+/).map((t) => {
           const [category, name] = t.split(":");
-          return parseTag(name!, category);
+          return Tag.parse({ category, name });
         });
         tagPost.mutate({ post: pid, tags: tagList });
       }}
