@@ -1,12 +1,7 @@
 import "@/globals.css";
-<<<<<<< HEAD
 
-import { Button } from "@/components/ui/button"
 import { PageLayout } from "@/components/PageLayout.tsx"
-=======
-import Link from "next/link";
 import React from "react";
->>>>>>> origin/ui
 
 import { Comic_Neue } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
