@@ -29,10 +29,13 @@ export function CreatePost() {
     setButtonText("creating...");
     createPost.mutate({
       title: name,
-      tags: tags.split(/\s+/).map((t) => {
-        const [category, name] = t.split(":");
-        return parseTag(name!, category);
-      }),
+      tags: tags
+        .split(/\s+/)
+        .filter((t) => t)
+        .map((t) => {
+          const [category, name] = t.split(":");
+          return parseTag(name!, category);
+        }),
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
     });
   };

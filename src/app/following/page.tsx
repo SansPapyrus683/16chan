@@ -1,6 +1,6 @@
 import { api } from "@/trpc/server";
 import { UserButton } from "@clerk/nextjs";
-import { PostList } from "@/components/PostList";
+import { PaginatedPostList } from "@/components/PostList";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function NewPage() {
@@ -12,7 +12,7 @@ export default async function NewPage() {
       <UserButton />
       <div>posts by users u follow</div>
       <div>
-        <PostList
+        <PaginatedPostList
           initPosts={posts}
           getWhat="following"
           additional={{ user: userId! }}

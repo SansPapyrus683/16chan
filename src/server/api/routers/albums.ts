@@ -14,14 +14,14 @@ export const albumRouter = createRouter({
         .default({}),
     )
     .mutation(async ({ ctx, input }) => {
-      const user = ctx.db.user.findUnique({
+      const user = await ctx.db.user.findUnique({
         where: { id: ctx.auth.userId! },
         select: {
           albums: true,
         },
       });
       if (!input.name) {
-        input.name = `new album ${user.albums.length + 1}`;
+        input.name = `new album ${user!.albums.length + 1}`;
       }
 
       return ctx.db.album.create({

@@ -1,5 +1,7 @@
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
+import { DeleteAlbum } from "@/components/DeleteAlbum";
+import { PostList } from "@/components/PostList";
 
 export default async function AlbumView({ params }: { params: { aid: string } }) {
   let album;
@@ -17,18 +19,13 @@ export default async function AlbumView({ params }: { params: { aid: string } })
     }
   }
 
-  return error ? (
+  return !album ? (
     <div>{error}</div>
   ) : (
     <>
       <h1>{album!.name}</h1>
-      <ol>
-        {album!.posts.map((p) => (
-          <li key={p.postId}>
-            <a href={`/post/${p.postId}`}>{p.post.title}</a> | {p.postId}
-          </li>
-        ))}
-      </ol>
+      <PostList posts={album!.posts.map((p) => p.post)} likeButton />
+      <DeleteAlbum aid={params.aid} />
     </>
   );
 }
