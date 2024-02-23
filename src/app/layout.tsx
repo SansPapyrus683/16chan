@@ -26,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <TRPCReactProvider>
           <ClerkProvider>
             <PageLayout/>
-            {children}
+            <div className="pt-16">
+              {children}
+            </div>
           </ClerkProvider>
         </TRPCReactProvider>
       </body>
