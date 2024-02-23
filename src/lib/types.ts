@@ -19,7 +19,7 @@ export const Sauce = z
   .optional();
 
 export function parseSauce(mode: ArtSource | "AUTO", sauce: string) {
-  if (mode === "AUTO") {
+  if (mode === "AUTO" || !sauce) {
     return autoParse(sauce);
   }
 
