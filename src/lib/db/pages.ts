@@ -21,6 +21,12 @@ export async function postPages(
       ...(includeUnlisted ? [{ visibility: Visibility.UNLISTED }] : []),
     ],
   };
+  if (params.cursor) {
+    const post = await ctx.db.post.findUnique({ where: params.cursor });
+    if (post === null) {
+      delete params.cursor;
+    }
+  }
 
   const posts: (Post & { images?: Image[] })[] = await ctx.db.post.findMany({
     take: limit + 1,
@@ -52,11 +58,25 @@ export async function postPages(
 }
 
 export async function albumPages(
-  ctx: { db: Context["db"] },
+  ctx: { db: Context["db"]; auth: Context["auth"] },
   params: Prisma.AlbumFindManyArgs,
   takeParams: Prisma.AlbumFindManyArgs,
   limit: z.infer<typeof PageSize>,
 ) {
+  params.where = {
+    ...params.where,
+    OR: [
+      { visibility: Visibility.PUBLIC },
+      ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
+    ],
+  };
+  if (params.cursor) {
+    const post = await ctx.db.album.findUnique({ where: params.cursor });
+    if (post === null) {
+      delete params.cursor;
+    }
+  }
+
   const albums = await ctx.db.album.findMany({
     take: limit + 1,
     ...params,
