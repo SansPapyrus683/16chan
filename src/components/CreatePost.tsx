@@ -93,6 +93,13 @@ export function CreatePost() {
           ))}
         </select>
 
+        <input
+          value={sauce}
+          onChange={(e) => setSauce(e.target.value)}
+          placeholder="sauce..."
+          className="block border-2"
+        />
+
         <select
           value={vis}
           onChange={(e) => setVis(e.target.value as Visibility)}
@@ -104,13 +111,6 @@ export function CreatePost() {
             </option>
           ))}
         </select>
-
-        <input
-          value={sauce}
-          onChange={(e) => setSauce(e.target.value)}
-          placeholder="sauce..."
-          className="block border-2"
-        />
 
         <button type="submit" className="block border-2 p-0.5">
           {buttonText}
