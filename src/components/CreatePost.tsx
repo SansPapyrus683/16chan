@@ -53,6 +53,7 @@ export function CreatePost() {
         }),
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
       sauce: parseSauce(sauceType, sauce),
+      visibility: vis,
     });
   };
 
