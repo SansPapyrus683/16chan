@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ArtSource, TagCategory } from "@prisma/client";
-import { isValidHttpUrl } from "@/lib/utils";
+import { isValidHttpUrl, toTitleCase } from "@/lib/utils";
 
 export function validTag(tag: string) {
   return /^[-a-z]+$/.test(tag);
@@ -37,7 +37,7 @@ export function parseSauce(mode: ArtSource | "AUTO", sauce: string) {
       break;
   }
   if (!test()) {
-    throw new Error(`${sauce} is not a valid id for ${mode}`);
+    throw new Error(`${sauce} is not a valid id for ${toTitleCase(mode)}`);
   }
   return Sauce.parse({ src: mode, id: sauce });
 }

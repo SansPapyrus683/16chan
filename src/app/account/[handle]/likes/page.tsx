@@ -1,7 +1,7 @@
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
-import { PaginatedPostList } from "@/components/PostList";
+import { PaginatedPostList } from "@/components/posts/PostList";
 import { UserButton } from "@clerk/nextjs";
 
 export default async function userLikes({ params }: { params: { handle: string } }) {

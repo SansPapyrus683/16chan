@@ -1,6 +1,6 @@
 import { api } from "@/trpc/server";
 import { UserButton } from "@clerk/nextjs";
-import { PaginatedPostList } from "@/components/PostList";
+import { PaginatedPostList } from "@/components/posts/PostList";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function NewPage() {

@@ -1,10 +1,10 @@
-import { CreatePost } from "@/components/CreatePost";
+import { CreatePost } from "@/components/posts/MakePost";
 
 export default function PostCreation() {
   return (
-    <>
-      <div>create a post here</div>
+    <div className="space-y-4">
+      <h1>create a post here</h1>
       <CreatePost />
-    </>
+    </div>
   );
 }
