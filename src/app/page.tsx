@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { SignInButton } from "@clerk/nextjs";
 import { z } from "zod";
-import { PaginatedPostList } from "@/components/PostList";
+import { PaginatedPostList } from "@/components/posts/PostList";
 import { api } from "@/trpc/server";
 
 const SortOrder = z.enum(["new", "likes"]).catch("new");

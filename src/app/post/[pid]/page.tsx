@@ -2,9 +2,10 @@ import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
-import { TagPost } from "@/components/TagPost";
+import { TagPost } from "@/components/posts/TagPost";
 import Link from "next/link";
 import { sauceUrl } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   let post;
@@ -24,12 +25,15 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   if (!post) {
     return <div>{error}</div>;
   }
+  const { userId } = auth();
 
   const src = sauceUrl(post.src, post.artId);
   return (
     <div className="space-y-4">
       <h1>{post.title}</h1>
-      <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
+      {post.userId == userId && (
+        <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
+      )}
       <div className="space-y-2">
         {post.images.map((u, ind) => (
           <Image

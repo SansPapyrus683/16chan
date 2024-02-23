@@ -88,6 +88,47 @@ export const postCrudRouter = createRouter({
     checkPerms(post!, ctx.auth.userId, "view");
     return post;
   }),
+  edit: protectedProcedure
+    .input(
+      z.object({
+        pid: z.string().uuid(),
+        title: z.string().optional(),
+        sauce: Sauce.optional(),
+        tags: Tag.array().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await findPost(ctx, input.pid, false, true);
+      if (input.tags) {
+        await ctx.db.tag.createMany({
+          data: input.tags.map((t) => ({
+            name: t.name,
+            category: t.category,
+          })),
+          skipDuplicates: true,
+        });
+        await ctx.db.postTags.deleteMany({
+          where: { postId: input.pid },
+        });
+      }
+
+      return ctx.db.post.update({
+        where: {
+          id: input.pid,
+        },
+        data: {
+          title: input.title,
+          src: input.sauce?.src,
+          artId: input.sauce?.id,
+          tags: input.tags && {
+            create: input.tags.map((t) => ({
+              tagName: t.name,
+              tagCat: t.category,
+            })),
+          },
+        },
+      });
+    }),
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
