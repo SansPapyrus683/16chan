@@ -41,10 +41,23 @@ export function CreatePost() {
 }
 
 export function EditPost({ pid }: { pid: string }) {
+  const router = useRouter();
   const { data: post } = api.post.get.useQuery(pid);
   if (post === null) {
     return <div>post not found</div>;
   }
+
+  const utils = api.useUtils();
+  const editPost = api.post.edit.useMutation({
+    onSuccess: (data) => {
+      setButtonText("success!");
+      utils.post.get.invalidate(pid);
+      router.push(`/post/${data.id}`);
+    },
+    onError: () => {
+      setButtonText("error...");
+    },
+  });
 
   const [buttonText, setButtonText] = useState("change");
   return (
@@ -53,11 +66,17 @@ export function EditPost({ pid }: { pid: string }) {
         iTitle={post.title}
         iTags={post.tags.map((t) => `${t.tagCat}:${t.tagName}`).join(" ")}
         iSauce={{ src: post.src, id: post.artId }}
-        onSubmit={async (pd) => {}}
+        onSubmit={async (pd) => {
+          editPost.mutate({
+            pid: pid,
+            title: pd.title,
+            sauce: pd.sauce,
+            tags: pd.tags,
+          });
+        }}
         onParseError={(e) => {
           setButtonText("error...");
         }}
-        editVis
         buttonText={buttonText}
       />
     )
