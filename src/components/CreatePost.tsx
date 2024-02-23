@@ -5,6 +5,8 @@ import { toBase64 } from "@/lib/files";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
 import { parseSauce, Tag } from "@/lib/types";
+import { Visibility } from "@prisma/client";
+import { toTitleCase } from "@/lib/utils";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -31,7 +33,8 @@ export function CreatePost() {
   const [name, setName] = useState("");
   const [tags, setTags] = useState("");
   const [sauce, setSauce] = useState("");
-  const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>("OTHER");
+  const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>("AUTO");
+  const [vis, setVis] = useState<Visibility>("PUBLIC");
   const [buttonText, setButtonText] = useState("submit");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -77,7 +80,11 @@ export function CreatePost() {
           className="block border-2"
         />
 
-        <select onChange={(e) => setSauceType(e.target.value as typeof sauceType)}>
+        <select
+          value={sauceType}
+          onChange={(e) => setSauceType(e.target.value as typeof sauceType)}
+          className="block"
+        >
           {Object.entries(SOURCE_NAME).map(([val, name]) => (
             <option value={val} key={val}>
               {name}
@@ -85,7 +92,17 @@ export function CreatePost() {
           ))}
         </select>
 
-        <select></select>
+        <select
+          value={vis}
+          onChange={(e) => setVis(e.target.value as Visibility)}
+          className="block"
+        >
+          {Object.keys(Visibility).map((v) => (
+            <option value={v} key={v}>
+              {toTitleCase(v)}
+            </option>
+          ))}
+        </select>
 
         <input
           value={sauce}

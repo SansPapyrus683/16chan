@@ -52,7 +52,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
         ) : (
           <ul>
             {post.tags.map((t) => (
-              <li>
+              <li key={t.tagName}>
                 {t.tagCat}:{t.tagName}
               </li>
             ))}
