@@ -4,7 +4,7 @@ import Link from "next/link"
 
 export function PageLayout() { 
   return (
-    <div className="flex fixed w-full h-16 justify-between items-center bg-gray-200 p-6 pl-12 pr-12 text-xl">
+    <nav className="flex fixed w-full h-16 justify-between items-center bg-gray-200 p-6 pl-12 pr-12 text-xl">
       <div className="flex space-x-16">
         <div className="">
           <Link href="/">
@@ -29,7 +29,7 @@ export function PageLayout() {
           </Link>
         </div>
       </div>
-    </div>
+    </nav>
   )
 }
 
