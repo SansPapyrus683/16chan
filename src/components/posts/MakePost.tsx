@@ -31,9 +31,6 @@ export function CreatePost() {
           visibility: pd.vis,
         });
       }}
-      onParseError={(e) => {
-        setButtonText("error...");
-      }}
       editVis
       buttonText={buttonText}
     />
@@ -73,9 +70,6 @@ export function EditPost({ pid }: { pid: string }) {
             sauce: pd.sauce,
             tags: pd.tags,
           });
-        }}
-        onParseError={(e) => {
-          setButtonText("error...");
         }}
         buttonText={buttonText}
       />

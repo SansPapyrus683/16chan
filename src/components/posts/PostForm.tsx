@@ -31,7 +31,6 @@ export function PostForm({
   editVis = false,
   buttonText = "submit",
   onSubmit, // why the hell is next js giving warnings on these two
-  onParseError,
 }: {
   iPics?: File[];
   iTitle?: string;
@@ -41,7 +40,6 @@ export function PostForm({
   editVis?: boolean;
   buttonText?: string;
   onSubmit: (pd: PostData) => void;
-  onParseError: (e: any) => void;
 }) {
   const [pics, setPics] = useState<File[]>(iPics);
   const [title, setTitle] = useState(iTitle);
@@ -50,6 +48,7 @@ export function PostForm({
   const sourceType = sauceUrl(iSauce.src, iSauce.id) === null ? "AUTO" : iSauce.src;
   const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>(sourceType);
   const [vis, setVis] = useState<Visibility>(iVis);
+  const [err, setErr] = useState("");
 
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,7 +64,7 @@ export function PostForm({
           return Tag.parse({ category, name });
         });
     } catch (e) {
-      onParseError(e);
+      setErr(`tag parsing: ${e}`);
       return;
     }
 
@@ -73,7 +72,7 @@ export function PostForm({
     try {
       parsedSauce = parseSauce(sauceType, sauce);
     } catch (e) {
-      onParseError(e);
+      setErr(`source parsing: ${e}`);
       return;
     }
 
@@ -147,6 +146,7 @@ export function PostForm({
           {buttonText}
         </button>
       </form>
+      <span className="text-red-600">{err}</span>
     </div>
   );
 }
