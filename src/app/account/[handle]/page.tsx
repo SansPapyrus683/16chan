@@ -8,7 +8,13 @@ import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
 import { auth } from "@clerk/nextjs/server";
 
-export default async function Account({ params }: { params: { handle: string } }) {
+export default async function Account({
+  params,
+  searchParams: sp,
+}: {
+  params: { handle: string };
+  searchParams: { cursor: string | string[] | undefined };
+}) {
   const handle = params.handle;
   const { userId } = auth();
 
@@ -21,7 +27,9 @@ export default async function Account({ params }: { params: { handle: string } }
     }
     return <div>something terrible has happened</div>;
   }
-  const posts = await api.user.userPosts({ user: profile.id });
+
+  const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
+  const posts = await api.user.userPosts({ user: profile.id, cursor });
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
