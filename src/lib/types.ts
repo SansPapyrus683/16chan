@@ -30,7 +30,7 @@ export function parseSauce(mode: ArtSource | "AUTO", sauce: string) {
       test = () => /^[0-9]+$/.test(sauce);
       break;
     case "DA":
-      test = () => /^.*$/.test(sauce); // MAKE BETTER LATER
+      test = () => /^[-a-zA-Z0-9]+-[0-9]+$/.test(sauce); // MAKE BETTER LATER
       break;
     case "OTHER":
       test = () => isValidHttpUrl(sauce);
