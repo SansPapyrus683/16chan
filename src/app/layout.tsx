@@ -1,5 +1,4 @@
 import "@/globals.css";
-import React from "react";
 
 import { PageLayout } from "@/components/PageLayout.tsx"
 import React from "react";
