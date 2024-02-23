@@ -2,6 +2,7 @@ import "@/globals.css";
 import React from "react";
 
 import { PageLayout } from "@/components/PageLayout.tsx"
+import React from "react";
 
 import { Comic_Neue } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
