@@ -33,7 +33,31 @@ export const Sauce = z
   })
   .optional();
 
-export function parseSauce(url: string): z.infer<typeof Sauce> {
+export function parseSauce(mode: ArtSource | "AUTO", sauce: string) {
+  if (mode === "AUTO") {
+    return autoParse(sauce);
+  }
+
+  let test;
+  switch (mode) {
+    case "PIXIV":
+    case "TWITTER":
+      test = () => /^[0-9]+$/.test(sauce);
+      break;
+    case "DA":
+      test = () => /^.*$/.test(sauce); // MAKE BETTER LATER
+      break;
+    case "OTHER":
+      test = () => isValidHttpUrl(sauce);
+      break;
+  }
+  if (!test()) {
+    throw new Error(`${sauce} is not a valid id for ${mode}`);
+  }
+  return Sauce.parse({ src: mode, id: sauce });
+}
+
+export function autoParse(url: string): z.infer<typeof Sauce> {
   if (!isValidHttpUrl(url)) {
     return Sauce.parse({ src: "OTHER", id: "" });
   }

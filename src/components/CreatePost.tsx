@@ -6,6 +6,14 @@ import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
 import { parseSauce, parseTag } from "@/lib/types";
 
+const SOURCE_NAME = {
+  DA: "DeviantArt",
+  PIXIV: "Pixiv",
+  TWITTER: "Twitter",
+  OTHER: "Other URL",
+  AUTO: "Auto-detect from URL",
+};
+
 export function CreatePost() {
   const router = useRouter();
 
@@ -23,11 +31,13 @@ export function CreatePost() {
   const [name, setName] = useState("");
   const [tags, setTags] = useState("");
   const [sauce, setSauce] = useState("");
+  const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>("OTHER");
   const [buttonText, setButtonText] = useState("submit");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setButtonText("creating...");
+
     createPost.mutate({
       title: name,
       tags: tags
@@ -38,7 +48,7 @@ export function CreatePost() {
           return parseTag(name!, category);
         }),
       images: await Promise.all(pics.map(async (p) => await toBase64(p))),
-      sauce: parseSauce(sauce),
+      sauce: parseSauce(sauceType, sauce),
     });
   };
 
@@ -62,18 +72,28 @@ export function CreatePost() {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="name..."
+          placeholder="title..."
           className="block border-2"
         />
+
+        <select onChange={(e) => setSauceType(e.target.value as typeof sauceType)}>
+          {Object.entries(SOURCE_NAME).map(([val, name]) => (
+            <option value={val} key={val}>
+              {name}
+            </option>
+          ))}
+        </select>
         <input
           value={sauce}
           onChange={(e) => setSauce(e.target.value)}
           placeholder="sauce..."
           className="block border-2"
         />
-        <button type="submit">{buttonText}</button>
+
+        <button type="submit" className="block border-2 p-0.5">
+          {buttonText}
+        </button>
       </form>
-      <div>parsed sauce: {JSON.stringify(parseSauce(sauce))}</div>
     </div>
   );
 }
