@@ -1,7 +1,7 @@
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { checkPerms, findAlbum } from "@/lib/db";
-import { Vis } from "@/lib/types";
+import { Visibility } from "@prisma/client";
 
 export const albumRouter = createRouter({
   create: protectedProcedure
@@ -9,7 +9,7 @@ export const albumRouter = createRouter({
       z
         .object({
           name: z.string().optional(),
-          visibility: Vis,
+          visibility: z.nativeEnum(Visibility).optional(),
         })
         .default({}),
     )

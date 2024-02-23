@@ -6,7 +6,8 @@ import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/
 import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
 import { checkPerms, findPost, isMod } from "@/lib/db";
 import { s3Delete, s3Upload } from "@/lib/s3";
-import { Sauce, Tag, Vis } from "@/lib/types";
+import { Sauce, Tag } from "@/lib/types";
+import { Visibility } from "@prisma/client";
 
 export const postCrudRouter = createRouter({
   create: protectedProcedure
@@ -18,7 +19,7 @@ export const postCrudRouter = createRouter({
           .refine((d) => Base64.isValid(removeDataURL(d)))
           .array()
           .min(1),
-        visibility: Vis,
+        visibility: z.nativeEnum(Visibility).optional(),
         sauce: Sauce,
         tags: Tag.array().default([]),
       }),
