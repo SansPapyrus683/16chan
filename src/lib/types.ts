@@ -1,9 +1,6 @@
 import { z } from "zod";
-import { ArtSource, TagCategory, Visibility } from "@prisma/client";
+import { ArtSource, TagCategory } from "@prisma/client";
 import { isValidHttpUrl } from "@/lib/utils";
-
-// maybe this is a bit too short for a centralized definition, but oh well
-export const Vis = z.nativeEnum(Visibility).optional();
 
 export function validTag(tag: string) {
   return /^[-a-z]+$/.test(tag);

@@ -84,6 +84,9 @@ export function CreatePost() {
             </option>
           ))}
         </select>
+
+        <select></select>
+
         <input
           value={sauce}
           onChange={(e) => setSauce(e.target.value)}
