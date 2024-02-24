@@ -6,6 +6,7 @@ import { TagPost } from "@/components/posts/TagPost";
 import Link from "next/link";
 import { sauceUrl } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
+import { CommentInput, CommentList } from "@/components/Comment";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   let post;
@@ -75,6 +76,8 @@ export default async function PostView({ params }: { params: { pid: string } }) 
 
       <TagPost pid={params.pid} />
       <AddToAlbum pid={params.pid} />
+      <CommentList comments={post.comments} />
+      <CommentInput pid={params.pid} />
     </div>
   );
 }
