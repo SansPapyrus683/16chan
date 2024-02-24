@@ -3,8 +3,10 @@ import { s3RawUrl } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 
+type DBContext = { db: Context["db"] };
+
 export async function findPost(
-  ctx: { db: Context["db"] },
+  ctx: DBContext,
   postId: string,
   mustExist: boolean = true,
   include: {
@@ -37,8 +39,10 @@ export async function findPost(
   return post;
 }
 
+export async function postExists(ctx: DBContext, postId: string) {}
+
 export async function findAlbum(
-  ctx: { db: Context["db"] },
+  ctx: DBContext,
   albumId: string,
   mustExist: boolean = true,
   include: {
@@ -73,7 +77,7 @@ export async function findAlbum(
 }
 
 export async function findComment(
-  ctx: { db: Context["db"] },
+  ctx: DBContext,
   commentId: string,
   mustExist: boolean = true,
 ) {
@@ -89,11 +93,7 @@ export async function findComment(
   return comm;
 }
 
-export async function findUser(
-  ctx: { db: Context["db"] },
-  uid: string,
-  mustExist: boolean = true,
-) {
+export async function findUser(ctx: DBContext, uid: string, mustExist: boolean = true) {
   const user = ctx.db.user.findUnique({ where: { id: uid } });
   if (user === null && mustExist) {
     throw new TRPCError({
@@ -104,7 +104,7 @@ export async function findUser(
   return user;
 }
 
-export async function isMod(ctx: { db: Context["db"]; auth: Context["auth"] }) {
+export async function isMod(ctx: DBContext & { auth: Context["auth"] }) {
   const user = await ctx.db.user.findUnique({ where: { id: ctx.auth.userId! } });
   return user === null ? false : user.isMod;
 }
