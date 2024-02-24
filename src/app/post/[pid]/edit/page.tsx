@@ -17,7 +17,6 @@ export default async function PostEditing({ params }: { params: { pid: string } 
     return redirect(`/post/${params.pid}`);
   }
 
-  console.log(post);
   return (
     <div className="space-y-4">
       <h1>edit post {params.pid} here</h1>
