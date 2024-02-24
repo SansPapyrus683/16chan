@@ -1,9 +1,29 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ArtSource } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+import { notFound } from "next/navigation";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export async function serverFetch<T>(
+  func: () => Promise<T>,
+): Promise<{ good: true; val: T } | { good: false; err: string }> {
+  try {
+    return { good: true, val: await func() };
+  } catch (e) {
+    let err = "something screwed up";
+    if (e instanceof TRPCError) {
+      if (e.code === "NOT_FOUND") {
+        notFound();
+      } else if (e.code === "FORBIDDEN") {
+        err = "not authorized to see this";
+      }
+    }
+    return { good: false, err };
+  }
 }
 
 export function isValidHttpUrl(string: string) {

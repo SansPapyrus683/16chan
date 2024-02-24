@@ -1,28 +1,16 @@
 import { api } from "@/trpc/server";
-import { TRPCError } from "@trpc/server";
 import { DeleteAlbum } from "@/components/DeleteAlbum";
 import { PostList } from "@/components/PostList";
-import { notFound } from "next/navigation";
+import { serverFetch } from "@/lib/utils";
 
 export default async function AlbumView({ params }: { params: { aid: string } }) {
-  let album;
-  let error = null;
-  try {
-    album = await api.album.get(params.aid);
-  } catch (e) {
-    error = "something screwed up";
-    if (e instanceof TRPCError) {
-      if (e.code == "NOT_FOUND") {
-        notFound();
-      } else if (e.code === "FORBIDDEN") {
-        error = "you aren't authorized to see this post";
-      }
-    }
+  const ret = await serverFetch(async () => await api.album.get(params.aid));
+  if (!ret.good) {
+    return <div>{ret.err}</div>;
   }
+  const album = ret.val;
 
-  return !album ? (
-    <div>{error}</div>
-  ) : (
+  return (
     <>
       <h1>{album!.name}</h1>
       <PostList posts={album!.posts.map((p) => p.post)} likeButton />

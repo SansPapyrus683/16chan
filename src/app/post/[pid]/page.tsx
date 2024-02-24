@@ -1,32 +1,19 @@
 import { api } from "@/trpc/server";
-import { TRPCError } from "@trpc/server";
 import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
 import { TagPost } from "@/components/TagPost";
 import Link from "next/link";
-import { sauceUrl } from "@/lib/utils";
+import { sauceUrl, serverFetch } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { CommentInput, CommentList } from "@/components/Comment";
-import { notFound } from "next/navigation";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
-  let post;
-  let error = null;
-  try {
-    post = await api.post.get(params.pid);
-  } catch (e) {
-    error = "something screwed up";
-    if (e instanceof TRPCError) {
-      if (e.code == "NOT_FOUND") {
-        notFound();
-      } else if (e.code === "FORBIDDEN") {
-        error = "you aren't authorized to see this post";
-      }
-    }
+  const ret = await serverFetch(async () => await api.post.get(params.pid));
+  if (!ret.good) {
+    return <div>{ret.err}</div>;
   }
-  if (!post) {
-    return <div>{error}</div>;
-  }
+  const post = ret.val;
+
   const { userId } = auth();
 
   const author = post.userId && (await api.user.profileByUid(post.userId));
