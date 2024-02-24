@@ -5,6 +5,7 @@ import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
 import { toBase64 } from "@/lib/files";
 import { useState } from "react";
+import { RouterOutputs } from "@/trpc/shared";
 
 export function CreatePost() {
   const router = useRouter();
@@ -37,12 +38,15 @@ export function CreatePost() {
   );
 }
 
-export function EditPost({ pid }: { pid: string }) {
+export function EditPost({
+  pid,
+  initPost,
+}: {
+  pid: string;
+  initPost?: RouterOutputs["post"]["get"];
+}) {
   const router = useRouter();
-  const { data: post } = api.post.get.useQuery(pid);
-  if (post === null) {
-    return <div>post not found</div>;
-  }
+  const { data: post } = api.post.get.useQuery(pid, { initialData: initPost });
 
   const utils = api.useUtils();
   const editPost = api.post.edit.useMutation({

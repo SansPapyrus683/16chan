@@ -7,6 +7,7 @@ import Link from "next/link";
 import { sauceUrl } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { CommentInput, CommentList } from "@/components/Comment";
+import { notFound } from "next/navigation";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   let post;
@@ -17,7 +18,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
     error = "something screwed up";
     if (e instanceof TRPCError) {
       if (e.code == "NOT_FOUND") {
-        error = "this post wasn't found";
+        notFound();
       } else if (e.code === "FORBIDDEN") {
         error = "you aren't authorized to see this post";
       }
