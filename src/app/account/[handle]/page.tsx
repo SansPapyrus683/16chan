@@ -1,4 +1,3 @@
-import { UserButton } from "@clerk/nextjs";
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
@@ -34,7 +33,6 @@ export default async function Account({
 
   return (
     <div className="space-y-4">
-      <UserButton />
       <div>account page for {profile.username}</div>
       {profile.id !== userId && <FollowButton uid={profile.id} />}
       <div>
