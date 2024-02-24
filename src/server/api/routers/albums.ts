@@ -40,7 +40,7 @@ export const albumRouter = createRouter({
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const album = await findAlbum(ctx, input, false, false);
+      const album = await findAlbum(ctx, input, false, { images: false });
       if (album === null) {
         return null;
       }

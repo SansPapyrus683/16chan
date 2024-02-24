@@ -98,7 +98,7 @@ export const postCrudRouter = createRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await findPost(ctx, input.pid, false, true);
+      await findPost(ctx, input.pid);
       if (input.tags) {
         await ctx.db.tag.createMany({
           data: input.tags.map((t) => ({
@@ -132,7 +132,11 @@ export const postCrudRouter = createRouter({
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(ctx, input, false, false);
+      const post = await findPost(ctx, input, false, {
+        images: false,
+        tags: false,
+        comments: false,
+      });
       if (post === null) {
         return null;
       }

@@ -20,7 +20,7 @@ export default async function Account({
 
   let profile;
   try {
-    profile = await api.user.profile(handle);
+    profile = await api.user.profileByUsername(handle);
   } catch (e) {
     if (e instanceof TRPCError && e.code === "NOT_FOUND") {
       return notFound();

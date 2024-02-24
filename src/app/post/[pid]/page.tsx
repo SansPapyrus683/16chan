@@ -6,6 +6,7 @@ import { TagPost } from "@/components/posts/TagPost";
 import Link from "next/link";
 import { sauceUrl } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
+import { CommentInput, CommentList } from "@/components/Comment";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   let post;
@@ -27,12 +28,23 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   }
   const { userId } = auth();
 
+  const author = post.userId && (await api.user.profileByUid(post.userId));
   const src = sauceUrl(post.src, post.artId);
   return (
     <div className="space-y-4">
       <h1>{post.title}</h1>
+      <h2>
+        posted by{" "}
+        {author ? (
+          <Link href={`/account/${author.username}`}>{author.username}</Link>
+        ) : (
+          "a deleted user"
+        )}
+      </h2>
       {post.userId == userId && (
-        <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
+        <div>
+          <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
+        </div>
       )}
       <div className="space-y-2">
         {post.images.map((u, ind) => (
@@ -46,9 +58,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           />
         ))}
       </div>
-
       <div>source: {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}</div>
-
       <div>
         tags:{" "}
         {post.tags.length == 0 ? (
@@ -66,6 +76,8 @@ export default async function PostView({ params }: { params: { pid: string } }) 
 
       <TagPost pid={params.pid} />
       <AddToAlbum pid={params.pid} />
+      <CommentList comments={post.comments} />
+      <CommentInput pid={params.pid} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { Visibility } from "@prisma/client";
 import { albumPages, findUser, PageSize, postPages, prismaOrder } from "@/lib/db";
 
 export const userProfileRouter = createRouter({
-  profile: publicProcedure.input(z.string()).query(async ({ input }) => {
+  profileByUsername: publicProcedure.input(z.string()).query(async ({ input }) => {
     const userList = await clerkClient.users.getUserList({ username: [input] });
     if (userList.length === 0) {
       throw new TRPCError({
@@ -20,6 +20,19 @@ export const userProfileRouter = createRouter({
       });
     }
     return userList[0]!;
+  }),
+  profileByUid: publicProcedure.input(z.string()).query(async ({ input }) => {
+    try {
+      return await clerkClient.users.getUser(input);
+    } catch (e) {
+      if ((e as { status: any })?.status === 404) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `the user ${input} doesn't exist`,
+        });
+      }
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: String(e) });
+    }
   }),
   userPosts: publicProcedure
     .input(

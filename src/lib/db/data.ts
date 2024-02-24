@@ -6,20 +6,32 @@ import { db } from "@/server/db";
 export async function findPost(
   ctx: { db: Context["db"] },
   postId: string,
-  includeImg: boolean = true,
   mustExist: boolean = true,
+  include: {
+    images?: boolean;
+    comments?: boolean;
+    tags?: boolean;
+  } = {},
 ) {
+  include = {
+    images: true,
+    tags: true,
+    comments: true,
+    ...include,
+  };
   const post = await ctx.db.post.findUnique({
     where: { id: postId },
-    include: { images: includeImg, tags: true },
+    include: include,
   });
+
   if (post === null && mustExist) {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: `post w/ id ${postId} not found`,
     });
   }
-  if (post !== null && includeImg) {
+
+  if (post !== null && include.images) {
     post.images.forEach((i) => (i.img = s3RawUrl(i.img)));
   }
   return post;
@@ -28,19 +40,26 @@ export async function findPost(
 export async function findAlbum(
   ctx: { db: Context["db"] },
   albumId: string,
-  includePosts: boolean = true,
   mustExist: boolean = true,
+  include: {
+    images?: boolean;
+  } = {},
 ) {
+  include = {
+    images: true,
+    ...include,
+  };
+
   const album = await ctx.db.album.findUnique({
     where: { id: albumId },
     include: {
       posts: {
-        include: { post: { include: { images: includePosts } } },
+        include: { post: { include } },
         orderBy: { addedAt: "desc" },
       },
     },
   });
-  if (album !== null && includePosts) {
+  if (album !== null && include.images) {
     album.posts.forEach((p) => p.post.images.forEach((i) => (i.img = s3RawUrl(i.img))));
   }
 
