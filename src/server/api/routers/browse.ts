@@ -31,6 +31,7 @@ export const browseRouter = createRouter({
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: prismaOrder(input.sortBy),
       };
+
       return postPages(
         ctx,
         params,
