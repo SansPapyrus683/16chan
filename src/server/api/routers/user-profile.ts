@@ -36,15 +36,13 @@ export const userProfileRouter = createRouter({
   }),
   userPosts: publicProcedure
     .input(
-      z
-        .object({
-          user: z.string().optional(),
-          what: z.enum(["posts", "likes"]).default("posts"),
-          sortBy: z.enum(["new", "likes", "alpha"]).default("new"),
-          limit: PageSize,
-          cursor: z.string().uuid().optional(),
-        })
-        .default({}),
+      z.object({
+        user: z.string(),
+        what: z.enum(["posts", "likes"]).default("posts"),
+        sortBy: z.enum(["new", "likes", "alpha"]).default("new"),
+        limit: PageSize,
+        cursor: z.string().uuid().optional(),
+      }),
     )
     .query(async ({ ctx, input }) => {
       const id = input.user ?? ctx.auth.userId;

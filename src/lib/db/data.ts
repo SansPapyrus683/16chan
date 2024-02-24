@@ -39,8 +39,6 @@ export async function findPost(
   return post;
 }
 
-export async function postExists(ctx: DBContext, postId: string) {}
-
 export async function findAlbum(
   ctx: DBContext,
   albumId: string,
