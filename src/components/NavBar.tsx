@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link"
-import { UserButton } from "@clerk/nextjs"
+import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 
-export function NavBar() { 
+export function NavBar() {
   return (
-    <nav className="flex fixed z-50 w-full h-16 justify-between border-b border-gray-300 bg-white items-center pl-10 pr-10 text-base">
+    <nav className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-gray-300 bg-white pl-10 pr-10 text-base">
       <div className="flex space-x-16">
         <div className="">
           <Link href="/">16chan</Link>
@@ -26,6 +26,5 @@ export function NavBar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }
-
