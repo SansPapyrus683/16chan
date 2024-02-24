@@ -86,7 +86,7 @@ export const postCrudRouter = createRouter({
   get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
     const post = await findPost(ctx, input);
     checkPerms(post!, ctx.auth.userId, "view");
-    return post;
+    return post!;
   }),
   edit: protectedProcedure
     .input(

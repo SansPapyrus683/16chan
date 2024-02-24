@@ -59,7 +59,7 @@ export function PaginatedPostList({
             router.push(`${pathname}?${modParams("cursor", prevCursor)}`);
           }}
           disabled={prevCursor === undefined}
-          className="border-4 p-1"
+          className="border p-1"
         >
           prev
         </button>
@@ -68,7 +68,7 @@ export function PaginatedPostList({
             e.preventDefault();
             router.push(`${pathname}?${modParams("cursor", nextCursor)}`);
           }}
-          className="ml-3 border-4 p-1"
+          className="ml-3 border p-1"
           disabled={nextCursor === undefined}
         >
           next

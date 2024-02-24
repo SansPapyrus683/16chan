@@ -1,4 +1,4 @@
-import { CreatePost } from "@/components/posts/MakePost";
+import { CreatePost } from "@/components/MakePost";
 
 export default function PostCreation() {
   return (
