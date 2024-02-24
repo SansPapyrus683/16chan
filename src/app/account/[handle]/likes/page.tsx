@@ -1,6 +1,5 @@
 import { api } from "@/trpc/server";
 import { PaginatedPostList } from "@/components/PostList";
-import { UserButton } from "@clerk/nextjs";
 import { serverFetch } from "@/lib/utils";
 
 export default async function userLikes({ params }: { params: { handle: string } }) {
@@ -15,7 +14,6 @@ export default async function userLikes({ params }: { params: { handle: string }
   const likes = await api.user.userPosts({ user: profile.id, what: "likes" });
   return (
     <>
-      <UserButton />
       <div>{profile.username}'s likes</div>
       <br />
       <div>
