@@ -27,7 +27,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   }
   const { userId } = auth();
 
-  const author = post.userId ? await api.user.profileByUid(post.userId) : null;
+  const author = post.userId && (await api.user.profileByUid(post.userId));
   const src = sauceUrl(post.src, post.artId);
   return (
     <div className="space-y-4">
@@ -40,11 +40,11 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           "a deleted user"
         )}
       </h2>
-      <div>
-        {post.userId == userId && (
+      {post.userId == userId && (
+        <div>
           <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
-        )}
-      </div>
+        </div>
+      )}
       <div className="space-y-2">
         {post.images.map((u, ind) => (
           <Image
