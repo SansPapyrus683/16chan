@@ -1,6 +1,6 @@
 import "@/globals.css";
 
-import { PageLayout } from "@/components/PageLayout.tsx"
+import { NavBar } from "@/components/NavBar"
 import React from "react";
 
 import { Comic_Neue } from "next/font/google";
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={comicNeue.className}>
         <TRPCReactProvider>
           <ClerkProvider>
-            <PageLayout/>
+            <NavBar />
             <div className="pt-16">
               {children}
             </div>
