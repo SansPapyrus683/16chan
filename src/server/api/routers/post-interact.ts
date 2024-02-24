@@ -5,7 +5,11 @@ import { Tag } from "@/lib/types";
 
 export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
-    const post = await findPost(ctx, input, false);
+    const post = await findPost(ctx, input, true, {
+      images: false,
+      tags: false,
+      comments: false,
+    });
     // liking doesn't really change the post- as long as the user can view it it's fine
     checkPerms(post!, ctx.auth.userId, "view");
 
@@ -34,7 +38,7 @@ export const postInteractRouter = createRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(ctx, input.post, false);
+      const post = await findPost(ctx, input.post);
       checkPerms(post!, ctx.auth.userId, "view");
       const album = await findAlbum(ctx, input.album, false);
       checkPerms(album!, ctx.auth.userId, "change");
@@ -69,7 +73,7 @@ export const postInteractRouter = createRouter({
   tag: protectedProcedure
     .input(z.object({ post: z.string().uuid(), tags: Tag.array() }))
     .mutation(async ({ ctx, input }) => {
-      await findPost(ctx, input.post, false);
+      await findPost(ctx, input.post);
 
       await ctx.db.tag.createMany({
         data: input.tags,
@@ -89,7 +93,7 @@ export const postInteractRouter = createRouter({
   untag: protectedProcedure
     .input(z.object({ post: z.string().uuid(), tag: Tag }))
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(ctx, input.post, false);
+      const post = await findPost(ctx, input.post);
       if (!(await isMod(ctx))) {
         checkPerms(post!, ctx.auth.userId, "change");
       }

@@ -6,7 +6,7 @@ export const commentRouter = createRouter({
   create: protectedProcedure
     .input(z.object({ post: z.string().uuid(), text: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await findPost(ctx, input.post, false);
+      await findPost(ctx, input.post);
       return ctx.db.comment.create({
         data: {
           userId: ctx.auth.userId!,
