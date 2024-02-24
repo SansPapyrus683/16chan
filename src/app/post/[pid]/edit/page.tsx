@@ -1,28 +1,16 @@
 import { api } from "@/trpc/server";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { DeletePost } from "@/components/DeletePost";
 import { EditPost } from "@/components/MakePost";
-import { TRPCError } from "@trpc/server";
+import { serverFetch } from "@/lib/utils";
 
 export default async function PostEditing({ params }: { params: { pid: string } }) {
-  let post;
-  let error = null;
-  try {
-    post = await api.post.get(params.pid);
-  } catch (e) {
-    error = "something screwed up";
-    if (e instanceof TRPCError) {
-      if (e.code == "NOT_FOUND") {
-        notFound();
-      } else if (e.code === "FORBIDDEN") {
-        error = "you aren't authorized to see this post";
-      }
-    }
+  const ret = await serverFetch(async () => await api.post.get(params.pid));
+  if (!ret.good) {
+    return <div>{ret.err}</div>;
   }
-  if (!post) {
-    return <div>{error}</div>;
-  }
+  const post = ret.val;
 
   const { userId } = auth();
   if (post!.userId !== userId) {
