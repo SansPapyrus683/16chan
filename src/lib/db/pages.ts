@@ -22,7 +22,9 @@ export async function postPages(
     ],
   };
   if (params.cursor) {
-    const post = await ctx.db.post.findUnique({ where: params.cursor });
+    const post = await ctx.db.post.findFirst({
+      where: { ...params.cursor, ...params.where },
+    });
     if (post === null) {
       delete params.cursor;
     }
@@ -71,8 +73,10 @@ export async function albumPages(
     ],
   };
   if (params.cursor) {
-    const post = await ctx.db.album.findUnique({ where: params.cursor });
-    if (post === null) {
+    const album = await ctx.db.album.findFirst({
+      where: { ...params.cursor, ...params.where },
+    });
+    if (album === null) {
       delete params.cursor;
     }
   }
