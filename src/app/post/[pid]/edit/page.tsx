@@ -7,7 +7,7 @@ import { EditPost } from "@/components/MakePost";
 export default async function PostEditing({ params }: { params: { pid: string } }) {
   const post = await api.post.get(params.pid);
   if (post === null) {
-    return notFound();
+    notFound();
   }
   const { userId } = auth();
   if (post.userId !== userId) {

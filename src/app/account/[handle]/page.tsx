@@ -22,9 +22,9 @@ export default async function Account({
     profile = await api.user.profileByUsername(handle);
   } catch (e) {
     if (e instanceof TRPCError && e.code === "NOT_FOUND") {
-      return notFound();
+      notFound();
     }
-    return <div>something terrible has happened</div>;
+    throw e;
   }
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
