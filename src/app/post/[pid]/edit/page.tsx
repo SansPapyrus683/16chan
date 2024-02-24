@@ -1,8 +1,8 @@
 import { api } from "@/trpc/server";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { DeletePost } from "@/components/ui/DeletePost";
-import { EditPost } from "@/components/posts/MakePost";
+import { DeletePost } from "@/components/DeletePost";
+import { EditPost } from "@/components/MakePost";
 
 export default async function PostEditing({ params }: { params: { pid: string } }) {
   const post = await api.post.get(params.pid);

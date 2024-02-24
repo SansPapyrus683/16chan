@@ -2,7 +2,7 @@ import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
-import { TagPost } from "@/components/posts/TagPost";
+import { TagPost } from "@/components/TagPost";
 import Link from "next/link";
 import { sauceUrl } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";

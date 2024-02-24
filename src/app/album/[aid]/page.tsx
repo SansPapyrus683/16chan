@@ -1,7 +1,7 @@
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { DeleteAlbum } from "@/components/DeleteAlbum";
-import { PostList } from "@/components/posts/PostList";
+import { PostList } from "@/components/PostList";
 
 export default async function AlbumView({ params }: { params: { aid: string } }) {
   let album;

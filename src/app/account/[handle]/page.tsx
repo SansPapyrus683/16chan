@@ -2,7 +2,7 @@ import { UserButton } from "@clerk/nextjs";
 import { api } from "@/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
-import { PaginatedPostList } from "@/components/posts/PostList";
+import { PaginatedPostList } from "@/components/PostList";
 import { CreateAlbum } from "@/components/CreateAlbum";
 import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
