@@ -40,7 +40,7 @@ export const postInteractRouter = createRouter({
     .mutation(async ({ ctx, input }) => {
       const post = await findPost(ctx, input.post);
       checkPerms(post!, ctx.auth.userId, "view");
-      const album = await findAlbum(ctx, input.album, false);
+      const album = await findAlbum(ctx, input.album);
       checkPerms(album!, ctx.auth.userId, "change");
 
       const ids = {
@@ -56,7 +56,7 @@ export const postInteractRouter = createRouter({
   deleteFromAlbum: protectedProcedure
     .input(z.object({ post: z.string().uuid(), album: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const album = await findAlbum(ctx, input.album, false, false);
+      const album = await findAlbum(ctx, input.album, false, { images: false });
       if (album === null) {
         return null;
       }

@@ -40,19 +40,26 @@ export async function findPost(
 export async function findAlbum(
   ctx: { db: Context["db"] },
   albumId: string,
-  includePosts: boolean = true,
   mustExist: boolean = true,
+  include: {
+    images?: boolean;
+  } = {},
 ) {
+  include = {
+    images: true,
+    ...include,
+  };
+
   const album = await ctx.db.album.findUnique({
     where: { id: albumId },
     include: {
       posts: {
-        include: { post: { include: { images: includePosts } } },
+        include: { post: { include } },
         orderBy: { addedAt: "desc" },
       },
     },
   });
-  if (album !== null && includePosts) {
+  if (album !== null && include.images) {
     album.posts.forEach((p) => p.post.images.forEach((i) => (i.img = s3RawUrl(i.img))));
   }
 
