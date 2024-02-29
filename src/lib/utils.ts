@@ -44,6 +44,8 @@ export function sauceUrl(source: ArtSource, id: string): [string, string] | null
       return [`Twitter ID ${id}`, `https://twitter.com/i/web/status/${id}`];
     case "PIXIV":
       return [`Pixiv ID ${id}`, `https://pixiv.net/artworks/${id}`];
+    case "OC":
+      return ["Original art", "#"];
     case "OTHER":
       return isValidHttpUrl(id) ? [id, id] : null;
   }

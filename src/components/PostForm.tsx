@@ -11,6 +11,7 @@ const SOURCE_NAME = {
   PIXIV: "Pixiv",
   TWITTER: "Twitter",
   OTHER: "Other URL",
+  OC: "Original (photo or art)",
   AUTO: "Auto-detect from URL",
 };
 
@@ -121,12 +122,14 @@ export function PostForm({
           ))}
         </select>
 
-        <input
-          value={sauce}
-          onChange={(e) => setSauce(e.target.value)}
-          placeholder="sauce..."
-          className="block border-2"
-        />
+        {sauceType !== "OC" && (
+          <input
+            value={sauce}
+            onChange={(e) => setSauce(e.target.value)}
+            placeholder="sauce..."
+            className="block border-2"
+          />
+        )}
 
         {editVis && (
           <select

@@ -19,11 +19,11 @@ export const Sauce = z
   .optional();
 
 export function parseSauce(mode: ArtSource | "AUTO", sauce: string) {
-  if (mode === "AUTO" || !sauce) {
+  if (mode === "AUTO" && !sauce) {
     return autoParse(sauce);
   }
 
-  let test;
+  let test = () => true;
   switch (mode) {
     case "PIXIV":
     case "TWITTER":
