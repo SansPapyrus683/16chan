@@ -8,13 +8,13 @@ export const browseRouter = createRouter({
   browse: publicProcedure
     .input(
       z.object({
-        query: z.string().optional(),
+        query: z.string().default(""),
         sortBy: z.enum(["new", "likes"]).default("new"),
         cursor: z.string().uuid().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const [tags, other] = input.query ? parseSearch(input.query) : [[], []];
+      const { tags, other, sources } = parseSearch(input.query);
       const params = {
         where: {
           visibility: Visibility.PUBLIC,
@@ -27,6 +27,11 @@ export const browseRouter = createRouter({
               title: { contains: o },
             })),
           ],
+          ...(sources.length > 0
+            ? {
+                src: { in: sources },
+              }
+            : {}),
         },
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: prismaOrder(input.sortBy),

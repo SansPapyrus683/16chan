@@ -1,4 +1,4 @@
-import { Visibility } from "@prisma/client";
+import { ArtSource, Visibility } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
 export function prismaOrder(order: "new" | "likes" | "alpha") {
@@ -43,12 +43,47 @@ export function checkPerms(
   }
 }
 
-export function parseSearch(query: string): [string[], string[]] {
+export function searchSourceConv(src: string) {
+  switch (src.toUpperCase()) {
+    case "PIXIV":
+    case "PIX":
+      return ArtSource.PIXIV;
+    case "DEVIANTART":
+    case "DA":
+      return ArtSource.DA;
+    case "TWITTER":
+    case "X":
+      return ArtSource.TWITTER;
+    case "OC":
+    case "OG":
+      return ArtSource.OC;
+    case "OTHER":
+      return ArtSource.OTHER;
+  }
+}
+
+export function parseSearch(query: string) {
   const splitQ = query.split(/(\s+)/).filter((s) => s);
-  const tagged: string[] = [];
+  const tags: string[] = [];
   const other: string[] = [];
-  splitQ.forEach((s) =>
-    (s.startsWith("tag:") ? tagged : other).push(s.replace(/^tag:/, "")),
-  );
-  return [tagged.map((t) => t.split(",")).flat(), other];
+  const sources: ArtSource[] = [];
+
+  splitQ.forEach((s) => {
+    if (s.startsWith("tag:")) {
+      tags.push(s.replace(/^tag:/, ""));
+    } else if (s.startsWith("src:") || s.startsWith("source:")) {
+      s = s.replace(/^(src|source):/, "");
+      let src = searchSourceConv(s);
+      if (src) {
+        sources.push(src);
+      }
+    } else {
+      other.push(s);
+    }
+  });
+  return {
+    tags,
+    sources,
+    other,
+  };
 }
