@@ -12,6 +12,14 @@ const config = {
         protocol: "https",
         hostname: "16chan.s3.us-east-2.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "16chan-mini.s3.us-east-2.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "16chan-raw.s3.us-east-2.amazonaws.com",
+      },
     ],
   },
 };

@@ -14,7 +14,7 @@ const s3 = new S3Client({});
 export async function s3Upload(name: string, data: string, content: string) {
   return s3.send(
     new PutObjectCommand({
-      Bucket: env.AWS_BUCKET_NAME,
+      Bucket: env.AWS_BUCKET_RAW,
       Key: name,
       ContentType: content,
       Body: Buffer.from(base64StripUrl(data), "base64"),
@@ -22,24 +22,31 @@ export async function s3Upload(name: string, data: string, content: string) {
   );
 }
 
-// shouldn't need this after i made all objects public, but just in case
-export async function s3Retrieve(name: string) {
+export async function s3Get(name: string, mini: boolean = true) {
   const cmd = new GetObjectCommand({
-    Bucket: env.AWS_BUCKET_NAME,
+    Bucket: mini ? env.AWS_BUCKET_MINI : env.AWS_BUCKET_RAW,
     Key: name,
   });
   return getSignedUrl(s3, cmd, { expiresIn: 3600 });
 }
 
-export function s3RawUrl(name: string) {
-  return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${name}`;
+// keeping this here just in case we need it again
+export function s3RawUrl(name: string, mini: boolean = true) {
+  const bucket = mini ? env.AWS_BUCKET_MINI : env.AWS_BUCKET_RAW;
+  return `https://${bucket}.s3.${env.AWS_REGION}.amazonaws.com/${name}`;
 }
 
 export async function s3Delete(name: string) {
-  return s3.send(
-    new DeleteObjectCommand({
-      Bucket: env.AWS_BUCKET_NAME,
-      Key: name,
-    }),
+  const buckets = [env.AWS_BUCKET_MINI, env.AWS_BUCKET_RAW];
+  return Promise.all(
+    buckets.map(
+      async (b) =>
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: b,
+            Key: name,
+          }),
+        ),
+    ),
   );
 }

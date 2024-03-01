@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { s3RawUrl } from "@/lib/s3";
+import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 
@@ -34,7 +34,9 @@ export async function findPost(
   }
 
   if (post !== null && include.images) {
-    post.images.forEach((i) => (i.img = s3RawUrl(i.img)));
+    for (const i of post.images) {
+      i.img = await s3Get(i.img, false);
+    }
   }
   return post;
 }
@@ -62,7 +64,11 @@ export async function findAlbum(
     },
   });
   if (album !== null && include.images) {
-    album.posts.forEach((p) => p.post.images.forEach((i) => (i.img = s3RawUrl(i.img))));
+    for (const p of album.posts) {
+      for (const img of p.post.images) {
+        img.img = await s3Get(img.img);
+      }
+    }
   }
 
   if (album === null && mustExist) {
