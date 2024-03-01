@@ -25,9 +25,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={comicNeue.className}>
         <TRPCReactProvider>
           <ClerkProvider>
-            <NavBar />
-            <div className="pt-16">
-              {children}
+            <div className="flex h-screen">
+              <NavBar />
+              <div className="flex-grow pt-16">
+                {children}
+              </div>
             </div>
           </ClerkProvider>
         </TRPCReactProvider>
