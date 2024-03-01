@@ -18,8 +18,12 @@ export function base64ToFile(dataurl: string, filename: string) {
 }
 
 // https://stackoverflow.com/a/24289420/12128483
-export function removeDataURL(str: string) {
+export function base64StripUrl(str: string) {
   return str.split(",")[1]!;
+}
+
+export function base64Type(str: string) {
+  return str.substring("data:".length, str.indexOf(";base64"));
 }
 
 // found this somewhere online lmao too bad i forgot where

@@ -7,7 +7,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { env } from "@/env.js";
-import { removeDataURL } from "@/lib/files";
+import { base64StripUrl } from "@/lib/files";
 
 const s3 = new S3Client({});
 
@@ -17,7 +17,7 @@ export async function s3Upload(name: string, data: string, content: string) {
       Bucket: env.AWS_BUCKET_NAME,
       Key: name,
       ContentType: content,
-      Body: Buffer.from(removeDataURL(data), "base64"),
+      Body: Buffer.from(base64StripUrl(data), "base64"),
     }),
   );
 }

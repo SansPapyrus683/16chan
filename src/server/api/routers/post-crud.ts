@@ -3,7 +3,7 @@ import { Base64 } from "js-base64";
 import { TRPCError } from "@trpc/server";
 
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { ACCEPTED_IMAGE_TYPES, removeDataURL } from "@/lib/files";
+import { ACCEPTED_IMAGE_TYPES, base64StripUrl, base64Type } from "@/lib/files";
 import { checkPerms, findPost, isMod } from "@/lib/db";
 import { s3Delete, s3Upload } from "@/lib/s3";
 import { Sauce, Tag } from "@/lib/types";
@@ -16,7 +16,8 @@ export const postCrudRouter = createRouter({
         title: z.string().min(1),
         images: z
           .string()
-          .refine((d) => Base64.isValid(removeDataURL(d)))
+          .refine((d) => Base64.isValid(base64StripUrl(d)))
+          .refine((d) => ACCEPTED_IMAGE_TYPES.includes(base64Type(d)))
           .array()
           .min(1),
         visibility: z.nativeEnum(Visibility).optional(),
@@ -51,13 +52,6 @@ export const postCrudRouter = createRouter({
       const imgPaths = [];
       for (const [v, img] of input.images.entries()) {
         const type = img.substring("data:".length, img.indexOf(";base64"));
-        if (!ACCEPTED_IMAGE_TYPES.includes(type)) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `${type} image format not supported`,
-          });
-        }
-
         const ext = type.slice("image/".length);
         const path = `${post.id}-p${v}.${ext}`;
         imgPaths.push(path);
