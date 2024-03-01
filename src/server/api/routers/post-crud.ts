@@ -51,7 +51,7 @@ export const postCrudRouter = createRouter({
 
       const imgPaths = [];
       for (const [v, img] of input.images.entries()) {
-        const type = img.substring("data:".length, img.indexOf(";base64"));
+        const type = base64Type(img);
         const ext = type.slice("image/".length);
         const path = `${post.id}-p${v}.${ext}`;
         imgPaths.push(path);
