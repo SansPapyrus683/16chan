@@ -8,4 +8,20 @@
     @apply text-blue-400 visited:text-purple-500;
   }
   */
+
+  .title {
+    @apply font-bold;
+    @apply text-xl;
+  }
+
+  .category {
+    @apply font-bold;
+    @apply text-black;
+    @apply text-lg;
+  }
+
+  .subtext {
+    @apply text-gray-400;
+  }
 }
+

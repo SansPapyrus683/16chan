@@ -6,6 +6,13 @@ import Link from "next/link";
 import { sauceUrl, serverFetch } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { CommentInput, CommentList } from "@/components/Comment";
+import { ResizableHandle,
+         ResizablePanel,
+         ResizablePanelGroup, } from "@/components/ui/resizable"
+import { Accordion,
+         AccordionContent,
+         AccordionItem,
+         AccordionTrigger, } from "@/components/ui/accordion"
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   const ret = await serverFetch(async () => await api.post.get(params.pid));
@@ -19,19 +26,23 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   const author = post.userId && (await api.user.profileByUid(post.userId));
   const src = sauceUrl(post.src, post.artId);
   return (
-    <div className="space-y-4">
-      <h1>{post.title}</h1>
-      <h2>
-        posted by{" "}
-        {author ? (
-          <Link href={`/account/${author.username}`}>{author.username}</Link>
-        ) : (
-          "a deleted user"
+    <ResizablePanelGroup direction="horizontal" className="flex-1">
+      <ResizablePanel defaultSize={20} className="m-2 mr-0 min-w-48 max-w-2xl">
+        <h2 className="category">posted by:</h2>
+        <p className="subtext">
+          {author ? (
+            <Link href={`/account/${author.username}`}>{author.username}</Link>
+          ) : (
+              "a deleted user"
+            )}
+        </p>
+        {post.userId == userId && (
+          <div>
+            <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
+          </div>
         )}
-      </h2>
-      {post.userId == userId && (
-        <div>
-          <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
+        <div className="category">
+          source:
         </div>
       )}
       <div className="space-y-2">
