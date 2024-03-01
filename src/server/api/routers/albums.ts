@@ -37,6 +37,22 @@ export const albumRouter = createRouter({
     checkPerms(album!, ctx.auth.userId, "view");
     return album;
   }),
+  edit: protectedProcedure
+    .input(
+      z.object({
+        aid: z.string().uuid(),
+        name: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await findAlbum(ctx, input.aid, true, { images: false });
+      return ctx.db.album.update({
+        where: { id: input.aid },
+        data: {
+          name: input.name,
+        },
+      });
+    }),
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
