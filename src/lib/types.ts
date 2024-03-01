@@ -3,7 +3,7 @@ import { ArtSource, TagCategory } from "@prisma/client";
 import { isValidHttpUrl, toTitleCase } from "@/lib/utils";
 
 export function validTag(tag: string) {
-  return /^[-a-z]+$/.test(tag);
+  return /^[a-z][-a-z0-9]*$/.test(tag);
 }
 
 export const Tag = z.object({
