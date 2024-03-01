@@ -1,9 +1,4 @@
-export const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
+export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
 // https://stackoverflow.com/a/38935990/12128483
 export function base64ToFile(dataurl: string, filename: string) {
