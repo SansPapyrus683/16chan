@@ -37,16 +37,6 @@ export const browseRouter = createRouter({
         orderBy: prismaOrder(input.sortBy),
       };
 
-      return postPages(
-        ctx,
-        params,
-        {
-          include: {
-            images: true,
-            likes: { where: { userId: ctx.auth.userId ?? "" } },
-          },
-        },
-        env.NEXT_PUBLIC_PAGE_SIZE,
-      );
+      return postPages(ctx, params, env.NEXT_PUBLIC_PAGE_SIZE);
     }),
 });

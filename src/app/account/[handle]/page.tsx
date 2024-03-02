@@ -38,7 +38,7 @@ export default async function Account({
         <PaginatedPostList
           getWhat="userPosts"
           initPosts={posts}
-          additional={{ user: profile.id, what: "posts" }}
+          params={{ user: profile.id, what: "posts", cursor }}
           likeButton
         />
       </div>

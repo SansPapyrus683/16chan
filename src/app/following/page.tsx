@@ -18,7 +18,7 @@ export default async function NewPage({
         <PaginatedPostList
           initPosts={posts}
           getWhat="following"
-          additional={{ user: userId! }}
+          params={{ user: userId! }}
           likeButton
         />
       </div>

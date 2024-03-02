@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { env } from "@/env";
-import { Image, Post, Prisma, UserLikes, Visibility } from "@prisma/client";
+import { Prisma, Visibility } from "@prisma/client";
 import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 
@@ -9,7 +9,6 @@ export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE
 export async function postPages(
   ctx: Context,
   params: Prisma.PostFindManyArgs,
-  takeParams: Prisma.PostFindManyArgs,
   limit: z.infer<typeof PageSize> = env.NEXT_PUBLIC_PAGE_SIZE,
   includeUnlisted: boolean = false,
 ) {
@@ -30,12 +29,15 @@ export async function postPages(
     }
   }
 
-  const posts: (Post & { images?: Image[]; likes?: UserLikes[] })[] =
-    await ctx.db.post.findMany({
-      take: limit + 1,
-      ...params,
-      ...takeParams,
-    });
+  const posts = await ctx.db.post.findMany({
+    take: limit + 1,
+    ...params,
+    include: {
+      ...params.include,
+      images: true,
+      likes: { where: { userId: ctx.auth.userId ?? "" } },
+    },
+  });
   for (const p of posts) {
     if (p.images) {
       for (const i of p.images) {

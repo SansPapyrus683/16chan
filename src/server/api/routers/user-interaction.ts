@@ -54,16 +54,6 @@ export const userInteractionRouter = createRouter({
         orderBy: { createdAt: "desc" },
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
-      return postPages(
-        ctx,
-        params,
-        {
-          include: {
-            images: true,
-            likes: { where: { userId: ctx.auth.userId! } },
-          },
-        },
-        env.NEXT_PUBLIC_PAGE_SIZE,
-      );
+      return postPages(ctx, params, env.NEXT_PUBLIC_PAGE_SIZE);
     }),
 });

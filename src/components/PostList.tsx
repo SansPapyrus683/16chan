@@ -14,12 +14,12 @@ type PostData = RouterOutputs["user"]["userPosts"];
 export function PaginatedPostList({
   initPosts,
   getWhat,
-  additional,
+  params,
   likeButton = false,
 }: {
   initPosts: PostData;
   getWhat: "userPosts" | "following" | "search";
-  additional?: object;
+  params?: object;
   likeButton?: boolean;
 }) {
   const searchParams = useSearchParams();
@@ -46,7 +46,6 @@ export function PaginatedPostList({
       query = api.browse.browse;
       break;
   }
-  const params = { cursor: searchParams.get("cursor") ?? undefined, ...additional };
   //@ts-ignore
   const { data } = query.useQuery(params, { initialData: initPosts, staleTime: 5e3 });
 
@@ -114,6 +113,7 @@ export function PostList({
             />
           </Link>
           <Link href={`/post/${p.id}`}>{p.title}</Link>
+          {p.id}
           {likeButton && (
             <LikeButton pid={p.id} liked={p.likes!.some((i) => i.userId === userId)} />
           )}

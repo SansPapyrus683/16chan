@@ -2,7 +2,13 @@ import { api } from "@/trpc/server";
 import { PaginatedPostList } from "@/components/PostList";
 import { serverFetch } from "@/lib/utils";
 
-export default async function userLikes({ params }: { params: { handle: string } }) {
+export default async function userLikes({
+  params,
+  searchParams: sp,
+}: {
+  params: { handle: string };
+  searchParams: { cursor: string | string[] | undefined };
+}) {
   const ret = await serverFetch(
     async () => await api.user.profileByUsername(params.handle),
   );
@@ -11,7 +17,8 @@ export default async function userLikes({ params }: { params: { handle: string }
   }
   const profile = ret.val;
 
-  const likes = await api.user.userPosts({ user: profile.id, what: "likes" });
+  const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
+  const likes = await api.user.userPosts({ user: profile.id, what: "likes", cursor });
   return (
     <>
       <div>{profile.username}'s likes</div>
@@ -20,7 +27,7 @@ export default async function userLikes({ params }: { params: { handle: string }
         <PaginatedPostList
           getWhat="userPosts"
           initPosts={likes}
-          additional={{ user: profile.id, what: "likes" }}
+          params={{ user: profile.id, what: "likes", cursor }}
         />
       </div>
     </>

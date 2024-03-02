@@ -40,7 +40,7 @@ export default async function Browsing({
           <PaginatedPostList
             initPosts={res}
             getWhat="search"
-            additional={{ query, sortBy }}
+            params={{ query, sortBy, cursor }}
             likeButton={userId !== null}
           />
         </div>
