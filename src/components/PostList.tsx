@@ -85,10 +85,7 @@ export function PostList({
   posts: PostData["posts"];
   likeButton: boolean;
 }) {
-  const utils = api.useUtils();
-  const likePost = api.post.like.useMutation({
-    onSuccess: () => utils.user.userPosts.invalidate({ what: "likes" }),
-  });
+  const likePost = api.post.like.useMutation();
   return (
     <div className="grid grid-cols-3 gap-4">
       {posts.map((v) => (

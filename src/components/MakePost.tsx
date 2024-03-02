@@ -48,11 +48,9 @@ export function EditPost({
   const router = useRouter();
   const { data: post } = api.post.get.useQuery(pid, { initialData: initPost });
 
-  const utils = api.useUtils();
   const editPost = api.post.edit.useMutation({
     onSuccess: (data) => {
       setButtonText("success!");
-      utils.post.get.invalidate(pid);
       router.push(`/post/${data.id}`);
     },
     onError: () => {
