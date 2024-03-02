@@ -5,11 +5,7 @@ import { Tag } from "@/lib/types";
 
 export const postInteractRouter = createRouter({
   like: protectedProcedure.input(z.string().uuid()).mutation(async ({ ctx, input }) => {
-    const post = await findPost(ctx, input, true, {
-      images: false,
-      tags: false,
-      comments: false,
-    });
+    const post = await findPost(ctx, input);
     // liking doesn't really change the post- as long as the user can view it it's fine
     checkPerms(post!, ctx.auth.userId, "view");
 
