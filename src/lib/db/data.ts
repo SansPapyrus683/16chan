@@ -4,6 +4,7 @@ import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 
 type DBContext = { db: Context["db"] };
+type FullContext = DBContext & { auth: Context["auth"] };
 
 export async function findPost(
   ctx: DBContext,
@@ -39,6 +40,19 @@ export async function findPost(
     }
   }
   return post;
+}
+
+export async function postLiked(ctx: FullContext, postId: string) {
+  return (
+    (await ctx.db.userLikes.findUnique({
+      where: {
+        liking: {
+          userId: ctx.auth.userId ?? "",
+          postId: postId,
+        },
+      },
+    })) !== null
+  );
 }
 
 export async function findAlbum(
@@ -108,7 +122,7 @@ export async function findUser(ctx: DBContext, uid: string, mustExist: boolean =
   return user;
 }
 
-export async function isMod(ctx: DBContext & { auth: Context["auth"] }) {
+export async function isMod(ctx: FullContext) {
   const user = await ctx.db.user.findUnique({ where: { id: ctx.auth.userId! } });
   return user === null ? false : user.isMod;
 }

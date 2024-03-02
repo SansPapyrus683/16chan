@@ -3,6 +3,7 @@ import { env } from "@/env";
 import { Image, Post, Prisma, Visibility } from "@prisma/client";
 import { Context } from "@/server/api/trpc";
 import { s3Get } from "@/lib/s3";
+import { postLiked } from "@/lib/db/data";
 
 export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
 
@@ -30,17 +31,22 @@ export async function postPages(
     }
   }
 
-  const posts: (Post & { images?: Image[] })[] = await ctx.db.post.findMany({
+  const rawPosts: (Post & { images?: Image[] })[] = await ctx.db.post.findMany({
     take: limit + 1,
     ...params,
     ...takeParams,
   });
-  for (const p of posts) {
+  const posts: (Post & { images?: Image[]; liked: boolean })[] = [];
+  for (const p of rawPosts) {
     if (p.images) {
       for (const i of p.images) {
         i.img = await s3Get(i.img);
       }
     }
+    posts.push({
+      ...p,
+      liked: await postLiked(ctx, p.id),
+    });
   }
 
   const nextCursor =

@@ -43,6 +43,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
             alt={`picture number ${ind + 1}`}
             width={200}
             height={200}
+            priority
           />
         ))}
       </div>
