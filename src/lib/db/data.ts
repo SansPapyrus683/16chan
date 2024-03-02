@@ -16,9 +16,9 @@ export async function findPost(
   } = {},
 ) {
   include = {
-    images: true,
-    tags: true,
-    comments: true,
+    images: false,
+    tags: false,
+    comments: false,
     ...include,
   };
   const post = await ctx.db.post.findUnique({

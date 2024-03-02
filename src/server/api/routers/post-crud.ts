@@ -78,7 +78,11 @@ export const postCrudRouter = createRouter({
       return post;
     }),
   get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
-    const post = await findPost(ctx, input);
+    const post = await findPost(ctx, input, true, {
+      images: true,
+      comments: true,
+      tags: true,
+    });
     checkPerms(post!, ctx.auth.userId, "view");
     return post!;
   }),
@@ -126,11 +130,7 @@ export const postCrudRouter = createRouter({
   delete: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
-      const post = await findPost(ctx, input, false, {
-        images: false,
-        tags: false,
-        comments: false,
-      });
+      const post = await findPost(ctx, input, false);
       if (post === null) {
         return null;
       }
