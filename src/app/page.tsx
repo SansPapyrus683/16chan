@@ -41,6 +41,7 @@ export default async function Browsing({
             initPosts={res}
             getWhat="search"
             additional={{ query, sortBy }}
+            likeButton={userId !== null}
           />
         </div>
       </div>
