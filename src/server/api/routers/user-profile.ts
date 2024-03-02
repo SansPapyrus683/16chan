@@ -69,7 +69,6 @@ export const userProfileRouter = createRouter({
         orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
-      console.log(params);
       return postPages(
         ctx,
         params,
