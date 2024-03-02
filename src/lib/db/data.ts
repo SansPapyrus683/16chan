@@ -82,16 +82,7 @@ export async function findAlbum(
       }
     }
   }
-  const newPosts = await Promise.all(
-    album.posts.map(async (p) => ({
-      ...p,
-      post: {
-        ...p.post,
-        liked: await postLiked(ctx, p.postId),
-      },
-    })),
-  );
-  return { ...album, posts: newPosts };
+  return album;
 }
 
 export async function findComment(

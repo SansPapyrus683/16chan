@@ -45,13 +45,7 @@ export const userProfileRouter = createRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const id = input.user ?? ctx.auth.userId;
-      if (!id) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "you need to provide a user id or be logged in",
-        });
-      }
+      const id = input.user; // just a shorthand
       await findUser(ctx, id);
 
       let what;

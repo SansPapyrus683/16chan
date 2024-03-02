@@ -1,7 +1,9 @@
 import { ArtSource, Prisma, Visibility } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-export function prismaOrder(order: "new" | "likes" | "alpha") {
+export function prismaOrder(
+  order: "new" | "likes" | "alpha",
+): Prisma.PostOrderByWithRelationInput[] {
   const desc = Prisma.SortOrder.desc; // just a shorthand
   return [
     ...(order === "likes" ? [{ likes: { _count: desc } }] : []),
