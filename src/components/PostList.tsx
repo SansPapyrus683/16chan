@@ -46,7 +46,7 @@ export function PaginatedPostList({
   }
   const params = { cursor: searchParams.get("cursor") ?? undefined, ...additional };
   //@ts-ignore
-  const { data } = query.useQuery(params, { initialData: initPosts });
+  const { data } = query.useQuery(params, { initialData: initPosts, staleTime: 10e3 });
   const { posts, prevCursor, nextCursor } = data || {};
 
   return (
