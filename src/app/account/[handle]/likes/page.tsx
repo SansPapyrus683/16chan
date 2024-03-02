@@ -18,7 +18,7 @@ export default async function userLikes({
   const profile = ret.val;
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
-  const likes = await api.user.userPosts({ user: profile.id, what: "likes", cursor });
+  const likes = await api.user.userLikes({ user: profile.id, cursor });
   return (
     <>
       <div>{profile.username}'s likes</div>

@@ -18,7 +18,7 @@ export function PaginatedPostList({
   likeButton = false,
 }: {
   initPosts: PostData;
-  getWhat: "userPosts" | "following" | "search";
+  getWhat: "userPosts" | "userLikes" | "following" | "search";
   params?: object;
   likeButton?: boolean;
 }) {
@@ -38,6 +38,9 @@ export function PaginatedPostList({
   switch (getWhat) {
     case "userPosts":
       query = api.user.userPosts;
+      break;
+    case "userLikes":
+      query = api.user.userLikes;
       break;
     case "following":
       query = api.user.followedPosts;

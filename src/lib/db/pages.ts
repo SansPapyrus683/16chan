@@ -8,16 +8,25 @@ export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE
 
 export async function postPages(
   ctx: Context,
-  params: Prisma.PostFindManyArgs,
+  params: {
+    where?: Prisma.PostWhereInput;
+    cursor?: Prisma.PostWhereUniqueInput;
+    orderBy?:
+      | Prisma.PostOrderByWithRelationInput
+      | Prisma.PostOrderByWithRelationInput[];
+  },
   limit: z.infer<typeof PageSize> = env.NEXT_PUBLIC_PAGE_SIZE,
   includeUnlisted: boolean = false,
 ) {
+  const goodVis = [
+    Visibility.PUBLIC,
+    ...(includeUnlisted ? [Visibility.UNLISTED] : []),
+  ];
   params.where = {
     ...params.where,
     OR: [
-      { visibility: Visibility.PUBLIC },
+      { visibility: { in: goodVis } },
       ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
-      ...(includeUnlisted ? [{ visibility: Visibility.UNLISTED }] : []),
     ],
   };
   if (params.cursor) {
@@ -30,19 +39,16 @@ export async function postPages(
   }
 
   const posts = await ctx.db.post.findMany({
-    take: limit + 1,
     ...params,
+    take: limit + 1,
     include: {
-      ...params.include,
       images: true,
       likes: { where: { userId: ctx.auth.userId ?? "" } },
     },
   });
   for (const p of posts) {
-    if (p.images) {
-      for (const i of p.images) {
-        i.img = await s3Get(i.img);
-      }
+    for (const i of p.images) {
+      i.img = await s3Get(i.img);
     }
   }
 
@@ -51,8 +57,8 @@ export async function postPages(
 
   const prevPosts = params.cursor
     ? await ctx.db.post.findMany({
-        take: -limit - 1,
         ...params,
+        take: -limit - 1,
       })
     : [];
   const prevCursor = prevPosts.length > 1 ? prevPosts[0]!.id : undefined;
@@ -64,10 +70,86 @@ export async function postPages(
   };
 }
 
+export async function likePages(
+  ctx: Context,
+  params: {
+    where?: Prisma.UserLikesWhereInput;
+    cursor?: Prisma.UserLikesWhereUniqueInput;
+    orderBy?:
+      | Prisma.UserLikesOrderByWithRelationInput
+      | Prisma.UserLikesOrderByWithRelationInput[];
+  },
+  limit: z.infer<typeof PageSize> = env.NEXT_PUBLIC_PAGE_SIZE,
+  includeUnlisted: boolean = false,
+) {
+  const goodVis = [
+    Visibility.PUBLIC,
+    ...(includeUnlisted ? [Visibility.UNLISTED] : []),
+  ];
+  params.where = {
+    ...params.where,
+    OR: [
+      { post: { visibility: { in: goodVis } } },
+      ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
+    ],
+  };
+
+  if (params.cursor) {
+    const post = await ctx.db.userLikes.findFirst({
+      // WHAT THE HELL
+      where: { ...params.cursor.liking, ...params.where },
+    });
+    if (post === null) {
+      delete params.cursor;
+    }
+  }
+
+  const posts = (
+    await ctx.db.userLikes.findMany({
+      ...params,
+      take: limit + 1,
+      include: {
+        post: {
+          include: {
+            images: true,
+            likes: { where: { userId: ctx.auth.userId ?? "" } },
+          },
+        },
+      },
+    })
+  ).map((i) => i.post);
+  for (const p of posts) {
+    for (const i of p.images) {
+      i.img = await s3Get(i.img);
+    }
+  }
+  const nextCursor =
+    posts.length > env.NEXT_PUBLIC_PAGE_SIZE ? posts.pop()!.id : undefined;
+
+  const prevPosts = params.cursor
+    ? await ctx.db.userLikes.findMany({
+        ...params,
+        take: -limit - 1,
+      })
+    : [];
+  const prevCursor = prevPosts.length > 1 ? prevPosts[0]!.postId : undefined;
+
+  return {
+    posts,
+    prevCursor,
+    nextCursor,
+  };
+}
+
 export async function albumPages(
   ctx: Context,
-  params: Prisma.AlbumFindManyArgs,
-  takeParams: Prisma.AlbumFindManyArgs,
+  params: {
+    where?: Prisma.AlbumWhereInput;
+    cursor?: Prisma.AlbumWhereUniqueInput;
+    orderBy?:
+      | Prisma.AlbumOrderByWithRelationInput
+      | Prisma.AlbumOrderByWithRelationInput[];
+  },
   limit: z.infer<typeof PageSize>,
 ) {
   params.where = {
@@ -87,16 +169,16 @@ export async function albumPages(
   }
 
   const albums = await ctx.db.album.findMany({
-    take: limit + 1,
     ...params,
-    ...takeParams,
+    include: { posts: true },
+    take: limit + 1,
   });
   const nextCursor =
     albums.length > env.NEXT_PUBLIC_PAGE_SIZE ? albums.pop()!.id : undefined;
 
   const prevPosts = await ctx.db.album.findMany({
-    take: -limit - 1,
     ...params,
+    take: -limit - 1,
   });
   let prevCursor = prevPosts.length >= 1 ? prevPosts[0]!.id : undefined;
 

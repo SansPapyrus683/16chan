@@ -2,8 +2,16 @@ import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { TRPCError } from "@trpc/server";
-import { Visibility } from "@prisma/client";
-import { albumPages, findUser, PageSize, postPages, prismaOrder } from "@/lib/db";
+import { Prisma, Visibility } from "@prisma/client";
+import {
+  albumPages,
+  findUser,
+  likePages,
+  PageSize,
+  postPages,
+  prismaOrder,
+} from "@/lib/db";
+import SortOrder = Prisma.SortOrder;
 
 export const userProfileRouter = createRouter({
   profileByUsername: publicProcedure.input(z.string()).query(async ({ input }) => {
@@ -38,7 +46,6 @@ export const userProfileRouter = createRouter({
     .input(
       z.object({
         user: z.string(),
-        what: z.enum(["posts", "likes"]).default("posts"),
         sortBy: z.enum(["new", "likes", "alpha"]).default("new"),
         limit: PageSize,
         cursor: z.string().uuid().optional(),
@@ -48,47 +55,50 @@ export const userProfileRouter = createRouter({
       const id = input.user; // just a shorthand
       await findUser(ctx, id);
 
-      let what;
-      switch (input.what) {
-        case "posts":
-          what = { userId: id };
-          break;
-        case "likes":
-          what = { likes: { some: { userId: id } } };
-          break;
-      }
-
       const params = {
-        where: what,
+        where: { userId: id },
         orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
-      return postPages(
-        ctx,
-        params,
-        input.limit,
-        input.what === "likes" && ctx.auth.userId == id,
-      );
+      return postPages(ctx, params, input.limit);
+    }),
+  userLikes: publicProcedure
+    .input(
+      z.object({
+        user: z.string(),
+        limit: PageSize,
+        cursor: z.string().uuid().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const id = input.user;
+      await findUser(ctx, id);
+
+      const params = {
+        where: { userId: id },
+        orderBy: { likedAt: SortOrder.desc },
+        cursor: input.cursor
+          ? {
+              liking: {
+                postId: input.cursor,
+                userId: id,
+              },
+            }
+          : undefined,
+      };
+      return likePages(ctx, params, input.limit, ctx.auth.userId == id);
     }),
   userAlbums: publicProcedure
     .input(
-      z
-        .object({
-          user: z.string().optional(),
-          sortBy: z.enum(["new", "alpha"]).default("new"),
-          limit: PageSize,
-          cursor: z.string().uuid().optional(),
-        })
-        .default({}),
+      z.object({
+        user: z.string(),
+        sortBy: z.enum(["new", "alpha"]).default("new"),
+        limit: PageSize,
+        cursor: z.string().uuid().optional(),
+      }),
     )
     .query(async ({ ctx, input }) => {
-      const id = input.user ?? ctx.auth.userId;
-      if (!id) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "you need to provide a user id or be logged in",
-        });
-      }
+      const id = input.user;
       await findUser(ctx, id);
 
       const params = {
@@ -104,6 +114,6 @@ export const userProfileRouter = createRouter({
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
 
-      return albumPages(ctx, params, { include: { posts: true } }, input.limit);
+      return albumPages(ctx, params, input.limit);
     }),
 });
