@@ -5,7 +5,7 @@ import { db } from "@/server/db";
 import { DBContext, FullContext } from "@/lib/types";
 
 export async function findPost(
-  ctx: DBContext,
+  ctx: FullContext,
   postId: string,
   mustExist: boolean = true,
   include: {
@@ -25,19 +25,25 @@ export async function findPost(
     include: include,
   });
 
-  if (post === null && mustExist) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `post w/ id ${postId} not found`,
-    });
+  if (post === null) {
+    if (mustExist) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `post w/ id ${postId} not found`,
+      });
+    }
+    return null;
   }
 
-  if (post !== null && include.images) {
+  if (include.images) {
     for (const i of post.images) {
       i.img = await s3Get(i.img, false);
     }
   }
-  return post;
+  return {
+    liked: await postLiked(ctx, postId),
+    ...post,
+  };
 }
 
 export async function postLiked(ctx: FullContext, postId: string) {
@@ -54,7 +60,7 @@ export async function postLiked(ctx: FullContext, postId: string) {
 }
 
 export async function findAlbum(
-  ctx: DBContext,
+  ctx: FullContext,
   albumId: string,
   mustExist: boolean = true,
   include: {
@@ -75,21 +81,34 @@ export async function findAlbum(
       },
     },
   });
-  if (album !== null && include.images) {
+
+  if (album === null) {
+    if (mustExist) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `album w/ id ${albumId} not found`,
+      });
+    }
+    return null;
+  }
+
+  if (include.images) {
     for (const p of album.posts) {
       for (const img of p.post.images) {
         img.img = await s3Get(img.img);
       }
     }
   }
-
-  if (album === null && mustExist) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `album w/ id ${albumId} not found`,
-    });
-  }
-  return album;
+  const newPosts = await Promise.all(
+    album.posts.map(async (p) => ({
+      ...p,
+      post: {
+        ...p.post,
+        liked: await postLiked(ctx, p.postId),
+      },
+    })),
+  );
+  return { ...album, posts: newPosts };
 }
 
 export async function findComment(

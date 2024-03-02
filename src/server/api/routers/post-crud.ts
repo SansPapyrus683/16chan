@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { ACCEPTED_IMAGE_TYPES, base64StripUrl, base64Type } from "@/lib/files";
-import { checkPerms, findPost, isMod, postLiked } from "@/lib/db";
+import { checkPerms, findPost, isMod } from "@/lib/db";
 import { s3Delete, s3Upload } from "@/lib/s3";
 import { Sauce, Tag } from "@/lib/types";
 import { Visibility } from "@prisma/client";
@@ -84,10 +84,7 @@ export const postCrudRouter = createRouter({
       tags: true,
     });
     checkPerms(post!, ctx.auth.userId, "view");
-    return {
-      liked: await postLiked(ctx, input),
-      ...post!,
-    };
+    return post!;
   }),
   edit: protectedProcedure
     .input(
