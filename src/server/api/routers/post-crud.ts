@@ -3,7 +3,12 @@ import { Base64 } from "js-base64";
 import { TRPCError } from "@trpc/server";
 
 import { createRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { ACCEPTED_IMAGE_TYPES, base64StripUrl, base64Type } from "@/lib/files";
+import {
+  ACCEPTED_IMAGE_TYPES,
+  base64Mb,
+  base64StripUrl,
+  base64Type,
+} from "@/lib/files";
 import { checkPerms, findPost, isMod } from "@/lib/db";
 import { s3Delete, s3Upload } from "@/lib/s3";
 import { Sauce, Tag } from "@/lib/types";
@@ -17,6 +22,7 @@ export const postCrudRouter = createRouter({
         images: z
           .string()
           .refine((d) => Base64.isValid(base64StripUrl(d)))
+          .refine((d) => base64Mb(d) < 20)
           .refine((d) => ACCEPTED_IMAGE_TYPES.includes(base64Type(d)))
           .array()
           .min(1),

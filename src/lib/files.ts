@@ -17,6 +17,14 @@ export function base64StripUrl(str: string) {
   return str.split(",")[1]!;
 }
 
+export function base64Mb(str: string) {
+  // now ik not all sizes are going to png but like we just need an approx size
+  const strLen = str.length - "data:image/png;base64,".length;
+  // https://stackoverflow.com/a/49750491/12128483
+  const byteNum = 3 * Math.ceil(strLen / 4);
+  return byteNum / 1e6;
+}
+
 export function base64Type(str: string) {
   return str.substring("data:".length, str.indexOf(";base64"));
 }
