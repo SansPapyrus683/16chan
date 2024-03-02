@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { ArtSource, TagCategory } from "@prisma/client";
 import { isValidHttpUrl, toTitleCase } from "@/lib/utils";
+import { Context } from "@/server/api/trpc";
+
+export type DBContext = { db: Context["db"] };
+export type FullContext = DBContext & { auth: Context["auth"] };
 
 export function validTag(tag: string) {
   return /^[a-z][-a-z0-9]*$/.test(tag);

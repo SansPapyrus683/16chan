@@ -2,9 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
-
-type DBContext = { db: Context["db"] };
-type FullContext = DBContext & { auth: Context["auth"] };
+import { DBContext, FullContext } from "@/lib/types";
 
 export async function findPost(
   ctx: DBContext,
