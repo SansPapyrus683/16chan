@@ -2,11 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
-import { DBContext, FullContext } from "@/lib/types";
 import { Prisma } from "@prisma/client";
 
 export async function findPost(
-  ctx: FullContext,
+  ctx: Context,
   postId: string,
   mustExist: boolean = true,
   include: Prisma.PostInclude = {},
@@ -37,7 +36,7 @@ export async function findPost(
   };
 }
 
-export async function postLiked(ctx: FullContext, postId: string) {
+export async function postLiked(ctx: Context, postId: string) {
   return (
     (await ctx.db.userLikes.findUnique({
       where: {
@@ -51,7 +50,7 @@ export async function postLiked(ctx: FullContext, postId: string) {
 }
 
 export async function findAlbum(
-  ctx: FullContext,
+  ctx: Context,
   albumId: string,
   mustExist: boolean = true,
   include: Prisma.PostInclude = {},
@@ -96,7 +95,7 @@ export async function findAlbum(
 }
 
 export async function findComment(
-  ctx: DBContext,
+  ctx: Context,
   commentId: string,
   mustExist: boolean = true,
 ) {
@@ -112,7 +111,7 @@ export async function findComment(
   return comm;
 }
 
-export async function findUser(ctx: DBContext, uid: string, mustExist: boolean = true) {
+export async function findUser(ctx: Context, uid: string, mustExist: boolean = true) {
   const user = ctx.db.user.findUnique({ where: { id: uid } });
   if (user === null && mustExist) {
     throw new TRPCError({
@@ -123,7 +122,7 @@ export async function findUser(ctx: DBContext, uid: string, mustExist: boolean =
   return user;
 }
 
-export async function isMod(ctx: FullContext) {
+export async function isMod(ctx: Context) {
   const user = await ctx.db.user.findUnique({ where: { id: ctx.auth.userId! } });
   return user === null ? false : user.isMod;
 }
