@@ -50,7 +50,7 @@ export async function findAlbum(
   } = {},
 ) {
   include = {
-    images: true,
+    images: false,
     ...include,
   };
 
