@@ -52,7 +52,7 @@ export const postInteractRouter = createRouter({
   deleteFromAlbum: protectedProcedure
     .input(z.object({ post: z.string().uuid(), album: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const album = await findAlbum(ctx, input.album, false, { images: false });
+      const album = await findAlbum(ctx, input.album, false);
       if (album === null) {
         return null;
       }
