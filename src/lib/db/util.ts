@@ -1,24 +1,13 @@
-import { ArtSource, Visibility } from "@prisma/client";
+import { ArtSource, Prisma, Visibility } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
 export function prismaOrder(order: "new" | "likes" | "alpha") {
-  const ret: {
-    createdAt?: "desc";
-    likes?: { _count: "desc" };
-    title?: "desc";
-  } = {};
-  switch (order) {
-    case "new":
-      ret.createdAt = "desc";
-      break;
-    case "likes":
-      ret.likes = { _count: "desc" };
-      break;
-    case "alpha":
-      ret.title = "desc";
-      break;
-  }
-  return ret;
+  const desc = Prisma.SortOrder.desc; // just a shorthand
+  return [
+    ...(order === "likes" ? [{ likes: { _count: desc } }] : []),
+    ...(order === "alpha" ? [{ title: desc }] : []),
+    { createdAt: desc },
+  ];
 }
 
 export function checkPerms(

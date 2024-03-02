@@ -3,7 +3,7 @@
 import { api } from "@/trpc/react";
 import { useState } from "react";
 
-export function LikeButton({ pid, liked, ...props }: { pid: string; liked: boolean }) {
+export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
   const likePost = api.post.like.useMutation({
     onSuccess: () => setDisabled(false),
   });
