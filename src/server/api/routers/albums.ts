@@ -33,7 +33,10 @@ export const albumRouter = createRouter({
       });
     }),
   get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
-    const album = await findAlbum(ctx, input, true, { images: true });
+    const album = await findAlbum(ctx, input, true, {
+      images: true,
+      likes: { where: { userId: ctx.auth.userId ?? "" } },
+    });
     checkPerms(album!, ctx.auth.userId, "view");
     return album;
   }),

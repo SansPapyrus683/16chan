@@ -72,7 +72,12 @@ export const userProfileRouter = createRouter({
       return postPages(
         ctx,
         params,
-        { include: { images: true } },
+        {
+          include: {
+            images: true,
+            likes: { where: { userId: ctx.auth.userId ?? "" } },
+          },
+        },
         input.limit,
         input.what === "likes" && ctx.auth.userId == id,
       );

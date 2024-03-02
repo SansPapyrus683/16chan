@@ -40,7 +40,12 @@ export const browseRouter = createRouter({
       return postPages(
         ctx,
         params,
-        { include: { images: true } },
+        {
+          include: {
+            images: true,
+            likes: { where: { userId: ctx.auth.userId ?? "" } },
+          },
+        },
         env.NEXT_PUBLIC_PAGE_SIZE,
       );
     }),

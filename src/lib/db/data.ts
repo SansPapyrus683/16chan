@@ -3,23 +3,14 @@ import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import { DBContext, FullContext } from "@/lib/types";
+import { Prisma } from "@prisma/client";
 
 export async function findPost(
   ctx: FullContext,
   postId: string,
   mustExist: boolean = true,
-  include: {
-    images?: boolean;
-    comments?: boolean;
-    tags?: boolean;
-  } = {},
+  include: Prisma.PostInclude = {},
 ) {
-  include = {
-    images: false,
-    tags: false,
-    comments: false,
-    ...include,
-  };
   const post = await ctx.db.post.findUnique({
     where: { id: postId },
     include: include,
@@ -63,15 +54,8 @@ export async function findAlbum(
   ctx: FullContext,
   albumId: string,
   mustExist: boolean = true,
-  include: {
-    images?: boolean;
-  } = {},
+  include: Prisma.PostInclude = {},
 ) {
-  include = {
-    images: false,
-    ...include,
-  };
-
   const album = await ctx.db.album.findUnique({
     where: { id: albumId },
     include: {

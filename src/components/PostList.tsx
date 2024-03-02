@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
+import { useAuth } from "@clerk/nextjs";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -95,6 +96,9 @@ export function PostList({
   posts: PostData["posts"];
   likeButton?: boolean;
 }) {
+  // hm you'd think this would be undefined for a lil @ the start but it actually isn't
+  const { userId } = useAuth();
+
   return (
     <div className="grid grid-cols-3 gap-4">
       {posts.map((p) => (
@@ -110,7 +114,9 @@ export function PostList({
             />
           </Link>
           <Link href={`/post/${p.id}`}>{p.title}</Link>
-          {likeButton && <LikeButton pid={p.id} liked={p.liked} />}
+          {likeButton && (
+            <LikeButton pid={p.id} liked={p.likes!.some((i) => i.userId === userId)} />
+          )}
         </div>
       ))}
     </div>
