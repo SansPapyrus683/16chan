@@ -25,7 +25,7 @@ export default async function userLikes({
       <br />
       <div>
         <PaginatedPostList
-          getWhat="userPosts"
+          getWhat="userLikes"
           initPosts={likes}
           params={{ user: profile.id, what: "likes", cursor }}
         />
