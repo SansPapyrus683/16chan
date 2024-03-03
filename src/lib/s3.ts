@@ -11,7 +11,7 @@ import { base64StripUrl } from "@/lib/files";
 
 const s3 = new S3Client({});
 
-export async function s3Upload(name: string, data: string, content: string) {
+export function s3Upload(name: string, data: string, content: string) {
   return s3.send(
     new PutObjectCommand({
       Bucket: env.AWS_BUCKET_RAW,
@@ -22,7 +22,7 @@ export async function s3Upload(name: string, data: string, content: string) {
   );
 }
 
-export async function s3Get(name: string, mini: boolean = true) {
+export function s3Get(name: string, mini: boolean = true) {
   const cmd = new GetObjectCommand({
     Bucket: mini ? env.AWS_BUCKET_MINI : env.AWS_BUCKET_RAW,
     Key: name,
@@ -36,7 +36,7 @@ export function s3RawUrl(name: string, mini: boolean = true) {
   return `https://${bucket}.s3.${env.AWS_REGION}.amazonaws.com/${name}`;
 }
 
-export async function s3Delete(name: string) {
+export function s3Delete(name: string) {
   const buckets = [env.AWS_BUCKET_MINI, env.AWS_BUCKET_RAW];
   return Promise.all(
     buckets.map(
