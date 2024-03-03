@@ -42,7 +42,7 @@ export async function postPages(
     ...params,
     take: limit + 1,
     include: {
-      images: true,
+      images: { take: -1 },
       likes: { where: { userId: ctx.auth.userId ?? "" } },
     },
   });
@@ -111,7 +111,7 @@ export async function likePages(
       include: {
         post: {
           include: {
-            images: true,
+            images: { take: -1 },
             likes: { where: { userId: ctx.auth.userId ?? "" } },
           },
         },
