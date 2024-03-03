@@ -23,6 +23,7 @@ export function checkPerms(
       hasPerms = item.visibility !== Visibility.PRIVATE || userId === item.userId;
       break;
     case "change":
+    case "delete":
       hasPerms = userId === item.userId;
       break;
   }

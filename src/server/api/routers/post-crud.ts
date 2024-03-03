@@ -142,7 +142,7 @@ export const postCrudRouter = createRouter({
         return null;
       }
       if (!(await isMod(ctx))) {
-        checkPerms(post, ctx.auth.userId, "change");
+        checkPerms(post, ctx.auth.userId, "delete");
       }
       await ctx.db.post.delete({ where: { id: input } });
     }),
