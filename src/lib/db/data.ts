@@ -30,23 +30,7 @@ export async function findPost(
       i.img = await s3Get(i.img, false);
     }
   }
-  return {
-    liked: await postLiked(ctx, postId),
-    ...post,
-  };
-}
-
-export async function postLiked(ctx: Context, postId: string) {
-  return (
-    (await ctx.db.userLikes.findUnique({
-      where: {
-        liking: {
-          userId: ctx.auth.userId ?? "",
-          postId: postId,
-        },
-      },
-    })) !== null
-  );
+  return post;
 }
 
 export async function findAlbum(

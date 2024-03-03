@@ -88,6 +88,7 @@ export const postCrudRouter = createRouter({
       images: true,
       comments: true,
       tags: true,
+      likes: { where: { userId: ctx.auth.userId ?? "" } },
     });
     checkPerms(post!, ctx.auth.userId, "view");
     return post!;
