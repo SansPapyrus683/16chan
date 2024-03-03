@@ -3,15 +3,13 @@
 import { useState } from "react";
 import { Tag } from "@/lib/types";
 import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
 export function TagPost({ pid }: { pid: string }) {
   const [tag, setTag] = useState("");
-
-  const utils = api.useUtils();
+  const router = useRouter();
   const tagPost = api.post.tag.useMutation({
-    onSuccess: () => {
-      utils.post.get.invalidate(pid);
-    },
+    onSuccess: () => router.refresh(),
   });
 
   return (
