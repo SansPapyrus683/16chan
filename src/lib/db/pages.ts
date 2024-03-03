@@ -24,10 +24,7 @@ export async function postPages(
   ];
   params.where = {
     ...params.where,
-    OR: [
-      { visibility: { in: goodVis } },
-      ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
-    ],
+    OR: [{ visibility: { in: goodVis } }, { userId: ctx.auth.userId ?? "" }],
   };
   if (params.cursor) {
     const post = await ctx.db.post.findFirst({
@@ -88,10 +85,7 @@ export async function likePages(
   ];
   params.where = {
     ...params.where,
-    OR: [
-      { post: { visibility: { in: goodVis } } },
-      ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
-    ],
+    OR: [{ post: { visibility: { in: goodVis } } }, { userId: ctx.auth.userId ?? "" }],
   };
 
   if (params.cursor) {
@@ -151,13 +145,15 @@ export async function albumPages(
       | Prisma.AlbumOrderByWithRelationInput[];
   },
   limit: z.infer<typeof PageSize>,
+  includeUnlisted: boolean = false,
 ) {
+  const goodVis = [
+    Visibility.PUBLIC,
+    ...(includeUnlisted ? [Visibility.UNLISTED] : []),
+  ];
   params.where = {
     ...params.where,
-    OR: [
-      { visibility: Visibility.PUBLIC },
-      ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
-    ],
+    OR: [{ visibility: { in: goodVis } }, { userId: ctx.auth.userId }],
   };
   if (params.cursor) {
     const album = await ctx.db.album.findFirst({

@@ -2,7 +2,7 @@ import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { TRPCError } from "@trpc/server";
-import { Prisma, Visibility } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   albumPages,
   findUser,
@@ -102,18 +102,10 @@ export const userProfileRouter = createRouter({
       await findUser(ctx, id);
 
       const params = {
-        where: {
-          userId: id,
-          OR: [
-            { visibility: Visibility.PUBLIC },
-            ...(ctx.auth.userId !== null ? [{ userId: ctx.auth.userId }] : []),
-            ...(id === ctx.auth.userId ? [{ visibility: Visibility.UNLISTED }] : []),
-          ],
-        },
+        where: { userId: id },
         orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };
-
-      return albumPages(ctx, params, input.limit);
+      return albumPages(ctx, params, input.limit, id === ctx.auth.userId);
     }),
 });
