@@ -2,19 +2,23 @@
 
 import { useState } from "react";
 import { api } from "@/trpc/react";
+import { useAuth } from "@clerk/nextjs";
 
 export function AddToAlbum({ pid }: { pid: string }) {
-  const [aid, setAid] = useState("");
+  const { userId } = useAuth();
+  const { data } = api.user.userAlbums.useQuery({ user: userId ?? "" });
+  const { albums } = data ?? { albums: [] };
+
   const addPost = api.post.addToAlbum.useMutation();
+  const [aid, setAid] = useState("");
 
   return (
     <div>
-      <input
-        value={aid}
-        placeholder="album uuid (obv not practical)"
-        onChange={(e) => setAid(e.target.value)}
-        className="border-2"
-      />
+      <select onChange={(e) => setAid(e.target.value)}>
+        {albums.map((a) => (
+          <option value={a.id}>{a.name}</option>
+        ))}
+      </select>
       <br />
       <button
         onClick={(e) => {
