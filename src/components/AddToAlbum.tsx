@@ -16,7 +16,9 @@ export function AddToAlbum({ pid }: { pid: string }) {
     <div>
       <select onChange={(e) => setAid(e.target.value)}>
         {albums.map((a) => (
-          <option value={a.id}>{a.name}</option>
+          <option value={a.id} key={a.id}>
+            {a.name}
+          </option>
         ))}
       </select>
       <br />

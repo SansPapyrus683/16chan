@@ -7,23 +7,43 @@ import { s3Delete } from "@/lib/s3";
 function getPrisma() {
   return new BasePrismaClient({
     log: env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  }).$extends({
-    name: "s3 delete",
-    query: {
-      post: {
-        async delete({ args, query }) {
-          const deleted = await query({
-            ...args,
-            include: { ...args.include, images: true },
-          });
-          for (const img of deleted.images ?? []) {
-            void s3Delete(img.img!);
-          }
-          return deleted;
+  })
+    .$extends({
+      name: "s3 delete",
+      query: {
+        post: {
+          async delete({ args, query }) {
+            const deleted = await query({
+              ...args,
+              include: { ...args.include, images: true },
+            });
+            for (const img of deleted.images ?? []) {
+              void s3Delete(img.img!);
+            }
+            return deleted;
+          },
         },
       },
-    },
-  });
+    })
+    .$extends({
+      name: "post image urls",
+      result: {
+        image: {
+          miniImg: {
+            needs: { img: true },
+            compute(img) {
+              return new URL(img.img, env.MINI_CDN).href;
+            },
+          },
+          rawImg: {
+            needs: { img: true },
+            compute(img) {
+              return new URL(img.img, env.RAW_CDN).href;
+            },
+          },
+        },
+      },
+    });
 }
 
 export type PrismaClient = ReturnType<typeof getPrisma>;

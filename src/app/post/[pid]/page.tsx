@@ -39,7 +39,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           <Image
             key={u.id}
             className="w-auto"
-            src={u.img}
+            src={u.rawImg}
             alt={`picture number ${ind + 1}`}
             width={200}
             height={200}

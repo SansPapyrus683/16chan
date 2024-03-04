@@ -109,7 +109,7 @@ export function PostList({
             <Image
               key={p.id}
               className="w-auto"
-              src={p.images[0]!.img}
+              src={p.images[0]!.miniImg}
               alt="post preview"
               width={200}
               height={200}
