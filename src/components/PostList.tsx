@@ -114,8 +114,11 @@ export function PostList({
 
   useEffect(() => {
     const fetchPhotoDimensions = async () => {
+      let count: number = 0;
       const dimensions: { [id: string]: { width?: number; height?: number } } = {};
-
+      const track_photos: {
+        [num: number]: { id?: string; width?: number; height?: number };
+      } = {};
       await Promise.all(
         posts.map(async (photo) => {
           try {
@@ -123,11 +126,57 @@ export function PostList({
             img.src = photo.images[0]!.img;
             await img.decode();
             dimensions[photo.id] = { width: img.width, height: img.height };
+            track_photos[count] = {
+              id: photo.id,
+              width: img.width,
+              height: img.height,
+            };
+            count = count + 1;
           } catch (error) {
             console.error(`Error loading image: ${photo.id}`, error);
           }
         }),
       );
+
+      const MAX_WIDTH = window.innerWidth;
+      let currWidthPixelCount: number = 0;
+      let currHeightPixelCount: number = 0;
+      let backLog: number = 0;
+
+      for (let i = 0; i < Object.keys(dimensions).length; i++) {
+        const width = track_photos[i]?.width;
+        const height = track_photos[i]?.height;
+        if (width != undefined && height != undefined) {
+          currWidthPixelCount += width;
+          currHeightPixelCount += height;
+          backLog++;
+        }
+        if (currWidthPixelCount >= MAX_WIDTH) {
+          for (let j = 0; j < backLog; j++) {
+            let chosenHeight = currHeightPixelCount / backLog;
+            const id = track_photos[i - j]?.id;
+            if (id !== undefined && dimensions[id] !== undefined) {
+              const oldDimensions = dimensions[id];
+              if (
+                oldDimensions?.height !== undefined &&
+                oldDimensions?.width !== undefined
+              ) {
+                const scaleFactor = oldDimensions.height / chosenHeight;
+                dimensions[id] = {
+                  ...oldDimensions,
+                  height: oldDimensions.height * scaleFactor,
+                  width: oldDimensions.width * scaleFactor,
+                };
+                console.log(`resized ${id} to ${scaleFactor}`);
+              }
+            }
+          }
+          currWidthPixelCount = 0;
+          currHeightPixelCount = 0;
+          backLog = 0;
+        }
+      }
+
       setPhotoDimensions(dimensions);
     };
     fetchPhotoDimensions();
