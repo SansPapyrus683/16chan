@@ -3,7 +3,9 @@
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
 import { useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import getImageMetadata from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
@@ -91,6 +93,12 @@ export function PaginatedPostList({
   );
 }
 
+interface ImageData {
+  url: string;
+  width: number;
+  height: number;
+}
+
 export function PostList({
   posts,
   likeButton = false,
@@ -100,28 +108,61 @@ export function PostList({
 }) {
   // hm you'd think this would be undefined for a lil @ the start but it actually isn't
   const { userId } = useAuth();
+  const [photoDimensions, setPhotoDimensions] = useState<{
+    [id: string]: { width?: number; height?: number };
+  }>({});
+
+  useEffect(() => {
+    const fetchPhotoDimensions = async () => {
+      const dimensions: { [id: string]: { width?: number; height?: number } } = {};
+
+      await Promise.all(
+        posts.map(async (photo) => {
+          try {
+            const img = document.createElement("img");
+            img.src = photo.images[0]!.img;
+            await img.decode();
+            dimensions[photo.id] = { width: img.width, height: img.height };
+          } catch (error) {
+            console.error(`Error loading image: ${photo.id}`, error);
+          }
+        }),
+      );
+      setPhotoDimensions(dimensions);
+    };
+    fetchPhotoDimensions();
+  }, [posts]);
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {posts.map((p) => (
-        <div key={p.id} className="flex flex-col">
-          <Link href={`/post/${p.id}`}>
-            <Image
-              key={p.id}
-              className="w-auto"
-              src={p.images[0]!.img}
-              alt="post preview"
-              width={200}
-              height={200}
-            />
-          </Link>
-          <Link href={`/post/${p.id}`}>{p.title}</Link>
-          {p.id}
-          {likeButton && (
-            <LikeButton pid={p.id} liked={p.likes!.some((i) => i.userId === userId)} />
-          )}
+    <div>
+      {Object.keys(photoDimensions).length > 0 ? (
+        <div className="grid grid-cols-3 gap-4">
+          {posts.map((p) => (
+            <div key={p.id} className="flex flex-col">
+              <Link href={`/post/${p.id}`}>
+                <Image
+                  key={p.id}
+                  className="w-auto"
+                  src={p.images[0]!.img}
+                  alt="post preview"
+                  width={photoDimensions[p.id]?.width || 300}
+                  height={photoDimensions[p.id]?.height || 300}
+                />
+              </Link>
+              <Link href={`/post/${p.id}`}>{p.title}</Link>
+              {p.id}
+              {likeButton && (
+                <LikeButton
+                  pid={p.id}
+                  liked={p.likes!.some((i) => i.userId === userId)}
+                />
+              )}
+            </div>
+          ))}
         </div>
-      ))}
+      ) : (
+        <p>Loading Images...</p>
+      )}
     </div>
   );
 }
