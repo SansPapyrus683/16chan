@@ -36,7 +36,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
       <ResizablePanel defaultSize={20} className="m-2 min-w-48 max-w-2xl">
         <Collapsible>
           <div className="flex justify-between items-center">
-            <h2 className="category mx-2">posted by:</h2>
+            <h2 className="category mx-2">posted by</h2>
               <CollapsibleTrigger className="" asChild>
                 <Button variant="ghost" size="sm">
                   <CaretSortIcon className="h-4 w-4" />
@@ -52,11 +52,15 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           </ CollapsibleContent>
         </ Collapsible>
         <Collapsible>
-          <CollapsibleTrigger>
-            <div className="category">
-              source:
-            </div>
-          </ CollapsibleTrigger>
+          <div className="flex justify-between items-center">
+            <h2 className="category mx-2">source</h2>
+            <CollapsibleTrigger className="" asChild>
+              <Button variant="ghost" size="sm">
+                <CaretSortIcon className="h-4 w-4" />
+              </Button>
+            </ CollapsibleTrigger>
+          </div>
+          <Separator className="my-1" />
           <CollapsibleContent>
             <div>source: {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}</div>
           </ CollapsibleContent>
