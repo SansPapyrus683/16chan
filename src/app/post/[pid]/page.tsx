@@ -34,8 +34,8 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel defaultSize={20} className="m-2 min-w-48 max-w-2xl">
-        <Collapsible>
-          <div className="flex justify-between items-center">
+        <Collapsible defaultOpen>
+          <div className="flex justify-between items-center rounded bg-gray-100">
             <h2 className="category mx-2">posted by</h2>
               <CollapsibleTrigger className="" asChild>
                 <Button variant="ghost" size="sm">
@@ -43,16 +43,15 @@ export default async function PostView({ params }: { params: { pid: string } }) 
                 </Button>
               </ CollapsibleTrigger>
           </div>
-          <Separator className="my-1"/>
           <CollapsibleContent>
-            <Button variant="link" size="sm" className="subtext">
+            <Button variant="link" size="default" className="subtext">
               {author ? ( <Link href={`/account/${author.username}`}>{author.username}</Link>)
                 : ( "a deleted user" )}
             </Button>
           </ CollapsibleContent>
         </ Collapsible>
-        <Collapsible>
-          <div className="flex justify-between items-center">
+        <Collapsible defaultOpen>
+          <div className="flex justify-between items-center rounded border bg-gray-100">
             <h2 className="category mx-2">source</h2>
             <CollapsibleTrigger className="" asChild>
               <Button variant="ghost" size="sm">
@@ -60,25 +59,38 @@ export default async function PostView({ params }: { params: { pid: string } }) 
               </Button>
             </ CollapsibleTrigger>
           </div>
-          <Separator className="my-1" />
           <CollapsibleContent>
-            <div>source: {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}</div>
+            <Button variant="link" size="default" className="subtext">
+              {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}
+            </ Button>
           </ CollapsibleContent>
         </ Collapsible>
-        <div>
-          tags:{" "}
-          {post.tags.length == 0 ? (
-            "no tags!"
-          ) : (
-              <ul>
-                {post.tags.map((t) => (
-                  <li key={t.tagName}>
-                    {t.tagCat}:{t.tagName}
-                  </li>
-                ))}
-              </ul>
-            )}
-        </div>
+        <Collapsible defaultOpen>
+          <div className="flex justify-between items-center rounded bg-gray-100">
+            <h2 className="category mx-2">tags</h2>
+            <CollapsibleTrigger className="" asChild>
+              <Button variant="ghost" size="sm">
+                <CaretSortIcon className="h-4 w-4" />
+              </Button>
+            </ CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <div>
+              tags:{" "}
+              {post.tags.length == 0 ? (
+                "no tags!"
+              ) : (
+                <ul>
+                  {post.tags.map((t) => (
+                    <li key={t.tagName}>
+                      {t.tagCat}:{t.tagName}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </ CollapsibleContent>
+        </Collapsible>
 
         <TagPost pid={params.pid} />
         <AddToAlbum pid={params.pid} />
