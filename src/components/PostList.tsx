@@ -2,15 +2,12 @@
 
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
-import { useCallback } from "react";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import getImageMetadata from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
 import { useAuth } from "@clerk/nextjs";
-import { PhoneNumber } from "@clerk/clerk-sdk-node";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -110,7 +107,7 @@ export function PostList({
   // hm you'd think this would be undefined for a lil @ the start but it actually isn't
   const { userId } = useAuth();
   const [photoRows, setPhotoRows] = useState<{
-    [num: number]: { startIndex?: number; endIndex?: number; height?: number };
+    [num: string]: { startIndex?: number; endIndex?: number; height?: number };
   }>({});
   const [photoDimensions, setPhotoDimensions] = useState<{
     [id: string]: { width?: number; height?: number };
@@ -119,10 +116,10 @@ export function PostList({
   useEffect(() => {
     const fetchPhotoDimensions = async () => {
       const dimensions: {
-        [id: string]: { width?: number; height?: number };
+        [id: string]: { width: number; height: number };
       } = {};
       const retPhotoDimensions: {
-        [id: string]: { width?: number; height?: number };
+        [id: string]: { width: number; height: number };
       } = {};
       const retPhotoRows: {
         [num: number]: { startIndex?: number; endIndex?: number };
@@ -153,15 +150,15 @@ export function PostList({
       const MAX_WIDTH = window.innerWidth;
       const MAX_HEIGHT = 500;
 
-      let currWidthPixelCount: number = 0;
-      let currHeightPixelCount: number = 0;
-      let backLog: number = 0;
-      let rowCount: number = 0;
-      let start: number = 0;
-      let imagesInRow = [];
+      let currWidthPixelCount = 0;
+      let currHeightPixelCount = 0;
+      let backLog = 0;
+      let rowCount = 0;
+      let start = 0;
+      let imagesInRow: string[] = [];
       Object.keys(dimensions).map((id) => {
-        let width = dimensions[id]?.width;
-        let height = dimensions[id]?.height;
+        let width = dimensions[id]!.width;
+        let height = dimensions[id]!.height;
         let scale_factor = 0;
         if (width != undefined && height != undefined) {
           scale_factor = MAX_HEIGHT / height;
@@ -171,21 +168,20 @@ export function PostList({
           imagesInRow.push(id);
         }
         if (currWidthPixelCount >= MAX_WIDTH && backLog >= 5) {
-          let new_height: number =
-            (MAX_WIDTH / currWidthPixelCount) * (height * scale_factor);
+          let new_height = (MAX_WIDTH / currWidthPixelCount) * (height * scale_factor);
           imagesInRow.forEach((imageID) => {
             retPhotoDimensions[imageID] = {
               height: new_height,
               width:
-                dimensions[imageID]?.width *
-                (MAX_HEIGHT / dimensions[imageID]?.height) *
+                dimensions[imageID]!.width *
+                (MAX_HEIGHT / dimensions[imageID]!.height) *
                 (MAX_WIDTH / currWidthPixelCount),
             };
-          }),
-            (retPhotoRows[rowCount] = {
-              startIndex: start,
-              endIndex: start + backLog,
-            });
+          });
+          retPhotoRows[rowCount] = {
+            startIndex: start,
+            endIndex: start + backLog,
+          };
           currWidthPixelCount = 0;
           currHeightPixelCount = 0;
           imagesInRow = [];
@@ -193,8 +189,8 @@ export function PostList({
           backLog = 0;
           rowCount++;
         }
-      }),
-        setPhotoRows(retPhotoRows);
+      });
+      setPhotoRows(retPhotoRows);
       setPhotoDimensions(retPhotoDimensions);
     };
     fetchPhotoDimensions();
@@ -207,7 +203,7 @@ export function PostList({
           {Object.keys(photoRows).map((index) => (
             <div className="flex">
               {posts
-                .slice(photoRows[index].startIndex, photoRows[index].endIndex)
+                .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
                 .map((p) => (
                   <div key={p.id} className="flex flex-col">
                     <Link href={`/post/${p.id}`}>
