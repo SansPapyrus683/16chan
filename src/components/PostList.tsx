@@ -134,7 +134,7 @@ export function PostList({
           while (tries > 0 && !completed) {
             try {
               const img = document.createElement("img");
-              img.src = photo.images[0]!.img;
+              img.src = photo.images[0]!.miniImg;
               await img.decode();
               dimensions[photo.id] = {
                 width: img.width,
@@ -213,10 +213,10 @@ export function PostList({
                     <Link href={`/post/${p.id}`}>
                       <Image
                         key={p.id}
-                        src={p.images[0]!.img}
+                        src={p.images[0]!.miniImg}
                         alt="post preview"
                         width={photoDimensions[p.id]?.width || 300}
-                        height={photoDimensions[p.id]?.height | 300}
+                        height={photoDimensions[p.id]?.height || 300}
                       />
                     </Link>
                     {likeButton && (

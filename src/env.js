@@ -17,6 +17,8 @@ export const env = createEnv({
     AWS_REGION: z.string(),
     AWS_BUCKET_RAW: z.string(),
     AWS_BUCKET_MINI: z.string(),
+    RAW_CDN: z.string(),
+    MINI_CDN: z.string(),
   },
 
   /**
@@ -42,6 +44,8 @@ export const env = createEnv({
     AWS_REGION: process.env.AWS_REGION,
     AWS_BUCKET_RAW: process.env.AWS_BUCKET_RAW,
     AWS_BUCKET_MINI: process.env.AWS_BUCKET_MINI,
+    RAW_CDN: process.env.RAW_CDN,
+    MINI_CDN: process.env.MINI_CDN,
 
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_PAGE_SIZE: process.env.NEXT_PUBLIC_PAGE_SIZE,

@@ -1,5 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import { Prisma } from "@prisma/client";
@@ -23,12 +22,6 @@ export async function findPost(
       });
     }
     return null;
-  }
-
-  if (include.images) {
-    for (const i of post.images) {
-      i.img = await s3Get(i.img, false);
-    }
   }
   return post;
 }
@@ -59,13 +52,6 @@ export async function findAlbum(
     return null;
   }
 
-  if (include.images) {
-    for (const p of album.posts) {
-      for (const img of p.post.images) {
-        img.img = await s3Get(img.img);
-      }
-    }
-  }
   return album;
 }
 

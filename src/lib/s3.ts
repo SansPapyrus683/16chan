@@ -22,6 +22,10 @@ export function s3Upload(name: string, data: string, content: string) {
   );
 }
 
+/*
+ * these two functions (s3Get & s3RawUrl) aren't needed since the cdn thing
+ * i'll keep them here just in case we need them
+ */
 export function s3Get(name: string, mini: boolean = true) {
   const cmd = new GetObjectCommand({
     Bucket: mini ? env.AWS_BUCKET_MINI : env.AWS_BUCKET_RAW,
@@ -30,7 +34,6 @@ export function s3Get(name: string, mini: boolean = true) {
   return getSignedUrl(s3, cmd, { expiresIn: 3600 });
 }
 
-// keeping this here just in case we need it again
 export function s3RawUrl(name: string, mini: boolean = true) {
   const bucket = mini ? env.AWS_BUCKET_MINI : env.AWS_BUCKET_RAW;
   return `https://${bucket}.s3.${env.AWS_REGION}.amazonaws.com/${name}`;

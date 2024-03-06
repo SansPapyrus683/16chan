@@ -10,11 +10,11 @@ const config = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "16chan-mini.s3.us-east-2.amazonaws.com",
+        hostname: "d3amn9wapqcuo1.cloudfront.net",
       },
       {
         protocol: "https",
-        hostname: "16chan-raw.s3.us-east-2.amazonaws.com",
+        hostname: "d34j7afe9569nm.cloudfront.net",
       },
     ],
   },

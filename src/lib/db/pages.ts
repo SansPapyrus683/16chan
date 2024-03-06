@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { env } from "@/env";
 import { Prisma, Visibility } from "@prisma/client";
-import { s3Get } from "@/lib/s3";
 import { Context } from "@/server/api/trpc";
 
 export const PageSize = z.number().min(1).max(1000).default(env.NEXT_PUBLIC_PAGE_SIZE);
@@ -43,11 +42,6 @@ export async function postPages(
       likes: { where: { userId: ctx.auth.userId ?? "" } },
     },
   });
-  for (const p of posts) {
-    for (const i of p.images) {
-      i.img = await s3Get(i.img);
-    }
-  }
 
   const nextCursor =
     posts.length > env.NEXT_PUBLIC_PAGE_SIZE ? posts.pop()!.id : undefined;
@@ -112,11 +106,6 @@ export async function likePages(
       },
     })
   ).map((i) => i.post);
-  for (const p of posts) {
-    for (const i of p.images) {
-      i.img = await s3Get(i.img);
-    }
-  }
   const nextCursor =
     posts.length > env.NEXT_PUBLIC_PAGE_SIZE ? posts.pop()!.id : undefined;
 
