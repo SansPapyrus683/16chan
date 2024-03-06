@@ -126,7 +126,7 @@ export function PostList({
       } = {};
       await Promise.all(
         posts.map(async (photo) => {
-          let tries = 5;
+          let tries = 1000;
           let completed = false;
           while (tries > 0 && !completed) {
             try {
@@ -139,11 +139,16 @@ export function PostList({
               };
               completed = true;
             } catch (error) {
-              console.log(error);
               tries--;
             }
           }
-          if (!completed) console.log(`failed to load image ${photo.id}`);
+          if (!completed) {
+            dimensions[photo.id] = {
+              width: 500,
+              height: 500,
+            };
+            console.log(`failed to load image ${photo.id}`);
+          }
         }),
       );
 
@@ -156,7 +161,7 @@ export function PostList({
       let rowCount = 0;
       let start = 0;
       let imagesInRow: string[] = [];
-      Object.keys(dimensions).map((id) => {
+      Object.keys(dimensions).map((id, index) => {
         let width = dimensions[id]!.width;
         let height = dimensions[id]!.height;
         let scale_factor = 0;
@@ -167,7 +172,10 @@ export function PostList({
           backLog++;
           imagesInRow.push(id);
         }
-        if (currWidthPixelCount >= MAX_WIDTH && backLog >= 5) {
+        if (
+          (currWidthPixelCount >= MAX_WIDTH && backLog >= 5) ||
+          index == Object.keys(dimensions).length - 1
+        ) {
           let new_height = (MAX_WIDTH / currWidthPixelCount) * (height * scale_factor);
           imagesInRow.forEach((imageID) => {
             retPhotoDimensions[imageID] = {
@@ -211,8 +219,9 @@ export function PostList({
                         key={p.id}
                         src={p.images[0]!.miniImg}
                         alt="post preview"
-                        width={photoDimensions[p.id]?.width || 300}
-                        height={photoDimensions[p.id]?.height || 300}
+                        width={photoDimensions[p.id]?.width || 250}
+                        height={photoDimensions[p.id]?.height || 250}
+                        className="opacity-100 hover:opacity-75"
                       />
                     </Link>
                     {likeButton && (
