@@ -91,12 +91,6 @@ export function PaginatedPostList({
   );
 }
 
-interface ImageData {
-  url: string;
-  width: number;
-  height: number;
-}
-
 export function PostList({
   posts,
   likeButton = false,
@@ -118,15 +112,13 @@ export function PostList({
       const dimensions: {
         [id: string]: { width: number; height: number };
       } = {};
-      const retPhotoDimensions: {
-        [id: string]: { width: number; height: number };
-      } = {};
       const retPhotoRows: {
         [num: number]: { startIndex?: number; endIndex?: number };
       } = {};
+
       await Promise.all(
         posts.map(async (photo) => {
-          let tries = 1000;
+          let tries = 100;
           let completed = false;
           while (tries > 0 && !completed) {
             try {
@@ -147,7 +139,6 @@ export function PostList({
               width: 500,
               height: 500,
             };
-            console.log(`failed to load image ${photo.id}`);
           }
         }),
       );
@@ -161,30 +152,30 @@ export function PostList({
       let rowCount = 0;
       let start = 0;
       let imagesInRow: string[] = [];
-      Object.keys(dimensions).map((id, index) => {
-        let width = dimensions[id]!.width;
-        let height = dimensions[id]!.height;
+      posts.map((photo, index) => {
+        let width = dimensions[photo.id]!.width;
+        let height = dimensions[photo.id]!.height;
         let scale_factor = 0;
-        if (width != undefined && height != undefined) {
-          scale_factor = MAX_HEIGHT / height;
-          currWidthPixelCount += width * scale_factor;
-          currHeightPixelCount += height * scale_factor;
-          backLog++;
-          imagesInRow.push(id);
-        }
+        scale_factor = MAX_HEIGHT / height;
+        currWidthPixelCount += width * scale_factor;
+        currHeightPixelCount += height * scale_factor;
+        imagesInRow.push(photo.id);
+        backLog++;
         if (
-          (currWidthPixelCount >= MAX_WIDTH && backLog >= 5) ||
+          (currWidthPixelCount >= MAX_WIDTH && backLog >= 4) ||
           index == Object.keys(dimensions).length - 1
         ) {
-          let new_height = (MAX_WIDTH / currWidthPixelCount) * (height * scale_factor);
+          let widthScaleFactor = MAX_WIDTH / currWidthPixelCount;
+          let new_height = widthScaleFactor * (height * scale_factor);
           imagesInRow.forEach((imageID) => {
-            retPhotoDimensions[imageID] = {
+            dimensions[imageID] = {
               height: new_height,
               width:
                 dimensions[imageID]!.width *
                 (MAX_HEIGHT / dimensions[imageID]!.height) *
-                (MAX_WIDTH / currWidthPixelCount),
+                widthScaleFactor,
             };
+            console.log(`Changed ${imageID} height to ${new_height}`);
           });
           retPhotoRows[rowCount] = {
             startIndex: start,
@@ -199,7 +190,9 @@ export function PostList({
         }
       });
       setPhotoRows(retPhotoRows);
-      setPhotoDimensions(retPhotoDimensions);
+      setPhotoDimensions(dimensions);
+      console.log(retPhotoRows);
+      console.log(dimensions);
     };
     fetchPhotoDimensions();
   }, [posts]);
@@ -213,7 +206,7 @@ export function PostList({
               {posts
                 .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
                 .map((p) => (
-                  <div key={p.id} className="flex flex-col">
+                  <div key={p.id} className="group relative flex flex-col">
                     <Link href={`/post/${p.id}`}>
                       <Image
                         key={p.id}
@@ -224,6 +217,11 @@ export function PostList({
                         className="opacity-100 hover:opacity-75"
                       />
                     </Link>
+                    <div className="popup absolute left-0 right-0 opacity-0 group-hover:opacity-100">
+                      <div className="bg-white bg-opacity-50 p-2">
+                        <p>{`${p.title}`}</p>
+                      </div>
+                    </div>
                     {likeButton && (
                       <LikeButton
                         pid={p.id}
