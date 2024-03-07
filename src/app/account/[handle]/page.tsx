@@ -4,7 +4,7 @@ import { CreateAlbum } from "@/components/CreateAlbum";
 import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
 import { auth } from "@clerk/nextjs/server";
-import { serverFetch } from "@/lib/utils";
+import { serialize, serverFetch } from "@/lib/utils";
 
 export default async function Account({
   params,
@@ -37,7 +37,7 @@ export default async function Account({
       <div>
         <PaginatedPostList
           getWhat="userPosts"
-          initPosts={posts}
+          initPosts={serialize(posts)}
           params={{ user: profile.id, what: "posts", cursor }}
           likeButton
         />

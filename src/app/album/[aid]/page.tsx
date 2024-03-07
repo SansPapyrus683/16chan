@@ -1,6 +1,6 @@
 import { api } from "@/trpc/server";
 import { DeleteAlbum } from "@/components/DeleteAlbum";
-import { serverFetch } from "@/lib/utils";
+import { serialize, serverFetch } from "@/lib/utils";
 import { Album } from "@/components/Album";
 
 export default async function AlbumView({ params }: { params: { aid: string } }) {
@@ -11,7 +11,7 @@ export default async function AlbumView({ params }: { params: { aid: string } })
 
   return (
     <>
-      <Album aid={params.aid} initAlbum={ret.val} />
+      <Album aid={params.aid} initAlbum={serialize(ret.val)} />
       <DeleteAlbum aid={params.aid} />
     </>
   );

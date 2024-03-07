@@ -3,6 +3,7 @@ import { SignInButton } from "@clerk/nextjs";
 import { z } from "zod";
 import { PaginatedPostList } from "@/components/PostList";
 import { api } from "@/trpc/server";
+import { serialize } from "@/lib/utils";
 
 const SortOrder = z.enum(["new", "likes"]).catch("new");
 
@@ -38,7 +39,7 @@ export default async function Browsing({
         </div>
         <div>
           <PaginatedPostList
-            initPosts={res}
+            initPosts={serialize(res)}
             getWhat="search"
             params={{ query, sortBy, cursor }}
             likeButton={userId !== null}

@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { ArtSource } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { notFound } from "next/navigation";
+import superjson from "superjson";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -55,4 +56,8 @@ export function toTitleCase(str: string) {
   return str.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
   });
+}
+
+export function serialize<T>(val: T): T {
+  return superjson.parse(superjson.stringify(val));
 }
