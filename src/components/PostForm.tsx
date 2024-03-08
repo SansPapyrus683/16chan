@@ -28,16 +28,10 @@ type PostData = {
 //failed attempt #1 to get it working
 //doesn't work because JS forgets that readAsDataUrl is supposed to allow files
 export function ImgPreview(uploadedImg: File){
-  const reader = new FileReader();
+  
   let imgSrc;
-  reader.addEventListener(
-    "load",
-    () => {
-      imgSrc = reader.result;
-    },
-    false,
-  );
-  reader.readAsDataURL(uploadedImg)
+
+  imgSrc = URL.createObjectURL(uploadedImg)
   return(<image src={imgSrc} />);  
 }
 
@@ -72,9 +66,9 @@ export function PostForm({
   const preview = document.querySelector("#preview");
   const rows = []
   //commented out failed attempt #1
-  /*for(let i = 0; i<pics.length; i++){
-    rows.push(<ImgPreview uploadedImg={pics} />)
-  }*/
+  for(let i = 0; i<pics.length; i++){
+    rows.push(<ImgPreview uploadedImg={pics[i]} />)
+  }
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this is so cursed omg
@@ -120,7 +114,7 @@ export function PostForm({
           onChange={(e) => {
             //second method that fails because preview is null when the first img is uploaded for some reason
             setPics([...pics, ...Array.from(e.target.files!)]);
-            const reader = new FileReader();
+            /*const reader = new FileReader();
             reader.addEventListener(
               "load",
               () => {
@@ -134,7 +128,7 @@ export function PostForm({
             );
             for(let i = 0; i<e.target.files.length; i++) {
               reader.readAsDataURL(e.target.files[i]);
-            }         
+            }*/         
           }}
         />
         <input
