@@ -4,8 +4,8 @@ import { type FormEvent, useState } from "react";
 import { parseSauce, Sauce, Tag } from "@/lib/types";
 import { Visibility } from "@prisma/client";
 import { sauceUrl, toTitleCase } from "@/lib/utils";
+import Image from "next/image";
 import { z } from "zod";
-import { ForkOptions } from "child_process";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -24,17 +24,12 @@ type PostData = {
   vis: Visibility;
 };
 
-
 //failed attempt #1 to get it working
 //doesn't work because JS forgets that readAsDataUrl is supposed to allow files
-export function ImgPreview(uploadedImg: File){
-  
-  let imgSrc;
-
-  imgSrc = URL.createObjectURL(uploadedImg)
-  return(<image src={imgSrc} />);  
+export function ImgPreview({ img }: { img: File }) {
+  const src = URL.createObjectURL(img);
+  return <Image src={src} fill alt="alt text" />;
 }
-
 
 export function PostForm({
   iPics = [],
@@ -63,12 +58,7 @@ export function PostForm({
   const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>(sourceType);
   const [vis, setVis] = useState<Visibility>(iVis);
   const [err, setErr] = useState("");
-  const preview = document.querySelector("#preview");
-  const rows = []
-  //commented out failed attempt #1
-  for(let i = 0; i<pics.length; i++){
-    rows.push(<ImgPreview uploadedImg={pics[i]} />)
-  }
+
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this is so cursed omg
@@ -114,21 +104,6 @@ export function PostForm({
           onChange={(e) => {
             //second method that fails because preview is null when the first img is uploaded for some reason
             setPics([...pics, ...Array.from(e.target.files!)]);
-            /*const reader = new FileReader();
-            reader.addEventListener(
-              "load",
-              () => {
-                const image = new Image();
-                image.src = reader.result;
-                image.height = 200
-                image.width = 200
-                preview?.appendChild(image)
-              },
-              false,
-            );
-            for(let i = 0; i<e.target.files.length; i++) {
-              reader.readAsDataURL(e.target.files[i]);
-            }*/         
           }}
         />
         <input
@@ -184,9 +159,19 @@ export function PostForm({
         </button>
       </form>
       <span className="text-red-600">{err}</span>
-      
-      <div id="preview">There are {pics.length} images</div>
-      {rows}
+
+      <div>There are {pics.length} images</div>
+      {pics.map((p, i) => (
+        <Image
+          key={i}
+          src={URL.createObjectURL(p)}
+          width="0"
+          height="0"
+          sizes="100vw"
+          alt="alt"
+          style={{ width: "100%", height: "auto" }}
+        />
+      ))}
     </div>
   );
 }
