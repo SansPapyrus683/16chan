@@ -66,36 +66,27 @@ export function PaginatedPostList({
 
   return (
     <>
-      <PostList
-        posts={posts}
-        likeButton={likeButton}
-        startRow={startRow}
-        endRow={endRow}
-      />
+      <PostList posts={posts} likeButton={likeButton} />
       <div>
         <button
           onClick={async (e) => {
             e.preventDefault();
-            //router.push(`${pathname}?${modParams("cursor", prevCursor!)}`);
-            setStartRow(Math.max(startRow - ROWS_PER_PAGE, 0));
-            setEndRow(endRow - ROWS_PER_PAGE);
+            router.push(`${pathname}?${modParams("cursor", prevCursor!)}`);
           }}
-          //disabled={prevCursor === undefined}
+          disabled={prevCursor === undefined}
           className="border p-1"
         >
-          prev
+          Prev
         </button>
         <button
           onClick={async (e) => {
             e.preventDefault();
-            //router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
-            setStartRow(Math.min(startRow + ROWS_PER_PAGE));
-            setEndRow(endRow + ROWS_PER_PAGE);
+            router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
           }}
           className="ml-3 border p-1"
-          //disabled={nextCursor === undefined}
+          disabled={nextCursor === undefined}
         >
-          next
+          Next
         </button>
       </div>
     </>
@@ -105,13 +96,9 @@ export function PaginatedPostList({
 export function PostList({
   posts,
   likeButton = false,
-  startRow,
-  endRow,
 }: {
   posts: PostData["posts"];
   likeButton?: boolean;
-  startRow: number;
-  endRow: number;
 }) {
   // hm you'd think this would be undefined for a lil @ the start but it actually isn't
   const { userId } = useAuth();
@@ -213,10 +200,7 @@ export function PostList({
     <div>
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
         <div className="grid border border-2 border-solid border-black">
-          {Array.from(
-            { length: Math.min(endRow, Object.keys(photoRows).length) - startRow },
-            (_, index) => index + startRow,
-          ).map((index) => (
+          {Object.keys(photoRows).map((index) => (
             <div className="flex">
               {posts
                 .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
@@ -237,12 +221,14 @@ export function PostList({
                         <p>{`${p.title}`}</p>
                       </div>
                     </div>
-                    {likeButton && (
-                      <LikeButton
-                        pid={p.id}
-                        liked={p.likes!.some((i) => i.userId === userId)}
-                      />
-                    )}
+                    <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
+                      {likeButton && (
+                        <LikeButton
+                          pid={p.id}
+                          liked={p.likes!.some((i) => i.userId === userId)}
+                        />
+                      )}
+                    </div>
                   </div>
                 ))}
             </div>
