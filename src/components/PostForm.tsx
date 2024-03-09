@@ -24,13 +24,6 @@ type PostData = {
   vis: Visibility;
 };
 
-//failed attempt #1 to get it working
-//doesn't work because JS forgets that readAsDataUrl is supposed to allow files
-export function ImgPreview({ img }: { img: File }) {
-  const src = URL.createObjectURL(img);
-  return <Image src={src} fill alt="alt text" />;
-}
-
 export function PostForm({
   iPics = [],
   iTitle = "",
@@ -94,6 +87,15 @@ export function PostForm({
     });
   };
 
+  function clearForm(){
+    setPics([]);
+    setTitle("");
+    setTags("");
+    setSauce("");
+    setVis(Visibility.PUBLIC);
+    setSauceType("AUTO");
+  }
+
   return (
     <div className="space-y-2">
       <form onSubmit={formSubmit} className="space-y-2">
@@ -102,7 +104,6 @@ export function PostForm({
           accept="image/*"
           multiple
           onChange={(e) => {
-            //second method that fails because preview is null when the first img is uploaded for some reason
             setPics([...pics, ...Array.from(e.target.files!)]);
           }}
         />
@@ -158,6 +159,9 @@ export function PostForm({
           {buttonText}
         </button>
       </form>
+      <button type="clear" className="block border-2 p-0.5" onClick={clearForm}>
+        Reset Form
+      </button>
       <span className="text-red-600">{err}</span>
 
       <div>There are {pics.length} images</div>
@@ -169,7 +173,7 @@ export function PostForm({
           height="0"
           sizes="100vw"
           alt="alt"
-          style={{ width: "100%", height: "auto" }}
+          style={{ width: "25%", height: "auto" }}
         />
       ))}
     </div>
