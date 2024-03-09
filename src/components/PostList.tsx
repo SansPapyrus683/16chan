@@ -159,7 +159,7 @@ export function PostList({
       );
 
       const MAX_WIDTH = window.innerWidth;
-      const MAX_HEIGHT = 500;
+      const MAX_HEIGHT = 300;
 
       let currWidthPixelCount = 0;
       let currHeightPixelCount = 0;
