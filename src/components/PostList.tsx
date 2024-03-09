@@ -51,7 +51,9 @@ export function PaginatedPostList({
   }
   //@ts-ignore
   const { data } = query.useQuery(params, { initialData: initPosts, staleTime: 5e3 });
-
+  const ROWS_PER_PAGE = 3;
+  const [startRow, setStartRow] = useState(0);
+  const [endRow, setEndRow] = useState(ROWS_PER_PAGE);
   const {
     posts,
     prevCursor,
@@ -64,14 +66,21 @@ export function PaginatedPostList({
 
   return (
     <>
-      <PostList posts={posts} likeButton={likeButton} />
+      <PostList
+        posts={posts}
+        likeButton={likeButton}
+        startRow={startRow}
+        endRow={endRow}
+      />
       <div>
         <button
           onClick={async (e) => {
             e.preventDefault();
-            router.push(`${pathname}?${modParams("cursor", prevCursor!)}`);
+            //router.push(`${pathname}?${modParams("cursor", prevCursor!)}`);
+            setStartRow(Math.max(startRow - ROWS_PER_PAGE, 0));
+            setEndRow(endRow - ROWS_PER_PAGE);
           }}
-          disabled={prevCursor === undefined}
+          //disabled={prevCursor === undefined}
           className="border p-1"
         >
           prev
@@ -79,10 +88,12 @@ export function PaginatedPostList({
         <button
           onClick={async (e) => {
             e.preventDefault();
-            router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
+            //router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
+            setStartRow(Math.min(startRow + ROWS_PER_PAGE, posts.length));
+            setEndRow(endRow + ROWS_PER_PAGE);
           }}
           className="ml-3 border p-1"
-          disabled={nextCursor === undefined}
+          //disabled={nextCursor === undefined}
         >
           next
         </button>
@@ -94,9 +105,13 @@ export function PaginatedPostList({
 export function PostList({
   posts,
   likeButton = false,
+  startRow,
+  endRow,
 }: {
   posts: PostData["posts"];
   likeButton?: boolean;
+  startRow: number;
+  endRow: number;
 }) {
   // hm you'd think this would be undefined for a lil @ the start but it actually isn't
   const { userId } = useAuth();
@@ -175,7 +190,6 @@ export function PostList({
                 (MAX_HEIGHT / dimensions[imageID]!.height) *
                 widthScaleFactor,
             };
-            console.log(`Changed ${imageID} height to ${new_height}`);
           });
           retPhotoRows[rowCount] = {
             startIndex: start,
@@ -191,8 +205,6 @@ export function PostList({
       });
       setPhotoRows(retPhotoRows);
       setPhotoDimensions(dimensions);
-      console.log(retPhotoRows);
-      console.log(dimensions);
     };
     fetchPhotoDimensions();
   }, [posts]);
@@ -201,7 +213,10 @@ export function PostList({
     <div>
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
         <div className="grid">
-          {Object.keys(photoRows).map((index) => (
+          {Array.from(
+            { length: endRow - startRow },
+            (_, index) => index + startRow,
+          ).map((index) => (
             <div className="flex">
               {posts
                 .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
