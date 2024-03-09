@@ -51,9 +51,6 @@ export function PaginatedPostList({
   }
   //@ts-ignore
   const { data } = query.useQuery(params, { initialData: initPosts, staleTime: 5e3 });
-  const ROWS_PER_PAGE = 3;
-  const [startRow, setStartRow] = useState(0);
-  const [endRow, setEndRow] = useState(ROWS_PER_PAGE);
   const {
     posts,
     prevCursor,
@@ -157,7 +154,7 @@ export function PostList({
       posts.map((photo, index) => {
         let width = dimensions[photo.id]!.width;
         let height = dimensions[photo.id]!.height;
-        let scale_factor = 0;
+        let scale_factor: number;
         scale_factor = MAX_HEIGHT / height;
         currWidthPixelCount += width * scale_factor;
         currHeightPixelCount += height * scale_factor;
@@ -199,7 +196,7 @@ export function PostList({
   return (
     <div>
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
-        <div className="grid border border-2 border-solid border-black">
+        <div className="grid border-2 border-solid border-black">
           {Object.keys(photoRows).map((index) => (
             <div className="flex">
               {posts
