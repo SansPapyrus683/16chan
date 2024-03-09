@@ -1,6 +1,7 @@
 import { api } from "@/trpc/server";
 import { PaginatedPostList } from "@/components/PostList";
 import { auth } from "@clerk/nextjs/server";
+import { serialize } from "@/lib/utils";
 
 export default async function NewPage({
   searchParams: sp,
@@ -16,7 +17,7 @@ export default async function NewPage({
       <div>posts by users u follow</div>
       <div>
         <PaginatedPostList
-          initPosts={posts}
+          initPosts={serialize(posts)}
           getWhat="following"
           params={{ user: userId! }}
           likeButton

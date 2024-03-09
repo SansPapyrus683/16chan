@@ -30,7 +30,7 @@ export function AddToAlbum({ pid }: { pid: string }) {
         className="border-2 p-0.5"
       >
         submit
-      </button>{" "}
+      </button>
     </div>
   );
 }
