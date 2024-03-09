@@ -159,7 +159,7 @@ export function PostForm({
           {buttonText}
         </button>
       </form>
-      <button type="clear" className="block border-2 p-0.5" onClick={clearForm}>
+      <button className="block border-2 p-0.5" onClick={clearForm}>
         Reset Form
       </button>
       <span className="text-red-600">{err}</span>
