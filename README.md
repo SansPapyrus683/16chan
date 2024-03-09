@@ -4,9 +4,19 @@ upload images, tag images, look at anime girls, what else could you want?
 
 ## get started
 
+### easy way
+
+```bash
+python run.py
+```
+
+that's it. it'll prompt you for the environment variables and run `npm run dev` all by itself
+
+### normal way
+
 1. get the env file from kevin
 2. `npm run dev`
-3. **webhook setup**
+3. **webhook setup- not needed since we deployed to vercel for the webhook**
     1. if you want webhooks to work, which are needed for db entries to be created on user signups, you first have
        to [install ngrok](https://ngrok.com/)
     2. get the auth token from kevin so you can host the domain and run this
