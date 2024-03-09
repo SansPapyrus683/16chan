@@ -89,7 +89,7 @@ export function PaginatedPostList({
           onClick={async (e) => {
             e.preventDefault();
             //router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
-            setStartRow(Math.min(startRow + ROWS_PER_PAGE, posts.length));
+            setStartRow(Math.min(startRow + ROWS_PER_PAGE));
             setEndRow(endRow + ROWS_PER_PAGE);
           }}
           className="ml-3 border p-1"
@@ -212,9 +212,9 @@ export function PostList({
   return (
     <div>
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
-        <div className="grid">
+        <div className="grid border border-2 border-solid border-black">
           {Array.from(
-            { length: endRow - startRow },
+            { length: Math.min(endRow, Object.keys(photoRows).length) - startRow },
             (_, index) => index + startRow,
           ).map((index) => (
             <div className="flex">

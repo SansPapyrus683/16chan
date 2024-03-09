@@ -23,7 +23,7 @@ export default async function Browsing({
   const res = await api.browse.browse({ query, sortBy, cursor });
   return (
     <>
-      <div className="space-y-4">
+      <div className="mx-9 space-y-4">
         <div>
           {!userId && (
             <>
