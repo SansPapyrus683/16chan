@@ -213,7 +213,7 @@ export function PostList({
                         alt="post preview"
                         width={photoDimensions[p.id]?.width || 250}
                         height={photoDimensions[p.id]?.height || 250}
-                        className="opacity-100 hover:opacity-75"
+                        className="opacity-100 group-hover:opacity-75"
                       />
                     </Link>
                     <div className="popup absolute left-0 right-0 opacity-0 group-hover:opacity-100">
