@@ -79,7 +79,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           </CollapsibleContent>
         </Collapsible>
 
-        <TagPost pid={params.pid} />
+        {/* <TagPost pid={params.pid} /> */}
         <AddToAlbum pid={params.pid} />
         <CommentList comments={post.comments} />
         <CommentInput pid={params.pid} />
@@ -115,17 +115,19 @@ export default async function PostView({ params }: { params: { pid: string } }) 
 function TagsList({ tags }: { tags: { postId: string, taggedAt: Date, tagName: string, tagCat: string }[]}) {
   let tag_types = ['LOCATION', 'OTHER'];
   let tags_map: { [key: string]: any } = {};
-  tag_types.forEach(t => {
-    tags_map[t] = [];
-  });
 
   for (const tag of tags) {
-    tags_map[tag.tagCat].push(tag.tagName);
+    if (tags_map[tag.tagCat]) {
+      tags_map[tag.tagCat].push(tag.tagName);
+    }
+    else {
+      tags_map[tag.tagCat] = [tag.tagName];
+    }
   }
   
   return (
     <div className="m-2">
-      {tag_types.map((type: string) =>
+      {Object.keys(tags_map).map((type: string) =>
         <Collapsible defaultOpen>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="px-2 py-0 h-auto text-base text-gray-500">
