@@ -106,10 +106,7 @@ export function PostList({
   const [photoDimensions, setPhotoDimensions] = useState<{
     [id: string]: { width?: number; height?: number };
   }>({});
-<<<<<<< HEAD
   const [waitingMessage, setWaitingMessage] = useState("Loading Images...");
-=======
->>>>>>> main
 
   useEffect(() => {
     const fetchPhotoDimensions = async () => {
@@ -169,14 +166,10 @@ export function PostList({
           (currWidthPixelCount >= MAX_WIDTH && backLog >= 4) ||
           index == Object.keys(dimensions).length - 1
         ) {
-<<<<<<< HEAD
           let widthScaleFactor: number = 0.0;
           if (currWidthPixelCount <= MAX_WIDTH) {
             widthScaleFactor = 1.0;
           } else widthScaleFactor = MAX_WIDTH / currWidthPixelCount;
-=======
-          let widthScaleFactor = MAX_WIDTH / currWidthPixelCount;
->>>>>>> main
           let new_height = widthScaleFactor * (height * scale_factor);
           imagesInRow.forEach((imageID) => {
             dimensions[imageID] = {
