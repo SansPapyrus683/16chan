@@ -70,15 +70,14 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 
-  /*
-  a {
-    @apply text-blue-400 visited:text-purple-500;
+  h1 {
+    @apply text-xl font-bold
   }
-  */
 
   .title {
     @apply font-bold;

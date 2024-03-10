@@ -19,7 +19,7 @@ export function CreateAlbum() {
       }}
       className="border-2 p-1"
     >
-      create album lol
+      create album
     </button>
   );
 }

@@ -23,10 +23,10 @@ export default async function Browsing({
   const res = await api.browse.browse({ query, sortBy, cursor });
   return (
     <>
-      <div className="space-y-4">
-        <div>
-          results for the search query "{query}" sorted by {sortBy}
-        </div>
+      <div className="mt-5 space-y-4">
+        <h1>
+          results for "{query}" sorted by {sortBy}
+        </h1>
         <div>
           <PaginatedPostList
             initPosts={serialize(res)}
