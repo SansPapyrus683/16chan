@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
 import { useAuth } from "@clerk/nextjs";
+import { serialize, serverFetch } from "@/lib/utils";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -105,6 +106,7 @@ export function PostList({
   const [photoDimensions, setPhotoDimensions] = useState<{
     [id: string]: { width?: number; height?: number };
   }>({});
+  const [waitingMessage, setWaitingMessage] = useState("Loading Images...");
 
   useEffect(() => {
     const fetchPhotoDimensions = async () => {
@@ -164,7 +166,10 @@ export function PostList({
           (currWidthPixelCount >= MAX_WIDTH && backLog >= 4) ||
           index == Object.keys(dimensions).length - 1
         ) {
-          let widthScaleFactor = MAX_WIDTH / currWidthPixelCount;
+          let widthScaleFactor: number = 0.0;
+          if (currWidthPixelCount <= MAX_WIDTH) {
+            widthScaleFactor = 1.0;
+          } else widthScaleFactor = MAX_WIDTH / currWidthPixelCount;
           let new_height = widthScaleFactor * (height * scale_factor);
           imagesInRow.forEach((imageID) => {
             dimensions[imageID] = {
@@ -189,6 +194,7 @@ export function PostList({
       });
       setPhotoRows(retPhotoRows);
       setPhotoDimensions(dimensions);
+      if (Object.keys(retPhotoRows).length == 0) setWaitingMessage("No images found.");
     };
     fetchPhotoDimensions();
   }, [posts]);
@@ -232,7 +238,7 @@ export function PostList({
           ))}
         </div>
       ) : (
-        <p>Loading Images...</p>
+        <p>{`${waitingMessage}`}</p>
       )}
     </div>
   );
