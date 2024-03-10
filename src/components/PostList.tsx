@@ -198,7 +198,7 @@ export function PostList({
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
         <div className="grid border-2 border-solid border-black">
           {Object.keys(photoRows).map((index) => (
-            <div className="flex">
+            <div className="flex" key={index}>
               {posts
                 .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
                 .map((p) => (
