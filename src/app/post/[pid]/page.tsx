@@ -34,62 +34,49 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel defaultSize={20} className="m-2 min-w-48 max-w-2xl">
-        <Collapsible defaultOpen>
-          <div className="flex justify-between items-center rounded bg-gray-100">
+        <Collapsible defaultOpen className="mb-2">
+          <div className="flex justify-between items-center rounded border-2 border-gray-200">
             <h2 className="category mx-2">posted by</h2>
               <CollapsibleTrigger className="" asChild>
                 <Button variant="ghost" size="sm">
                   <CaretSortIcon className="h-4 w-4" />
                 </Button>
-              </ CollapsibleTrigger>
+              </CollapsibleTrigger>
           </div>
           <CollapsibleContent>
             <Button variant="link" size="default" className="subtext">
               {author ? ( <Link href={`/account/${author.username}`}>{author.username}</Link>)
                 : ( "a deleted user" )}
             </Button>
-          </ CollapsibleContent>
-        </ Collapsible>
-        <Collapsible defaultOpen>
-          <div className="flex justify-between items-center rounded border bg-gray-100">
+          </CollapsibleContent>
+        </Collapsible>
+        <Collapsible defaultOpen className="mb-2">
+          <div className="flex justify-between items-center rounded border-2 border-gray-200">
             <h2 className="category mx-2">source</h2>
             <CollapsibleTrigger className="" asChild>
               <Button variant="ghost" size="sm">
                 <CaretSortIcon className="h-4 w-4" />
               </Button>
-            </ CollapsibleTrigger>
+            </CollapsibleTrigger>
           </div>
           <CollapsibleContent>
             <Button variant="link" size="default" className="subtext">
               {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}
-            </ Button>
-          </ CollapsibleContent>
-        </ Collapsible>
-        <Collapsible defaultOpen>
-          <div className="flex justify-between items-center rounded bg-gray-100">
+            </Button>
+          </CollapsibleContent>
+        </Collapsible>
+        <Collapsible defaultOpen className="mb-2">
+          <div className="flex justify-between items-center rounded border-2 border-gray-200">
             <h2 className="category mx-2">tags</h2>
             <CollapsibleTrigger className="" asChild>
               <Button variant="ghost" size="sm">
                 <CaretSortIcon className="h-4 w-4" />
               </Button>
-            </ CollapsibleTrigger>
+            </CollapsibleTrigger>
           </div>
           <CollapsibleContent>
-            <div>
-              tags:{" "}
-              {post.tags.length == 0 ? (
-                "no tags!"
-              ) : (
-                <ul>
-                  {post.tags.map((t) => (
-                    <li key={t.tagName}>
-                      {t.tagCat}:{t.tagName}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </ CollapsibleContent>
+            <TagsList tags={post.tags} />
+          </CollapsibleContent>
         </Collapsible>
 
         <TagPost pid={params.pid} />
@@ -123,4 +110,37 @@ export default async function PostView({ params }: { params: { pid: string } }) 
       </ResizablePanel>
     </ResizablePanelGroup>
   );
+}
+
+function TagsList({ tags }: { tags: { postId: string, taggedAt: Date, tagName: string, tagCat: string }[]}) {
+  let tag_types = ['LOCATION', 'OTHER'];
+  let tags_map: { [key: string]: any } = {};
+  tag_types.forEach(t => {
+    tags_map[t] = [];
+  });
+
+  for (const tag of tags) {
+    tags_map[tag.tagCat].push(tag.tagName);
+  }
+  
+  return (
+    <div className="m-2">
+      {tag_types.map((type: string) =>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="px-2 py-0 h-auto text-base text-gray-500">
+              {type}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <ul className="ml-4 mb-2 text-gray-400">
+              {tags_map[type].map((t: string) =>
+                <li key={t}>{t}</li>
+              )}
+            </ul>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+    </div>
+  )
 }
