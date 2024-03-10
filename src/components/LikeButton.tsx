@@ -2,7 +2,7 @@
 
 import { api } from "@/trpc/react";
 import { useState } from "react";
-import { HeartFilledIcon, HeartIcon } from "@radix-ui/react-icons";
+import { ThumbsUpIcon } from "lucide-react";
 
 export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
   const likePost = api.post.like.useMutation({
@@ -25,9 +25,9 @@ export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
       >
         <div className="flex items-center text-white">
           {liked ? (
-            <HeartFilledIcon className="mr-2" />
+            <ThumbsUpIcon fill="white" className="mr-2" />
           ) : (
-            <HeartIcon className="mr-2" />
+            <ThumbsUpIcon className="mr-2" />
           )}
           Like
         </div>
