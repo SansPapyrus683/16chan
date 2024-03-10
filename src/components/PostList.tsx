@@ -201,10 +201,7 @@ export function PostList({
       });
       setPhotoRows(retPhotoRows);
       setPhotoDimensions(dimensions);
-<<<<<<< HEAD
       if (Object.keys(retPhotoRows).length == 0) setWaitingMessage("No images found.");
-=======
->>>>>>> main
     };
     fetchPhotoDimensions();
   }, [posts]);
