@@ -3,6 +3,7 @@ import { z } from "zod";
 import { PaginatedPostList } from "@/components/PostList";
 import { api } from "@/trpc/server";
 import { serialize } from "@/lib/utils";
+import { SortMenu } from "@/components/SortMenu";
 
 const SortOrder = z.enum(["new", "likes"]).catch("new");
 
@@ -24,9 +25,13 @@ export default async function Browsing({
   return (
     <>
       <div className="mt-5 space-y-4">
-        <h1>
-          results for "{query}" sorted by {sortBy}
-        </h1>
+        <div className="flex justify-between align-middle">
+          <h1>Results for "{query}"</h1>
+          <div>
+            <h1>Sort By:</h1>
+            <SortMenu options={["new", "likes"]} initVal={sortBy} placeholder={""} />
+          </div>
+        </div>
         <div>
           <PaginatedPostList
             initPosts={serialize(res)}
