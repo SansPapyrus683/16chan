@@ -1,5 +1,4 @@
 import { auth } from "@clerk/nextjs/server";
-import { SignInButton } from "@clerk/nextjs";
 import { z } from "zod";
 import { PaginatedPostList } from "@/components/PostList";
 import { api } from "@/trpc/server";
@@ -25,15 +24,6 @@ export default async function Browsing({
   return (
     <>
       <div className="space-y-4">
-        <div>
-          {!userId && (
-            <>
-              you aren't signed in lol
-              <br />
-              <SignInButton>do it here</SignInButton>
-            </>
-          )}
-        </div>
         <div>
           results for the search query "{query}" sorted by {sortBy}
         </div>

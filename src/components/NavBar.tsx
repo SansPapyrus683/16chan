@@ -1,9 +1,10 @@
-"use client";
-
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import {SignInButton, UserButton} from "@clerk/nextjs";
+import {auth} from "@clerk/nextjs/server";
 
 export function NavBar() {
+  const { userId } = auth();
+
   return (
     <nav className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-gray-300 bg-white pl-10 pr-10 text-base">
       <div className="flex space-x-16">
@@ -18,12 +19,16 @@ export function NavBar() {
         </div>
       </div>
       <div className="flex items-center space-x-4">
-        <div className="">
-          <Link href="/account">Profile</Link>
-        </div>
-        <div className="">
-          <UserButton />
-        </div>
+        {
+          userId ? <>
+            <Link href="/account">Profile</Link>
+            <UserButton/>
+          </> : <>
+            <SignInButton>
+              Sign In
+            </SignInButton>
+          </>
+        }
       </div>
     </nav>
   );
