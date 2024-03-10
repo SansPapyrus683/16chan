@@ -193,6 +193,10 @@ export function PostList({
     fetchPhotoDimensions();
   }, [posts]);
 
+  if (posts.length === 0) {
+    return <div>There don't seem to be any posts here...</div>;
+  }
+
   return (
     <div>
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
