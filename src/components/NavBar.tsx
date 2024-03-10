@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SignInButton, UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
+import { SearchBar } from "@/components/SearchBar";
 
 export function NavBar() {
   const { userId } = auth();
@@ -14,6 +15,7 @@ export function NavBar() {
         <Link href="/following">Following</Link>
         <Link href="/post/create">New Post</Link>
       </div>
+      <SearchBar />
       <div className="flex items-center space-x-4">
         {userId ? (
           <>
