@@ -6,6 +6,7 @@ import { TagCategory, Visibility } from "@prisma/client";
 import { sauceUrl, toTitleCase } from "@/lib/utils";
 import Image from "next/image";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -39,7 +40,6 @@ export function TagForm({
   onContentChange: (tagIndex: number, newContent: string) => void;
   onDelete: (tagIndex: number) => void;
 }) {
-  console.log(tagNumber, tagType);
   return (
     <div>
       Tag #{tagNumber}
@@ -226,13 +226,13 @@ export function PostForm({
           </select>
         )}
 
-        <button type="submit" className="block border-2 p-0.5">
+        <Button type="submit" className="block">
           {buttonText}
-        </button>
+        </Button>
 
-        <button type="reset" className="block border-2 p-0.5" onClick={clearForm}>
+        <Button type="reset" className="block" onClick={clearForm}>
           Reset Form
-        </button>
+        </Button>
       </form>
 
       <span className="text-red-600">{err}</span>
