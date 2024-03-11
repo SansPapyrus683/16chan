@@ -2,6 +2,7 @@
 
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function DeletePost({ pid }: { pid: string }) {
   const router = useRouter();
@@ -9,14 +10,14 @@ export function DeletePost({ pid }: { pid: string }) {
     onSuccess: () => router.push("/account"),
   });
   return (
-    <button
+    <Button
       onClick={(e) => {
         e.preventDefault();
         deletePost.mutate(pid);
       }}
-      className="border-2 p-0.5"
+      className="bg-red-600"
     >
       delete
-    </button>
+    </Button>
   );
 }

@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 export function AddToAlbum({ pid }: { pid: string }) {
   const { userId } = useAuth();
@@ -34,14 +35,13 @@ export function AddToAlbum({ pid }: { pid: string }) {
         </SelectContent>
       </Select>
 
-      <button
-        onClick={(e) => {
+      <Button
+        onClick={() => {
           addPost.mutate({ post: pid, album: aid });
         }}
-        className="border-2 p-0.5"
       >
         Add
-      </button>
+      </Button>
     </div>
   );
 }

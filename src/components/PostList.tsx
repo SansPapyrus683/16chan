@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
 import { useAuth } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -64,27 +65,26 @@ export function PaginatedPostList({
   return (
     <>
       <PostList posts={posts} likeButton={likeButton} />
-      <div>
-        <button
+      <div className="flex">
+        <Button
           onClick={async (e) => {
             e.preventDefault();
             router.push(`${pathname}?${modParams("cursor", prevCursor!)}`);
           }}
           disabled={prevCursor === undefined}
-          className="border p-1"
         >
           Prev
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={async (e) => {
             e.preventDefault();
             router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
           }}
-          className="ml-3 border p-1"
+          className="ml-3"
           disabled={nextCursor === undefined}
         >
           Next
-        </button>
+        </Button>
       </div>
     </>
   );

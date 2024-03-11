@@ -133,7 +133,7 @@ function TagsList({
       {Object.entries(tagsMap).map(
         ([cat, tags]) =>
           tags.length > 0 && (
-            <Collapsible defaultOpen>
+            <Collapsible defaultOpen key={cat}>
               <CollapsibleTrigger asChild>
                 <Button
                   variant="ghost"

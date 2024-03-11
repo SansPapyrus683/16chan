@@ -3,6 +3,7 @@
 import { api } from "@/trpc/react";
 import { useState } from "react";
 import { ThumbsUpIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
   const likePost = api.post.like.useMutation({
@@ -15,7 +16,7 @@ export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
 
   return (
     <div className="p-1">
-      <button
+      <Button
         onClick={async (e) => {
           e.preventDefault();
           (liked ? unlikePost : likePost).mutate(pid);
@@ -31,7 +32,7 @@ export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
           )}
           Like
         </div>
-      </button>
+      </Button>
     </div>
   );
 }

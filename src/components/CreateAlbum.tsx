@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toTitleCase } from "@/lib/utils";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 export function CreateAlbum() {
   const router = useRouter();
@@ -49,7 +49,9 @@ export function CreateAlbum() {
   return (
     <>
       <Dialog onOpenChange={() => setButtonText("Create")}>
-        <DialogTrigger className="border-2 p-1">Create Album</DialogTrigger>
+        <DialogTrigger asChild>
+          <Button variant="outline">Create Album</Button>
+        </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create Album</DialogTitle>
@@ -85,11 +87,7 @@ export function CreateAlbum() {
             </Select>
           </div>
           <DialogFooter className="sm:justify-between">
-            <Button
-              onClick={createAlbum}
-            >
-              {buttonText}
-            </Button>
+            <Button onClick={createAlbum}>{buttonText}</Button>
             <DialogClose asChild>
               <Button type="button" variant="secondary">
                 Close

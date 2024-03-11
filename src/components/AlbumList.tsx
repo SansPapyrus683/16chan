@@ -3,6 +3,7 @@
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function AlbumList({
   initAlbums,
@@ -28,31 +29,17 @@ export function AlbumList({
           </li>
         ))}
       </ul>
-      <div>
-        <button
-          onClick={async (e) => {
-            e.preventDefault();
-            setAt(prevCursor);
-          }}
-          disabled={prevCursor === undefined}
-          className="border-4 p-1"
-        >
+      <div className="flex">
+        <Button onClick={() => setAt(prevCursor)} disabled={prevCursor === undefined}>
           prev
-        </button>
-        <button
-          onClick={async (e) => {
-            console.assert(
-              nextCursor !== undefined && !isPlaceholderData,
-              "what the hell?",
-            );
-            e.preventDefault();
-            setAt(nextCursor);
-          }}
-          className="ml-3 border-4 p-1"
+        </Button>
+        <Button
+          onClick={() => setAt(nextCursor)}
           disabled={isPlaceholderData || nextCursor === undefined}
+          className="ml-3"
         >
           next
-        </button>
+        </Button>
       </div>
     </>
   );
