@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toTitleCase } from "@/lib/utils";
+import {Button} from "@/components/ui/button";
 
 export function CreateAlbum() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export function CreateAlbum() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create Album</DialogTitle>
-            <DialogDescription>Make a collection of posts</DialogDescription>
+            <DialogDescription>Make a collection of posts.</DialogDescription>
           </DialogHeader>
           <div className="grid flex-1 gap-2">
             <Label htmlFor="link" className="sr-only">
@@ -84,15 +85,15 @@ export function CreateAlbum() {
             </Select>
           </div>
           <DialogFooter className="sm:justify-between">
-            <button
-              className="rounded-md border-2 p-2"
-              type="submit"
+            <Button
               onClick={createAlbum}
             >
               {buttonText}
-            </button>
-            <DialogClose className="rounded-md border-2 bg-black p-2 text-white">
-              Close
+            </Button>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

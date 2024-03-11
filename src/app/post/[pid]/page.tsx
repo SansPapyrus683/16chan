@@ -33,55 +33,53 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel defaultSize={20} className="m-2 min-w-48 max-w-2xl space-y-10">
-        <div>
-          <Collapsible defaultOpen className="mb-2">
-            <div className="flex items-center justify-between rounded border-2 border-gray-200">
-              <h2 className="category mx-2">posted by</h2>
-              <CollapsibleTrigger className="" asChild>
-                <Button variant="ghost" size="sm">
-                  <CaretSortIcon className="h-4 w-4" />
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
-              <Button variant="link" size="default" className="subtext">
-                {author ? (
-                  <Link href={`/account/${author.username}`}>{author.username}</Link>
-                ) : (
-                  "a deleted user"
-                )}
+        <Collapsible defaultOpen className="mb-2">
+          <div className="flex items-center justify-between rounded border-2 border-gray-200">
+            <h2 className="category mx-2">posted by</h2>
+            <CollapsibleTrigger className="" asChild>
+              <Button variant="ghost" size="sm">
+                <CaretSortIcon className="h-4 w-4" />
               </Button>
-            </CollapsibleContent>
-          </Collapsible>
-          <Collapsible defaultOpen className="mb-2">
-            <div className="flex items-center justify-between rounded border-2 border-gray-200">
-              <h2 className="category mx-2">source</h2>
-              <CollapsibleTrigger className="" asChild>
-                <Button variant="ghost" size="sm">
-                  <CaretSortIcon className="h-4 w-4" />
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
-              <Button variant="link" size="default" className="subtext">
-                {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <Button variant="link" size="default" className="subtext">
+              {author ? (
+                <Link href={`/account/${author.username}`}>{author.username}</Link>
+              ) : (
+                "a deleted user"
+              )}
+            </Button>
+          </CollapsibleContent>
+        </Collapsible>
+        <Collapsible defaultOpen className="mb-2">
+          <div className="flex items-center justify-between rounded border-2 border-gray-200">
+            <h2 className="category mx-2">source</h2>
+            <CollapsibleTrigger className="" asChild>
+              <Button variant="ghost" size="sm">
+                <CaretSortIcon className="h-4 w-4" />
               </Button>
-            </CollapsibleContent>
-          </Collapsible>
-          <Collapsible defaultOpen className="mb-2">
-            <div className="flex items-center justify-between rounded border-2 border-gray-200">
-              <h2 className="category mx-2">tags</h2>
-              <CollapsibleTrigger className="" asChild>
-                <Button variant="ghost" size="sm">
-                  <CaretSortIcon className="h-4 w-4" />
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
-              <TagsList tags={post.tags} />
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <Button variant="link" size="default" className="subtext">
+              {src ? <Link href={src[1]}>{src[0]}</Link> : "no source."}
+            </Button>
+          </CollapsibleContent>
+        </Collapsible>
+        <Collapsible defaultOpen className="mb-2">
+          <div className="flex items-center justify-between rounded border-2 border-gray-200">
+            <h2 className="category mx-2">tags</h2>
+            <CollapsibleTrigger className="" asChild>
+              <Button variant="ghost" size="sm">
+                <CaretSortIcon className="h-4 w-4" />
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <TagsList tags={post.tags} />
+          </CollapsibleContent>
+        </Collapsible>
 
         <div>
           <h1>Add to Album</h1>
