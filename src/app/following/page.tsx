@@ -13,13 +13,13 @@ export default async function NewPage({
   const posts = await api.user.followedPosts({ cursor });
 
   return (
-    <div className="space-y-4">
-      <div>posts by users u follow</div>
+    <div className="mt-5 space-y-4">
+      <h1>Following Posts</h1>
       <div>
         <PaginatedPostList
           initPosts={serialize(posts)}
           getWhat="following"
-          params={{ user: userId! }}
+          params={{ user: userId!, cursor }}
           likeButton
         />
       </div>

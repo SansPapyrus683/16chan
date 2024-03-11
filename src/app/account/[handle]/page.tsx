@@ -25,12 +25,15 @@ export default async function Account({
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const posts = await api.user.userPosts({ user: profile.id, cursor });
+  const isFollowing = await api.user.isFollowing(profile.id);
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
     <div className="space-y-4">
       <div>account page for {profile.username}</div>
-      {profile.id !== userId && <FollowButton uid={profile.id} />}
+      {profile.id !== userId && (
+        <FollowButton uid={profile.id} isFollowing={isFollowing} />
+      )}
       <div>
         <a href={`/account/${params.handle}/likes`}>see their likes</a>
       </div>
@@ -43,9 +46,8 @@ export default async function Account({
         />
       </div>
 
-      <div>
+      <div className="space-y-4">
         <CreateAlbum />
-        <br />
         <AlbumList initAlbums={albums} uid={profile.id} />
       </div>
     </div>

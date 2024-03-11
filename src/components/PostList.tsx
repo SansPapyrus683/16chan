@@ -51,7 +51,7 @@ export function PaginatedPostList({
       break;
   }
   //@ts-ignore
-  const { data } = query.useQuery(params, { initialData: initPosts, staleTime: 5e3 });
+  const { data } = query.useQuery(params, { initialData: initPosts });
   const {
     posts,
     prevCursor,
