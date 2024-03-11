@@ -8,6 +8,7 @@ import Image from "next/image";
 import { z } from "zod";
 
 const SOURCE_NAME = {
+
   DA: "DeviantArt",
   PIXIV: "Pixiv",
   TWITTER: "Twitter",
@@ -24,10 +25,43 @@ type PostData = {
   vis: Visibility;
 };
 
+export function TagForm(
+  { tagType, tagContent, tagNumber, onTypeChange, onContentChange, onDelete}
+ : { tagType: string, tagContent: string, tagNumber: number, onTypeChange : Function, onContentChange: Function, onDelete: Function}
+   ) {
+
+  
+  return (
+  <div>
+    Tag #{tagNumber}
+    <button className="block border-2 p-0.5" onClick={onDelete(tagNumber)}>
+      Delete Tag
+    </button>
+    <input type="radio" id="char" name="tagType" checked={tagType == "CHARACTER"} onClick={onTypeChange(tagNumber, "CHARACTER")} />
+    <label htmlFor="char" >Character</label>
+    <input type="radio" id="loc" name="tagType" checked={tagType == "LOCATION"} onClick={onTypeChange(tagNumber, "LOCATION")} />
+    <label htmlFor="loc">Location</label>
+    <input type="radio" id="media" name="tagType" checked={tagType == "MEDIA"} onClick={onTypeChange(tagNumber, "MEDIA")} />
+    <label htmlFor="media">Media</label>
+    <input type="radio" id="other" name="tagType" checked={tagType == "OTHER"} onClick={onTypeChange(tagNumber, "OTHER")} />
+    <label htmlFor="other" >Other</label>
+    <input
+      value={tagContent}
+      onChange={(e) => onContentChange(tagNumber, e.target.value)}
+      placeholder="tag content... "
+      className="block border-2"
+    />
+
+  </div>
+  );
+}
+  
+
 export function PostForm({
   iPics = [],
   iTitle = "",
-  iTags = "",
+  iTagTypes = [],
+  iTagContents = [],
   iSauce = { src: "OTHER", id: "" },
   iVis = Visibility.PUBLIC,
   editVis = false,
@@ -36,7 +70,8 @@ export function PostForm({
 }: {
   iPics?: File[];
   iTitle?: string;
-  iTags?: string;
+  iTagTypes?: string[];
+  iTagContents?: string[];
   iSauce?: z.infer<typeof Sauce>;
   iVis?: Visibility;
   editVis?: boolean;
@@ -45,7 +80,8 @@ export function PostForm({
 }) {
   const [pics, setPics] = useState<File[]>(iPics);
   const [title, setTitle] = useState(iTitle);
-  const [tags, setTags] = useState(iTags);
+  const [tagTypes, setTagTypes] = useState<string[]>(iTagTypes);
+  const [tagContents, setTagContents] = useState<string[]>(iTagContents); 
   const [sauce, setSauce] = useState(iSauce.id);
   const sourceType = sauceUrl(iSauce.src, iSauce.id) === null ? "AUTO" : iSauce.src;
   const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>(sourceType);
@@ -55,16 +91,15 @@ export function PostForm({
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this is so cursed omg
-    let goodTags;
+    let goodTags = [];
     try {
-      goodTags = tags
-        .split(/\s+/)
-        .filter((t) => t)
-        .map((t) => {
-          const [category, name] = t.split(":");
-          // the "as" is just to get ts to stop yapping LOL
-          return Tag.parse({ category, name });
-        });
+      for(let i = 0; i < tagTypes.length; i++)
+      {
+        let category = tagTypes[i];
+        let name = tagContents[i];
+        goodTags.push(Tag.parse({ category, name }));
+      }
+
     } catch (e) {
       setErr(`tag parsing: ${e}`);
       return;
@@ -90,10 +125,59 @@ export function PostForm({
   function clearForm(){
     setPics([]);
     setTitle("");
-    setTags("");
+    setTagTypes([]);
+    setTagContents([]);
     setSauce("");
     setVis(Visibility.PUBLIC);
     setSauceType("AUTO");
+  }
+
+  function onTagTypeChange(tagIndex: number, newType: string){
+    const newTypes: string[] = [];
+    
+    for(let i = 0; i < tagTypes.length; i++){
+      if(i != tagIndex){ 
+        newTypes.push(tagTypes[i]!);
+      }
+      else newTypes.push(newType);
+    } 
+    setTagTypes(newTypes);
+  } 
+  function onTagContentChange(tagIndex: number, newContent: string){
+    const newContents: string[] = [];  
+    for(let i = 0; i < tagContents.length; i++){
+      if(i != tagIndex){ 
+        newContents.push(tagContents[i]!);
+      }
+      else newContents.push(newContent);
+    } 
+    setTagContents(newContents);
+  }
+
+  function onTagDelete(tagIndex: number){
+    const newTypes: string[] = [];
+    const newContents: string[] = [];  
+    for(let i = 0; i < tagContents.length; i++){
+      if(i != tagIndex){ 
+        newTypes.push(tagTypes[i]!);
+        newContents.push(tagContents[i]!);
+      }
+    } 
+    setTagContents(newContents);
+    setTagTypes(newTypes);
+  }
+
+  function onTagAdd(){
+    const newTypes: string[] = [];
+    const newContents: string[] = [];  
+    for(let i = 0; i < tagContents.length; i++){
+      newTypes.push(tagTypes[i]!);
+      newContents.push(tagContents[i]!);
+    }
+    newTypes.push("CHARACTER");
+    newContents.push(""); 
+    setTagContents(newContents);
+    setTagTypes(newTypes);
   }
 
   return (
@@ -107,18 +191,20 @@ export function PostForm({
             setPics([...pics, ...Array.from(e.target.files!)]);
           }}
         />
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="tags..."
-          className="block border-2"
-        />
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="title..."
-          className="block border-2"
-        />
+    
+        {tagTypes.map((t, i) => (
+          <TagForm
+            tagType={tagTypes[i]!}
+            tagContent={tagContents[i]!}
+            tagNumber={i}
+            onTypeChange={onTagTypeChange}
+            onContentChange={onTagContentChange}
+            onDelete={onTagDelete}
+          />
+        ))}
+      <button type="button" className="block border-2 p-0.5" onClick={onTagAdd}>
+        Add Tag #{tagTypes.length}
+      </button>
 
         <select
           value={sauceType}
