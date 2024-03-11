@@ -32,7 +32,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   const src = sauceUrl(post.src, post.artId);
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
-      <ResizablePanel defaultSize={20} className="m-2 min-w-48 max-w-2xl space-y-10">
+      <ResizablePanel defaultSize={20} className="min-w-48 max-w-2xl space-y-10 p-5">
         <Collapsible defaultOpen className="mb-2">
           <div className="flex items-center justify-between rounded border-2 border-gray-200">
             <h2 className="category mx-2">posted by</h2>
@@ -92,9 +92,17 @@ export default async function PostView({ params }: { params: { pid: string } }) 
         </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel>
-        <div className="title"> {post.title} </div>
-        <div className="space-y-2">
+      {/* why the hell do i have to pass overflow-y-auto in both */}
+      <ResizablePanel className="overflow-y-auto p-5" style={{ overflow: "y-auto" }}>
+        <h1>
+          {post.title}
+          {post.userId == userId && (
+            <Button variant="link">
+              <Link href={`/post/${params.pid}/edit`}>edit</Link>
+            </Button>
+          )}
+        </h1>
+        <div className="flex space-x-2">
           {post.images.map((u, ind) => (
             <Image
               key={u.id}
@@ -102,16 +110,14 @@ export default async function PostView({ params }: { params: { pid: string } }) 
               src={u.rawImg}
               alt={`picture number ${ind + 1}`}
               width={200}
-              height={200}
+              height="0"
+              sizes="20vw"
+              style={{ width: "30%", height: "10%" }}
               priority
+              unoptimized
             />
           ))}
         </div>
-        {post.userId == userId && (
-          <div>
-            <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
-          </div>
-        )}
       </ResizablePanel>
     </ResizablePanelGroup>
   );
@@ -143,7 +149,7 @@ function TagsList({
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <ul className="mb-2 ml-4 text-gray-400">
+                <ul className="mb-2 ml-4">
                   {tagsMap[cat]!.map((t: string) => (
                     <li key={t}>{t}</li>
                   ))}
