@@ -39,7 +39,7 @@ export default async function Account({
           getWhat="userPosts"
           initPosts={serialize(posts)}
           params={{ user: profile.id, what: "posts", cursor }}
-          likeButton
+          likeButton={userId !== null}
         />
       </div>
 

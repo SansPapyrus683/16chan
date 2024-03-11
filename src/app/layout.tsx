@@ -1,12 +1,13 @@
 import "@/globals.css";
 
-import { NavBar } from "@/components/NavBar"
+import { NavBar } from "@/components/NavBar";
 import React from "react";
 
 import { Comic_Neue } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { cn } from "@/lib/utils";
 
 const comicNeue = Comic_Neue({
   weight: "400",
@@ -22,12 +23,17 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={comicNeue.className}>
+      <body
+        className={cn(
+          comicNeue.className,
+          "min-h-screen bg-background font-sans antialiased",
+        )}
+      >
         <TRPCReactProvider>
           <ClerkProvider>
-            <NavBar />
-            <div className="pt-16">
-              {children}
+            <div className="flex h-screen">
+              <NavBar />
+              <div className="mx-9 flex-grow pt-16">{children}</div>
             </div>
           </ClerkProvider>
         </TRPCReactProvider>

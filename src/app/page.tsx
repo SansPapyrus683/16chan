@@ -1,9 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
-import { SignInButton } from "@clerk/nextjs";
 import { z } from "zod";
 import { PaginatedPostList } from "@/components/PostList";
 import { api } from "@/trpc/server";
 import { serialize } from "@/lib/utils";
+import { SortMenu } from "@/components/SortMenu";
 
 const SortOrder = z.enum(["new", "likes"]).catch("new");
 
@@ -24,18 +24,13 @@ export default async function Browsing({
   const res = await api.browse.browse({ query, sortBy, cursor });
   return (
     <>
-      <div className="space-y-4">
-        <div>
-          {!userId && (
-            <>
-              you aren't signed in lol
-              <br />
-              <SignInButton>do it here</SignInButton>
-            </>
-          )}
-        </div>
-        <div>
-          results for the search query "{query}" sorted by {sortBy}
+      <div className="mt-5 space-y-4">
+        <div className="flex justify-between align-middle">
+          <h1>Results for "{query}"</h1>
+          <div>
+            <h1>Sort By:</h1>
+            <SortMenu options={["new", "likes"]} initVal={sortBy} placeholder={""} />
+          </div>
         </div>
         <div>
           <PaginatedPostList
