@@ -1,14 +1,13 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, Fragment, useState } from "react";
 import { parseSauce, Sauce, Tag } from "@/lib/types";
-import { Visibility } from "@prisma/client";
+import { TagCategory, Visibility } from "@prisma/client";
 import { sauceUrl, toTitleCase } from "@/lib/utils";
 import Image from "next/image";
 import { z } from "zod";
 
 const SOURCE_NAME = {
-
   DA: "DeviantArt",
   PIXIV: "Pixiv",
   TWITTER: "Twitter",
@@ -25,37 +24,49 @@ type PostData = {
   vis: Visibility;
 };
 
-export function TagForm(
-  { tagType, tagContent, tagNumber, onTypeChange, onContentChange, onDelete}
- : { tagType: string, tagContent: string, tagNumber: number, onTypeChange : Function, onContentChange: Function, onDelete: Function}
-   ) {
-
-  
+export function TagForm({
+  tagType,
+  tagContent,
+  tagNumber,
+  onTypeChange,
+  onContentChange,
+  onDelete,
+}: {
+  tagType: string;
+  tagContent: string;
+  tagNumber: number;
+  onTypeChange: (tagIndex: number, newType: string) => void;
+  onContentChange: (tagIndex: number, newContent: string) => void;
+  onDelete: (tagIndex: number) => void;
+}) {
+  console.log(tagNumber, tagType);
   return (
-  <div>
-    Tag #{tagNumber}
-    <button className="block border-2 p-0.5" onClick={onDelete(tagNumber)}>
-      Delete Tag
-    </button>
-    <input type="radio" id="char" name="tagType" checked={tagType == "CHARACTER"} onClick={onTypeChange(tagNumber, "CHARACTER")} />
-    <label htmlFor="char" >Character</label>
-    <input type="radio" id="loc" name="tagType" checked={tagType == "LOCATION"} onClick={onTypeChange(tagNumber, "LOCATION")} />
-    <label htmlFor="loc">Location</label>
-    <input type="radio" id="media" name="tagType" checked={tagType == "MEDIA"} onClick={onTypeChange(tagNumber, "MEDIA")} />
-    <label htmlFor="media">Media</label>
-    <input type="radio" id="other" name="tagType" checked={tagType == "OTHER"} onClick={onTypeChange(tagNumber, "OTHER")} />
-    <label htmlFor="other" >Other</label>
-    <input
-      value={tagContent}
-      onChange={(e) => onContentChange(tagNumber, e.target.value)}
-      placeholder="tag content... "
-      className="block border-2"
-    />
-
-  </div>
+    <div>
+      Tag #{tagNumber}
+      <button className="block border-2 p-0.5" onClick={() => onDelete(tagNumber)}>
+        Delete Tag
+      </button>
+      {Object.keys(TagCategory).map((t) => (
+        <Fragment key={t}>
+          <input
+            type="radio"
+            id={t}
+            name={`tag${tagNumber}`}
+            checked={tagType === t}
+            onChange={() => onTypeChange(tagNumber, t)}
+          />
+          <label htmlFor={t}>{toTitleCase(t)}</label>
+        </Fragment>
+      ))}
+      <input
+        value={tagContent}
+        onChange={(e) => onContentChange(tagNumber, e.target.value)}
+        placeholder="tag content... "
+        className="block border-2"
+      />
+    </div>
   );
 }
-  
 
 export function PostForm({
   iPics = [],
@@ -81,7 +92,7 @@ export function PostForm({
   const [pics, setPics] = useState<File[]>(iPics);
   const [title, setTitle] = useState(iTitle);
   const [tagTypes, setTagTypes] = useState<string[]>(iTagTypes);
-  const [tagContents, setTagContents] = useState<string[]>(iTagContents); 
+  const [tagContents, setTagContents] = useState<string[]>(iTagContents);
   const [sauce, setSauce] = useState(iSauce.id);
   const sourceType = sauceUrl(iSauce.src, iSauce.id) === null ? "AUTO" : iSauce.src;
   const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>(sourceType);
@@ -91,15 +102,11 @@ export function PostForm({
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this is so cursed omg
-    let goodTags = [];
+    let goodTags: z.infer<typeof Tag>[] = [];
     try {
-      for(let i = 0; i < tagTypes.length; i++)
-      {
-        let category = tagTypes[i];
-        let name = tagContents[i];
-        goodTags.push(Tag.parse({ category, name }));
+      for (let i = 0; i < tagTypes.length; i++) {
+        goodTags.push(Tag.parse({ category: tagTypes[i], name: tagContents[i] }));
       }
-
     } catch (e) {
       setErr(`tag parsing: ${e}`);
       return;
@@ -122,7 +129,7 @@ export function PostForm({
     });
   };
 
-  function clearForm(){
+  function clearForm() {
     setPics([]);
     setTitle("");
     setTagTypes([]);
@@ -132,52 +139,22 @@ export function PostForm({
     setSauceType("AUTO");
   }
 
-  function onTagTypeChange(tagIndex: number, newType: string){
-    const newTypes: string[] = [];
-    
-    for(let i = 0; i < tagTypes.length; i++){
-      if(i != tagIndex){ 
-        newTypes.push(tagTypes[i]!);
-      }
-      else newTypes.push(newType);
-    } 
-    setTagTypes(newTypes);
-  } 
-  function onTagContentChange(tagIndex: number, newContent: string){
-    const newContents: string[] = [];  
-    for(let i = 0; i < tagContents.length; i++){
-      if(i != tagIndex){ 
-        newContents.push(tagContents[i]!);
-      }
-      else newContents.push(newContent);
-    } 
-    setTagContents(newContents);
+  function onTagTypeChange(tagIndex: number, newType: string) {
+    setTagTypes(tagTypes.map((t, i) => (i !== tagIndex ? t : newType)));
   }
 
-  function onTagDelete(tagIndex: number){
-    const newTypes: string[] = [];
-    const newContents: string[] = [];  
-    for(let i = 0; i < tagContents.length; i++){
-      if(i != tagIndex){ 
-        newTypes.push(tagTypes[i]!);
-        newContents.push(tagContents[i]!);
-      }
-    } 
-    setTagContents(newContents);
-    setTagTypes(newTypes);
+  function onTagContentChange(tagIndex: number, newContent: string) {
+    setTagContents(tagContents.map((t, i) => (i !== tagIndex ? t : newContent)));
   }
 
-  function onTagAdd(){
-    const newTypes: string[] = [];
-    const newContents: string[] = [];  
-    for(let i = 0; i < tagContents.length; i++){
-      newTypes.push(tagTypes[i]!);
-      newContents.push(tagContents[i]!);
-    }
-    newTypes.push("CHARACTER");
-    newContents.push(""); 
-    setTagContents(newContents);
-    setTagTypes(newTypes);
+  function onTagDelete(tagIndex: number) {
+    setTagContents(tagContents.filter((_, i) => i !== tagIndex));
+    setTagTypes(tagTypes.filter((_, i) => i !== tagIndex));
+  }
+
+  function onTagAdd() {
+    setTagContents([...tagContents, ""]);
+    setTagTypes([...tagTypes, "CHARACTER"]);
   }
 
   return (
@@ -191,10 +168,18 @@ export function PostForm({
             setPics([...pics, ...Array.from(e.target.files!)]);
           }}
         />
-    
+
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="title..."
+          className="block border-2"
+        />
+
         {tagTypes.map((t, i) => (
           <TagForm
-            tagType={tagTypes[i]!}
+            key={i}
+            tagType={t}
             tagContent={tagContents[i]!}
             tagNumber={i}
             onTypeChange={onTagTypeChange}
@@ -202,9 +187,9 @@ export function PostForm({
             onDelete={onTagDelete}
           />
         ))}
-      <button type="button" className="block border-2 p-0.5" onClick={onTagAdd}>
-        Add Tag #{tagTypes.length}
-      </button>
+        <button type="button" className="block border-2 p-0.5" onClick={onTagAdd}>
+          Add Tag #{tagTypes.length}
+        </button>
 
         <select
           value={sauceType}
@@ -244,10 +229,12 @@ export function PostForm({
         <button type="submit" className="block border-2 p-0.5">
           {buttonText}
         </button>
+
+        <button type="reset" className="block border-2 p-0.5" onClick={clearForm}>
+          Reset Form
+        </button>
       </form>
-      <button className="block border-2 p-0.5" onClick={clearForm}>
-        Reset Form
-      </button>
+
       <span className="text-red-600">{err}</span>
 
       <div>There are {pics.length} images</div>
@@ -257,9 +244,9 @@ export function PostForm({
           src={URL.createObjectURL(p)}
           width="0"
           height="0"
-          sizes="100vw"
+          sizes="20vw"
           alt="alt"
-          style={{ width: "25%", height: "auto" }}
+          style={{ width: "10%", height: "10%" }}
         />
       ))}
     </div>
