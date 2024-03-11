@@ -151,7 +151,14 @@ function TagsList({
               <CollapsibleContent>
                 <ul className="mb-2 ml-4">
                   {tagsMap[cat]!.map((t: string) => (
-                    <li key={t}>{t}</li>
+                    <li key={t}>
+                      <Link
+                        href={`/?${new URLSearchParams([["q", `tag:${t}`]])}`}
+                        className="hover:underline"
+                      >
+                        {t}
+                      </Link>
+                    </li>
                   ))}
                 </ul>
               </CollapsibleContent>
