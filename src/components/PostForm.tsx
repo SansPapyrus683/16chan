@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 import { parseSauce, Sauce, Tag } from "@/lib/types";
 import { Visibility } from "@prisma/client";
 import { sauceUrl, toTitleCase } from "@/lib/utils";
+import Image from "next/image";
 import { z } from "zod";
 
 const SOURCE_NAME = {
@@ -86,6 +87,15 @@ export function PostForm({
     });
   };
 
+  function clearForm(){
+    setPics([]);
+    setTitle("");
+    setTags("");
+    setSauce("");
+    setVis(Visibility.PUBLIC);
+    setSauceType("AUTO");
+  }
+
   return (
     <div className="space-y-2">
       <form onSubmit={formSubmit} className="space-y-2">
@@ -94,7 +104,7 @@ export function PostForm({
           accept="image/*"
           multiple
           onChange={(e) => {
-            setPics(Array.from(e.target.files!));
+            setPics([...pics, ...Array.from(e.target.files!)]);
           }}
         />
         <input
@@ -149,7 +159,23 @@ export function PostForm({
           {buttonText}
         </button>
       </form>
+      <button className="block border-2 p-0.5" onClick={clearForm}>
+        Reset Form
+      </button>
       <span className="text-red-600">{err}</span>
+
+      <div>There are {pics.length} images</div>
+      {pics.map((p, i) => (
+        <Image
+          key={i}
+          src={URL.createObjectURL(p)}
+          width="0"
+          height="0"
+          sizes="100vw"
+          alt="alt"
+          style={{ width: "25%", height: "auto" }}
+        />
+      ))}
     </div>
   );
 }
