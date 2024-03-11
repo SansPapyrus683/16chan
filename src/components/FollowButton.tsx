@@ -11,9 +11,9 @@ export function FollowButton({ uid }: { uid: string }) {
         e.preventDefault();
         follow.mutate(uid);
       }}
-      className="border-2 p-0.5"
+      className="w-40 items-center rounded-md border-2 p-0.5"
     >
-      follow
+      Follow
     </button>
   );
 }

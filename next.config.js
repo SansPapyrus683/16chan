@@ -16,6 +16,10 @@ const config = {
         protocol: "https",
         hostname: "d34j7afe9569nm.cloudfront.net",
       },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+      },
     ],
   },
 };

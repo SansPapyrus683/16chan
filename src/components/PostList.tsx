@@ -8,7 +8,6 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
 import { useAuth } from "@clerk/nextjs";
-import { serialize, serverFetch } from "@/lib/utils";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 

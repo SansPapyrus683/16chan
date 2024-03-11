@@ -5,6 +5,10 @@ import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
 import { auth } from "@clerk/nextjs/server";
 import { serialize, serverFetch } from "@/lib/utils";
+import smartcrop from "smartcrop";
+import Image from "next/image";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function Account({
   params,
@@ -28,25 +32,34 @@ export default async function Account({
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
-    <div className="space-y-4">
-      <div>account page for {profile.username}</div>
-      {profile.id !== userId && <FollowButton uid={profile.id} />}
+    <div className="flex space-y-4">
       <div>
-        <a href={`/account/${params.handle}/likes`}>see their likes</a>
+        <Avatar className="h-40 w-40">
+          <AvatarImage src={profile.imageUrl} />
+          <AvatarFallback>`${profile.username}`</AvatarFallback>
+        </Avatar>
+        <div className="text-size-10 items-center">{profile.username}</div>
+        {profile.id !== userId && <FollowButton uid={profile.id} />}
+        <a href={`/account/${params.handle}/likes`}>
+          <div className="w-40 rounded-md border-2 p-0.5 text-center">Liked Posts</div>
+        </a>
+
+        <div>
+          {userId === profile.id && <CreateAlbum />}
+          <br />
+          Albums
+          <AlbumList initAlbums={albums} uid={profile.id} />
+        </div>
       </div>
+
       <div>
+        Posts
         <PaginatedPostList
           getWhat="userPosts"
           initPosts={serialize(posts)}
           params={{ user: profile.id, what: "posts", cursor }}
           likeButton={userId !== null}
         />
-      </div>
-
-      <div>
-        <CreateAlbum />
-        <br />
-        <AlbumList initAlbums={albums} uid={profile.id} />
       </div>
     </div>
   );
