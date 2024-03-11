@@ -92,6 +92,7 @@ export const userProfileRouter = createRouter({
     .input(
       z.object({
         user: z.string(),
+        query: z.string().optional(),
         sortBy: z.enum(["new", "alpha"]).default("new"),
         limit: PageSize,
         cursor: z.string().uuid().optional(),
@@ -102,7 +103,10 @@ export const userProfileRouter = createRouter({
       await findUser(ctx, id);
 
       const params = {
-        where: { userId: id },
+        where: {
+          userId: id,
+          ...(input.query ? { name: { contains: input.query } } : {}),
+        },
         orderBy: prismaOrder(input.sortBy),
         cursor: input.cursor ? { id: input.cursor } : undefined,
       };

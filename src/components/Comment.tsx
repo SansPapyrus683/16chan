@@ -1,6 +1,6 @@
 "use client";
 
-import { Comment } from "@prisma/client";
+import type { Comment } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";

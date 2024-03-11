@@ -37,7 +37,7 @@ export function AlbumList({
           disabled={prevCursor === undefined}
           className="border-4 p-1"
         >
-          prev page
+          prev
         </button>
         <button
           onClick={async (e) => {
@@ -51,7 +51,7 @@ export function AlbumList({
           className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
         >
-          next page
+          next
         </button>
       </div>
     </>

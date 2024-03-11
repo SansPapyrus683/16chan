@@ -39,9 +39,9 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   if (eventType == "user.created") {
-    await db.user.create({ data: { id: id! } });
+    await db.user.createMany({ data: { id: id! }, skipDuplicates: true });
   } else if (eventType == "user.deleted") {
-    await db.user.delete({ where: { id: id! } });
+    await db.user.deleteMany({ where: { id: id! } });
   }
 
   console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
