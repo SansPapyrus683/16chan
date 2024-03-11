@@ -25,7 +25,8 @@ export const postCrudRouter = createRouter({
           .refine((d) => base64Mb(d) < 20)
           .refine((d) => ACCEPTED_IMAGE_TYPES.includes(base64Type(d)))
           .array()
-          .min(1),
+          .min(1)
+          .max(4),
         visibility: z.nativeEnum(Visibility).optional(),
         sauce: Sauce,
         tags: Tag.array().default([]),
