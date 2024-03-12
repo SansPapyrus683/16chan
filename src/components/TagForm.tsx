@@ -57,11 +57,17 @@ export function TagForm({
 }) {
   const [cat, setCat] = useState<TagCategory>(initCat);
   const [name, setName] = useState(initContent);
+  const [open, setOpen] = useState(false);
 
-  const submitTag = () => onSubmit(Tag.parse({ category: cat, name }));
+  const submitTag = () => {
+    onSubmit(Tag.parse({ category: cat, name }));
+    setOpen(false);
+  };
   return (
     <Dialog
-      onOpenChange={() => {
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
         setCat(TagCategory.CHARACTER);
         setName("");
       }}
@@ -83,7 +89,7 @@ export function TagForm({
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                console.log("submit tag");
+                submitTag();
               }
             }}
           />

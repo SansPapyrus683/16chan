@@ -6,11 +6,18 @@ import {
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { z } from "zod";
+import { Tag } from "@/lib/types";
+import { XIcon } from "lucide-react";
 
-export function TagsList({
+export function TagList({
   tags,
+  canDelete = false,
+  onDelete = () => {},
 }: {
   tags: { tagName: string; tagCat: TagCategory }[];
+  canDelete?: boolean;
+  onDelete?: (t: z.infer<typeof Tag>) => any;
 }) {
   const tagsMap: { [key: string]: string[] } = {};
   for (const cat of Object.keys(TagCategory)) {
@@ -35,13 +42,26 @@ export function TagsList({
               <CollapsibleContent>
                 <ul className="mb-2 ml-4">
                   {tagsMap[cat]!.map((t: string) => (
-                    <li key={t}>
+                    <li key={t} className="flex items-center space-x-4">
                       <Link
                         href={`/?${new URLSearchParams([["q", `tag:${t}`]])}`}
                         className="hover:underline"
                       >
                         {t}
                       </Link>
+                      {canDelete && (
+                        <Button
+                          onClick={() =>
+                            onDelete(Tag.parse({ category: cat, name: t }))
+                          }
+                          className="m-2 h-6 hover:bg-red-600"
+                          variant="ghost"
+                          type="button"
+                          size="icon"
+                        >
+                          <XIcon />
+                        </Button>
+                      )}
                     </li>
                   ))}
                 </ul>

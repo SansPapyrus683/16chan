@@ -19,7 +19,7 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { DeletePost } from "@/components/DeletePost";
 import { AddTagForm } from "@/components/TagForm";
-import { TagsList } from "@/components/TagList";
+import { TagList } from "@/components/TagList";
 
 export default async function PostView({
   params: { pid },
@@ -84,7 +84,7 @@ export default async function PostView({
             </CollapsibleTrigger>
           </div>
           <CollapsibleContent>
-            <TagsList tags={post.tags} />
+            <TagList tags={post.tags} />
             <div className="ml-2">
               Don't see a tag? <AddTagForm pid={pid} buttonText="Add it!" />
             </div>

@@ -7,7 +7,7 @@ import { sauceUrl, toTitleCase } from "@/lib/utils";
 import Image from "next/image";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { TagsList } from "@/components/TagList";
+import { TagList } from "@/components/TagList";
 import { TagForm } from "@/components/TagForm";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -110,14 +110,24 @@ export function PostForm({
     });
   };
 
-  function clearForm() {
+  const addTag = (t: z.infer<typeof Tag>) => {
+    if (!tags.some((i) => i.tagCat === t.category && i.tagName === t.name)) {
+      setTags([...tags, { tagCat: t.category, tagName: t.name }]);
+    }
+  };
+
+  const delTag = (t: z.infer<typeof Tag>) => {
+    setTags(tags.filter((i) => i.tagCat !== t.category || i.tagName !== t.name));
+  };
+
+  const clearForm = () => {
     setPics([]);
     setTitle("");
     setTags([]);
     setSauce("");
     setVis(Visibility.PUBLIC);
     setSauceType("AUTO");
-  }
+  };
 
   return (
     <div className="space-y-2">
@@ -155,15 +165,8 @@ export function PostForm({
         {fields.tags && (
           <div>
             <h3>Tags</h3>
-            <TagsList tags={tags} />
-            <TagForm
-              onSubmit={(t) => {
-                const toAdd = { tagCat: t.category, tagName: t.name };
-                if (!tags.includes(toAdd)) {
-                  setTags([...tags, toAdd]);
-                }
-              }}
-            />
+            <TagList tags={tags} canDelete onDelete={delTag} />
+            <TagForm onSubmit={addTag} />
           </div>
         )}
 
