@@ -5,6 +5,7 @@ import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
 import { auth } from "@clerk/nextjs/server";
 import { serialize, serverFetch } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import smartcrop from "smartcrop";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,11 +41,12 @@ export default async function Account({
           <AvatarFallback>`${profile.username}`</AvatarFallback>
         </Avatar>
         <div className="text-size-10 items-center">{profile.username}</div>
-        {profile.id !== userId && <FollowButton uid={profile.id} />}
-        <a href={`/account/${params.handle}/likes`}>
-          <div className="w-40 rounded-md border-2 p-0.5 text-center">Liked Posts</div>
-        </a>
-
+        {profile.id !== userId && (
+          <FollowButton uid={profile.id} isFollowing={isFollowing} />
+        )}
+        <Button className="w-40 rounded-md border-2 p-0.5 text-center">
+          <a href={`/account/${params.handle}/likes`}>Liked Posts</a>
+        </Button>
         <div>
           {userId === profile.id && <CreateAlbum />}
           <br />

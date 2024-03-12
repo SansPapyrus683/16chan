@@ -54,7 +54,6 @@ export function AlbumList({
           }}
           className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
-          className="ml-3"
         >
           Next Page
         </Button>
