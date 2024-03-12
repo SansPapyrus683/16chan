@@ -10,7 +10,7 @@ import { RouterOutputs } from "@/trpc/shared";
 export function CreatePost() {
   const router = useRouter();
 
-  const [buttonText, setButtonText] = useState("submit");
+  const [buttonText, setButtonText] = useState("Create");
   const createPost = api.post.create.useMutation({
     onSuccess: (data) => {
       setButtonText("success!");
@@ -50,15 +50,15 @@ export function EditPost({
 
   const editPost = api.post.edit.useMutation({
     onSuccess: (data) => {
-      setButtonText("success!");
+      setButtonText("Success!");
       router.push(`/post/${data.id}`);
     },
     onError: () => {
-      setButtonText("error...");
+      setButtonText("Error...");
     },
   });
 
-  const [buttonText, setButtonText] = useState("change");
+  const [buttonText, setButtonText] = useState("Change");
   return (
     post && (
       <PostForm

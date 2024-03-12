@@ -24,7 +24,7 @@ export default async function Browsing({
   const res = await api.browse.browse({ query, sortBy, cursor });
   return (
     <>
-      <div className="mt-5 space-y-4">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1>Results for "{query}"</h1>
           <div className="flex items-center space-x-1">

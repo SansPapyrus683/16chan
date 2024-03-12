@@ -9,6 +9,15 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { TagsList } from "@/components/TagList";
 import { TagForm } from "@/components/TagForm";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -35,7 +44,7 @@ export function PostForm({
   iSauce = { src: "OTHER", id: "" },
   iVis = Visibility.PUBLIC,
   editVis = false,
-  buttonText = "submit",
+  buttonText = "Submit",
   onSubmit,
 }: {
   iPics?: File[];
@@ -101,7 +110,7 @@ export function PostForm({
   return (
     <div className="space-y-2">
       <form onSubmit={formSubmit} className="space-y-2">
-        <input
+        <Input
           type="file"
           accept="image/*"
           multiple
@@ -110,11 +119,14 @@ export function PostForm({
           }}
         />
 
-        <input
+        <Label htmlFor="title" className="sr-only">
+          Post Title
+        </Label>
+        <Input
+          id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="title..."
-          className="block border-2"
+          placeholder="Title..."
         />
 
         <TagsList tags={tags} />
@@ -127,39 +139,46 @@ export function PostForm({
           }}
         />
 
-        <select
-          value={sauceType}
-          onChange={(e) => setSauceType(e.target.value as typeof sauceType)}
-          className="block"
-        >
-          {Object.entries(SOURCE_NAME).map(([val, name]) => (
-            <option value={val} key={val}>
-              {name}
-            </option>
-          ))}
-        </select>
+        <Select onValueChange={(e: typeof sauceType) => setSauceType(e)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={SOURCE_NAME[sauceType]} />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(SOURCE_NAME).map(([val, name]) => (
+              <SelectItem value={val} key={val}>
+                {name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {sauceType !== "OC" && (
-          <input
-            value={sauce}
-            onChange={(e) => setSauce(e.target.value)}
-            placeholder="sauce..."
-            className="block border-2"
-          />
+          <>
+            <Label htmlFor="source" className="sr-only">
+              Source
+            </Label>
+            <Input
+              id="source"
+              value={sauce}
+              onChange={(e) => setSauce(e.target.value)}
+              placeholder="Source..."
+            />
+          </>
         )}
 
         {editVis && (
-          <select
-            value={vis}
-            onChange={(e) => setVis(e.target.value as Visibility)}
-            className="block"
-          >
-            {Object.keys(Visibility).map((v) => (
-              <option value={v} key={v}>
-                {toTitleCase(v)}
-              </option>
-            ))}
-          </select>
+          <Select onValueChange={(e: Visibility) => setVis(e)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={toTitleCase(vis)} />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(Visibility).map((v) => (
+                <SelectItem value={v} key={v}>
+                  {toTitleCase(v)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
 
         <Button type="submit" className="block">
