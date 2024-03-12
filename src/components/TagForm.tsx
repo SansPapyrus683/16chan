@@ -46,16 +46,16 @@ export function AddTagForm({
 
 export function TagForm({
   buttonText = "Add Tag",
-  initCat = TagCategory.CHARACTER,
+  initCat,
   initContent = "",
   onSubmit = () => {},
 }: {
   buttonText?: string;
-  initCat?: TagCategory;
+  initCat?: TagCategory | undefined;
   initContent?: string;
   onSubmit?: (t: z.infer<typeof Tag>) => any;
 }) {
-  const [cat, setCat] = useState<TagCategory>(initCat);
+  const [cat, setCat] = useState<TagCategory | undefined>();
   const [name, setName] = useState(initContent);
   const [open, setOpen] = useState(false);
 
@@ -68,7 +68,7 @@ export function TagForm({
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
-        setCat(TagCategory.CHARACTER);
+        setCat(initCat);
         setName("");
       }}
     >
@@ -97,7 +97,7 @@ export function TagForm({
         <div className="grid flex-1 gap-2">
           <Select onValueChange={(e: TagCategory) => setCat(e)}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={toTitleCase(cat)} />
+              <SelectValue placeholder={cat ? toTitleCase(cat) : "Category..."} />
             </SelectTrigger>
             <SelectContent>
               {Object.keys(TagCategory).map((v) => (
