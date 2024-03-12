@@ -238,22 +238,21 @@ export function PostForm({
       <span className="text-red-600">{err}</span>
 
       {fields.pics && (
-        <>
+        <div className="pb-4">
           <h3>Uploading {pics.length} images</h3>
-          <div className="flex justify-between">
+          <div className="grid grid-cols-3 justify-between gap-2">
             {picUrls.map((p, i) => (
               <Image
                 key={i}
                 src={p}
                 width="0"
                 height="0"
-                sizes="20vw"
                 alt="alt"
-                style={{ width: "20%", height: "10%" }}
+                className="h-auto w-full"
               />
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

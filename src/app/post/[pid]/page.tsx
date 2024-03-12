@@ -115,17 +115,15 @@ export default async function PostView({
           )}
           {post.userId !== userId && isMod && <DeletePost pid={pid} />}
         </div>
-        <div className="mt-2 flex space-x-2">
+        <div className="mt-2 grid grid-cols-3 gap-4 space-x-2">
           {post.images.map((u, ind) => (
             <Image
               key={u.id}
-              className="w-auto"
+              className="h-auto w-full"
               src={u.rawImg}
               alt={`picture number ${ind + 1}`}
-              width={200}
-              height="0"
-              sizes="20vw"
-              style={{ width: "30%", height: "10%" }}
+              width={0}
+              height={0}
               priority
               unoptimized
             />
