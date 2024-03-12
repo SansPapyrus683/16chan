@@ -35,7 +35,7 @@ export function CreateAlbum() {
     },
   });
   const [name, setName] = useState("New Album");
-  const [vis, setVis] = useState<Visibility>("PUBLIC");
+  const [vis, setVis] = useState<Visibility>(Visibility.PUBLIC);
   const [buttonText, setButtonText] = useState("Create");
 
   const createAlbum = () => {
@@ -47,55 +47,53 @@ export function CreateAlbum() {
   };
 
   return (
-    <>
-      <Dialog onOpenChange={() => setButtonText("Create")}>
-        <DialogTrigger asChild>
-          <Button variant="outline">Create Album</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create Album</DialogTitle>
-            <DialogDescription>Make a collection of posts.</DialogDescription>
-          </DialogHeader>
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="link" className="sr-only">
-              Album Name
-            </Label>
-            <Input
-              id="link"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  createAlbum();
-                }
-              }}
-            />
-          </div>
-          <div className="grid flex-1 gap-2">
-            <Select onValueChange={(e: Visibility) => setVis(e as Visibility)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={toTitleCase(vis)} />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.keys(Visibility).map((v) => (
-                  <SelectItem value={v} key={v}>
-                    {toTitleCase(v)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter className="sm:justify-between">
-            <Button onClick={createAlbum}>{buttonText}</Button>
-            <DialogClose asChild>
-              <Button type="button" variant="secondary">
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog onOpenChange={() => setButtonText("Create")}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Create Album</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Create Album</DialogTitle>
+          <DialogDescription>Make a collection of posts.</DialogDescription>
+        </DialogHeader>
+        <div className="grid flex-1 gap-2">
+          <Label htmlFor="name" className="sr-only">
+            Album Name
+          </Label>
+          <Input
+            // id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                createAlbum();
+              }
+            }}
+          />
+        </div>
+        <div className="grid flex-1 gap-2">
+          <Select onValueChange={(e: Visibility) => setVis(e)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={toTitleCase(vis)} />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(Visibility).map((v) => (
+                <SelectItem value={v} key={v}>
+                  {toTitleCase(v)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <DialogFooter className="sm:justify-between">
+          <Button onClick={createAlbum}>{buttonText}</Button>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

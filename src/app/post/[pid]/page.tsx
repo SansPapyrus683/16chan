@@ -17,11 +17,16 @@ import {
 } from "@/components/ui/collapsible";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import { TagCategory } from "@prisma/client";
 import { DeletePost } from "@/components/DeletePost";
+import { AddTagForm } from "@/components/TagForm";
+import { TagsList } from "@/components/TagList";
 
-export default async function PostView({ params }: { params: { pid: string } }) {
-  const ret = await serverFetch(async () => await api.post.get(params.pid));
+export default async function PostView({
+  params: { pid },
+}: {
+  params: { pid: string };
+}) {
+  const ret = await serverFetch(async () => await api.post.get(pid));
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
@@ -80,17 +85,20 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           </div>
           <CollapsibleContent>
             <TagsList tags={post.tags} />
+            <div className="ml-2">
+              Don't see a tag? <AddTagForm pid={pid} buttonText="Add it!" />
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
         <div>
           <h1>Add to Album</h1>
-          {userId && <AddToAlbum pid={params.pid} />}
+          {userId && <AddToAlbum pid={pid} />}
         </div>
         <div>
           <h1>Comments</h1>
           <CommentList comments={post.comments} />
-          {userId && <CommentInput pid={params.pid} />}
+          {userId && <CommentInput pid={pid} />}
         </div>
       </ResizablePanel>
       <ResizableHandle />
@@ -102,10 +110,10 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           <h1>{post.title}</h1>
           {post.userId === userId && (
             <Button variant="link">
-              <Link href={`/post/${params.pid}/edit`}>edit</Link>
+              <Link href={`/post/${pid}/edit`}>edit</Link>
             </Button>
           )}
-          {post.userId !== userId && isMod && <DeletePost pid={params.pid} />}
+          {post.userId !== userId && isMod && <DeletePost pid={pid} />}
         </div>
         <div className="mt-2 flex space-x-2">
           {post.images.map((u, ind) => (
@@ -125,51 +133,5 @@ export default async function PostView({ params }: { params: { pid: string } }) 
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
-  );
-}
-
-function TagsList({
-  tags,
-}: {
-  tags: { postId: string; taggedAt: Date; tagName: string; tagCat: string }[];
-}) {
-  const tagsMap: { [key: string]: string[] } = {};
-  for (const cat of Object.keys(TagCategory)) {
-    tagsMap[cat] = [];
-  }
-  tags.forEach(({ tagCat, tagName }) => tagsMap[tagCat]!.push(tagName));
-
-  return (
-    <div className="m-2">
-      {Object.entries(tagsMap).map(
-        ([cat, tags]) =>
-          tags.length > 0 && (
-            <Collapsible defaultOpen key={cat}>
-              <CollapsibleTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-auto px-2 py-0 text-base text-gray-500"
-                >
-                  {cat}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <ul className="mb-2 ml-4">
-                  {tagsMap[cat]!.map((t: string) => (
-                    <li key={t}>
-                      <Link
-                        href={`/?${new URLSearchParams([["q", `tag:${t}`]])}`}
-                        className="hover:underline"
-                      >
-                        {t}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
-          ),
-      )}
-    </div>
   );
 }

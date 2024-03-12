@@ -4,23 +4,18 @@ upload images, tag images, look at anime girls, what else could you want?
 
 ## get started
 
-### easy way
-
-```bash
-python run.py
-```
-
-that's it. it'll prompt you for the environment variables and run `npm run dev` all by itself
-
 ### normal way
 
-1. get the env file from kevin
-2. `npm run dev`
-3. that's it lol
+1. create a file named `.env` in the root directory of the project
+2. copy paste all the text from 
+   [this google doc](https://docs.google.com/document/d/1-8259GSPKIUHJbyqNu5lBagW7aZ1LX_7Uyzuh8ftJCM/edit)
+   into that file
+3`npm run dev`
+3. that's it!
 
 ## ok how does this actually work
 
-ok let's see how this crappy t3 thing actually works
+ok let's see how this t3 thing actually works
 
 for trpc, [this](https://trpc.io/docs/client/nextjs/setup) link seems pretty handy
 

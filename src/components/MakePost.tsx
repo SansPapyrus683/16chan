@@ -10,20 +10,22 @@ import { RouterOutputs } from "@/trpc/shared";
 export function CreatePost() {
   const router = useRouter();
 
-  const [buttonText, setButtonText] = useState("submit");
+  const [buttonText, setButtonText] = useState("Create");
   const createPost = api.post.create.useMutation({
     onSuccess: (data) => {
-      setButtonText("success!");
+      setButtonText("Success!");
       router.push(`/post/${data.id}`);
+      router.refresh();
     },
     onError: () => {
-      setButtonText("error...");
+      setButtonText("Error...");
     },
   });
 
   return (
     <PostForm
       onSubmit={async (pd) => {
+        setButtonText("Creating...");
         createPost.mutate({
           title: pd.title,
           tags: pd.tags,
@@ -32,7 +34,6 @@ export function CreatePost() {
           visibility: pd.vis,
         });
       }}
-      editVis
       buttonText={buttonText}
     />
   );
@@ -50,23 +51,22 @@ export function EditPost({
 
   const editPost = api.post.edit.useMutation({
     onSuccess: (data) => {
-      setButtonText("success!");
+      setButtonText("Success!");
       router.push(`/post/${data.id}`);
+      router.refresh();
     },
-    onError: () => {
-      setButtonText("error...");
-    },
+    onError: () => setButtonText("Error..."),
   });
 
-  const [buttonText, setButtonText] = useState("change");
+  const [buttonText, setButtonText] = useState("Change");
   return (
     post && (
       <PostForm
         iTitle={post.title}
-        iTagTypes={post.tags.map((t) => t.tagCat)}
-        iTagContents={post.tags.map((t) => t.tagName)}
+        iTags={post.tags}
         iSauce={{ src: post.src, id: post.artId }}
         onSubmit={async (pd) => {
+          setButtonText("Changing...");
           editPost.mutate({
             pid: pid,
             title: pd.title,
@@ -75,6 +75,11 @@ export function EditPost({
           });
         }}
         buttonText={buttonText}
+        fields={{
+          pics: false,
+          vis: false,
+          resetButton: false,
+        }}
       />
     )
   );

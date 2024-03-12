@@ -13,8 +13,8 @@ export default async function NewPage({
   const posts = await api.user.followedPosts({ cursor });
 
   return (
-    <div className="mt-5 space-y-4">
-      <h1>Following Posts</h1>
+    <div className="space-y-4">
+      <h2>Following Posts</h2>
       <div>
         <PaginatedPostList
           initPosts={serialize(posts)}

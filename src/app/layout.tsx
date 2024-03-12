@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ClerkProvider>
             <div className="flex h-screen">
               <NavBar />
-              <div className="mx-9 flex-grow pt-16">{children}</div>
+              <div className="mx-9 mt-4 flex-grow pt-16">{children}</div>
             </div>
           </ClerkProvider>
         </TRPCReactProvider>
