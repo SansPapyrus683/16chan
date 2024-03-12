@@ -83,8 +83,9 @@ export async function findUser(ctx: Context, uid: string, mustExist: boolean = t
   return user;
 }
 
-export async function isMod(ctx: Context) {
-  const user = await ctx.db.user.findUnique({ where: { id: ctx.auth.userId! } });
+export async function isMod(ctx: Context, userId: string | undefined = undefined) {
+  const id = userId || ctx.auth.userId!;
+  const user = await ctx.db.user.findUnique({ where: { id } });
   return user === null ? false : user.isMod;
 }
 

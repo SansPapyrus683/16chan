@@ -3,6 +3,7 @@
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function AlbumList({
   initAlbums,
@@ -32,7 +33,7 @@ export function AlbumList({
         ))}
       </ul>
       <div>
-        <button
+        <Button
           onClick={async (e) => {
             e.preventDefault();
             setAt(prevCursor);
@@ -41,8 +42,8 @@ export function AlbumList({
           className="border-4 p-1"
         >
           Prev Page
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={async (e) => {
             console.assert(
               nextCursor !== undefined && !isPlaceholderData,
@@ -53,9 +54,10 @@ export function AlbumList({
           }}
           className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
+          className="ml-3"
         >
           Next Page
-        </button>
+        </Button>
       </div>
     </>
   );

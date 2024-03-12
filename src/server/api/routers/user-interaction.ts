@@ -33,6 +33,18 @@ export const userInteractionRouter = createRouter({
       },
     });
   }),
+  isFollowing: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    return (
+      (await ctx.db.userFollowing.findUnique({
+        where: {
+          following: {
+            followerId: ctx.auth.userId!,
+            idolId: input,
+          },
+        },
+      })) !== null
+    );
+  }),
   following: protectedProcedure.input(z.void()).query(async ({ ctx }) => {
     return getFollowing(ctx);
   }),

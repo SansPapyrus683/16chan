@@ -2,7 +2,7 @@ import { api } from "@/trpc/server";
 import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
 import Link from "next/link";
-import { sauceUrl, serverFetch } from "@/lib/utils";
+import { cn, sauceUrl, serverFetch } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { CommentInput, CommentList } from "@/components/Comment";
 import {
@@ -17,10 +17,17 @@ import {
 } from "@/components/ui/collapsible";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import { TagCategory } from "@prisma/client";
+import { DeletePost } from "@/components/DeletePost";
+import { AddTagForm } from "@/components/TagForm";
+import { TagList } from "@/components/TagList";
+import { LikeButton } from "@/components/LikeButton";
 
-export default async function PostView({ params }: { params: { pid: string } }) {
-  const ret = await serverFetch(async () => await api.post.get(params.pid));
+export default async function PostView({
+  params: { pid },
+}: {
+  params: { pid: string };
+}) {
+  const ret = await serverFetch(async () => await api.post.get(pid));
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
@@ -29,10 +36,12 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   const { userId } = auth();
 
   const author = post.userId && (await api.user.profileByUid(post.userId));
+  const isMod = await api.user.isMod();
+  const liked = await api.post.isLiked(pid);
   const src = sauceUrl(post.src, post.artId);
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
-      <ResizablePanel defaultSize={20} className="m-2 min-w-48 max-w-2xl">
+      <ResizablePanel defaultSize={20} className="min-w-48 max-w-2xl space-y-10 p-5">
         <Collapsible defaultOpen className="mb-2">
           <div className="flex items-center justify-between rounded border-2 border-gray-200">
             <h2 className="category mx-2">posted by</h2>
@@ -77,76 +86,53 @@ export default async function PostView({ params }: { params: { pid: string } }) 
             </CollapsibleTrigger>
           </div>
           <CollapsibleContent>
-            <TagsList tags={post.tags} />
+            <TagList tags={post.tags} />
+            <div className="ml-2">
+              Don't see a tag? <AddTagForm pid={pid} buttonText="Add it!" />
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
-        {/* <TagPost pid={params.pid} /> */}
-        <AddToAlbum pid={params.pid} />
-        <CommentList comments={post.comments} />
-        <CommentInput pid={params.pid} />
+        <div>
+          <h1>Add to Album</h1>
+          {userId && <AddToAlbum pid={pid} />}
+        </div>
+        <div>
+          <h1>Comments</h1>
+          <CommentList comments={post.comments} />
+          {userId && <CommentInput pid={pid} />}
+        </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel>
-        <div className="title"> {post.title} </div>
-        <div className="space-y-2">
+      {/* why the hell do i have to pass overflow-y-auto in both */}
+      <ResizablePanel className="overflow-y-auto p-5" style={{ overflow: "y-auto" }}>
+        <div
+          className={cn("flex items-center", { "space-x-4": post.userId !== userId })}
+        >
+          <h1>{post.title}</h1>
+          {post.userId === userId && (
+            <Button variant="link">
+              <Link href={`/post/${pid}/edit`}>edit</Link>
+            </Button>
+          )}
+          <LikeButton pid={pid} liked={liked} />
+          {post.userId !== userId && isMod && <DeletePost pid={pid} />}
+        </div>
+        <div className="mt-2 grid grid-cols-3 gap-4 space-x-2">
           {post.images.map((u, ind) => (
             <Image
               key={u.id}
-              className="w-auto"
+              className="h-auto w-full"
               src={u.rawImg}
               alt={`picture number ${ind + 1}`}
-              width={200}
-              height={200}
+              width={0}
+              height={0}
               priority
+              unoptimized
             />
           ))}
         </div>
-        {post.userId == userId && (
-          <div>
-            <Link href={`/post/${params.pid}/edit`}>edit ur post here</Link>
-          </div>
-        )}
       </ResizablePanel>
     </ResizablePanelGroup>
-  );
-}
-
-function TagsList({
-  tags,
-}: {
-  tags: { postId: string; taggedAt: Date; tagName: string; tagCat: string }[];
-}) {
-  const tagsMap: { [key: string]: string[] } = {};
-  for (const cat of Object.keys(TagCategory)) {
-    tagsMap[cat] = [];
-  }
-  tags.forEach(({ tagCat, tagName }) => tagsMap[tagCat]!.push(tagName));
-
-  return (
-    <div className="m-2">
-      {Object.entries(tagsMap).map(
-        ([cat, tags]) =>
-          tags.length > 0 && (
-            <Collapsible defaultOpen>
-              <CollapsibleTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-auto px-2 py-0 text-base text-gray-500"
-                >
-                  {cat}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <ul className="mb-2 ml-4 text-gray-400">
-                  {tagsMap[cat]!.map((t: string) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
-          ),
-      )}
-    </div>
   );
 }

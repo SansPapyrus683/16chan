@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
+// https://nextjs.org/docs/app/building-your-application/routing/error-handling
 export default function Error({
   error,
   reset,
@@ -16,16 +18,8 @@ export default function Error({
 
   return (
     <div>
-      <h2>damit something screwed up</h2>
-      <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
-        className="border p-0.5"
-      >
-        try again i guess
-      </button>
+      <h1>Oops! Something screwed up.</h1>
+      <Button onClick={() => reset()}>Try Again</Button>
     </div>
   );
 }

@@ -4,34 +4,16 @@ upload images, tag images, look at anime girls, what else could you want?
 
 ## get started
 
-### easy way
-
-```bash
-python run.py
-```
-
-that's it. it'll prompt you for the environment variables and run `npm run dev` all by itself
-
-### normal way
-
-1. get the env file from kevin
-2. `npm run dev`
-3. **webhook setup- not needed since we deployed to vercel for the webhook**
-    1. if you want webhooks to work, which are needed for db entries to be created on user signups, you first have
-       to [install ngrok](https://ngrok.com/)
-    2. get the auth token from kevin so you can host the domain and run this
-       ```shell
-       ngrok config add-authtoken <AUTH TOKEN HERE>
-       ``` 
-    3. and then just run this and you chillin (if you use a port other than 3000, put that there instead)
-       ```shell
-       ngrok http --domain=upright-quail-vaguely.ngrok-free.app 3000
-       ```
-       if you don't wanna type that out it's also stored as a script- just do `npm run starthook`
+1. create a file named `.env` in the root directory of the project
+2. copy paste all the text from 
+   [this google doc](https://docs.google.com/document/d/1-8259GSPKIUHJbyqNu5lBagW7aZ1LX_7Uyzuh8ftJCM/edit)
+   into that file
+3`npm run dev`
+3. that's it!
 
 ## ok how does this actually work
 
-ok let's see how this crappy t3 thing actually works
+ok let's see how this t3 thing actually works
 
 for trpc, [this](https://trpc.io/docs/client/nextjs/setup) link seems pretty handy
 

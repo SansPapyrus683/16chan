@@ -1,8 +1,11 @@
 import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-import { Visibility } from "@prisma/client";
+import { Prisma, Visibility } from "@prisma/client";
 import { parseSearch, postPages, prismaOrder } from "@/lib/db";
 import { env } from "@/env";
+import { Tag } from "@/lib/types";
+import PostFindManyArgs = Prisma.PostFindManyArgs;
+import QueryMode = Prisma.QueryMode;
 
 export const browseRouter = createRouter({
   browse: publicProcedure
@@ -15,23 +18,28 @@ export const browseRouter = createRouter({
     )
     .query(async ({ ctx, input }) => {
       const { tags, other, sources } = parseSearch(input.query);
-      const params = {
+
+      const tagQueries = tags.map((t) => {
+        // god i hate typescript so much
+        if (typeof t === "string" || t instanceof String) {
+          return { tagName: t as string };
+        } else {
+          const tag = t as z.infer<typeof Tag>;
+          return { tagCat: tag.category, tagName: tag.name };
+        }
+      });
+
+      const params: PostFindManyArgs = {
         where: {
           visibility: Visibility.PUBLIC,
           // this is probably-no, definitely HORRIBLY inefficient
           AND: [
-            ...tags.map((t) => ({
-              tags: { some: { tagName: t } },
-            })),
+            ...tagQueries.map((t) => ({ tags: { some: t } })),
             ...other.map((o) => ({
-              title: { contains: o },
+              title: { contains: o, mode: QueryMode.insensitive },
             })),
           ],
-          ...(sources.length > 0
-            ? {
-                src: { in: sources },
-              }
-            : {}),
+          ...(sources.length > 0 ? { src: { in: sources } } : {}),
         },
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: prismaOrder(input.sortBy),

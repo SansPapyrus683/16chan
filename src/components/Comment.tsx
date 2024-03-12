@@ -1,9 +1,10 @@
 "use client";
 
-import { Comment } from "@prisma/client";
+import type { Comment } from "@prisma/client";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function CommentList({ comments }: { comments: Comment[] }) {
   return (
@@ -46,9 +47,9 @@ export function CommentInput({ pid }: { pid: string }) {
         onChange={(e) => setText(e.target.value)}
         className="border"
       />
-      <button type="submit" className="block">
+      <Button type="submit" className="block">
         {buttonText}
-      </button>
+      </Button>
     </form>
   );
 }

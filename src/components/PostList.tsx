@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
 import { useAuth } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -50,7 +51,7 @@ export function PaginatedPostList({
       break;
   }
   //@ts-ignore
-  const { data } = query.useQuery(params, { initialData: initPosts, staleTime: 5e3 });
+  const { data } = query.useQuery(params, { initialData: initPosts });
   const {
     posts,
     prevCursor,
@@ -65,27 +66,26 @@ export function PaginatedPostList({
     <>
       <PostList posts={posts} likeButton={likeButton} />
       <br />
-      <div>
-        <button
+      <div className="flex">
+        <Button
           onClick={async (e) => {
             e.preventDefault();
             router.push(`${pathname}?${modParams("cursor", prevCursor!)}`);
           }}
           disabled={prevCursor === undefined}
-          className="border p-1"
         >
           Prev
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={async (e) => {
             e.preventDefault();
             router.push(`${pathname}?${modParams("cursor", nextCursor!)}`);
           }}
-          className="ml-3 border p-1"
+          className="ml-3"
           disabled={nextCursor === undefined}
         >
           Next
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -199,12 +199,16 @@ export function PostList({
     fetchPhotoDimensions();
   }, [posts]);
 
+  if (posts.length === 0) {
+    return <div>There don't seem to be any posts here...</div>;
+  }
+
   return (
     <div>
       {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
         <div className="grid border-2 border-solid border-black">
           {Object.keys(photoRows).map((index) => (
-            <div className="flex">
+            <div className="flex" key={index}>
               {posts
                 .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
                 .map((p) => (

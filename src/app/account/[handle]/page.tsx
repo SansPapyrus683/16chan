@@ -29,6 +29,7 @@ export default async function Account({
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const posts = await api.user.userPosts({ user: profile.id, cursor });
+  const isFollowing = await api.user.isFollowing(profile.id);
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (

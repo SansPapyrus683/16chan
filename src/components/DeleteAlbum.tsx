@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
+import { Button } from "@/components/ui/button";
 
 export function DeleteAlbum({ aid }: { aid: string }) {
   const router = useRouter();
@@ -10,13 +11,14 @@ export function DeleteAlbum({ aid }: { aid: string }) {
   });
 
   return (
-    <button
+    <Button
       onClick={(e) => {
         e.preventDefault();
         deleteAlbum.mutate(aid);
       }}
+      className="bg-red-600"
     >
-      delete album
-    </button>
+      Delete album
+    </Button>
   );
 }

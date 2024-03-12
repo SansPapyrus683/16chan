@@ -65,20 +65,27 @@
     --ring: 212.7 26.8% 83.9%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 
-  /*
-  a {
-    @apply text-blue-400 visited:text-purple-500;
+  h1 {
+    @apply text-2xl font-bold
   }
-  */
+
+  h2 {
+    @apply text-xl font-bold
+  }
+
+  h3 {
+    @apply text-lg font-bold
+  }
 
   .title {
     @apply font-bold;

@@ -14,12 +14,12 @@ export default async function NewPage({
 
   return (
     <div className="space-y-4">
-      <div>posts by users u follow</div>
+      <h2>Following Posts</h2>
       <div>
         <PaginatedPostList
           initPosts={serialize(posts)}
           getWhat="following"
-          params={{ user: userId! }}
+          params={{ user: userId!, cursor }}
           likeButton
         />
       </div>
