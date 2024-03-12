@@ -15,6 +15,7 @@ export function CreatePost() {
     onSuccess: (data) => {
       setButtonText("Success!");
       router.push(`/post/${data.id}`);
+      router.refresh();
     },
     onError: () => {
       setButtonText("Error...");
@@ -54,6 +55,7 @@ export function EditPost({
     onSuccess: (data) => {
       setButtonText("Success!");
       router.push(`/post/${data.id}`);
+      router.refresh();
     },
     onError: () => setButtonText("Error..."),
   });

@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -73,25 +74,21 @@ export function PostForm({
   const [err, setErr] = useState("");
 
   const picUrls = useMemo(() => pics.map((p) => URL.createObjectURL(p)), [pics]);
+  let parsedSauce: z.infer<typeof Sauce> | undefined;
+  let displaySrc: [string, string] | null = null;
+  try {
+    parsedSauce = parseSauce(sauceType, sauce);
+    displaySrc = sauceUrl(parsedSauce!.src, parsedSauce!.id);
+  } catch (e) {}
 
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this is so cursed omg
     let goodTags: z.infer<typeof Tag>[] = [];
     try {
-      for (const t of tags) {
-        goodTags.push(Tag.parse({ category: t.tagCat, name: t.tagName }));
-      }
+      goodTags = tags.map((t) => Tag.parse({ category: t.tagCat, name: t.tagName }));
     } catch (e) {
       setErr(`tag parsing: ${e}`);
-      return;
-    }
-
-    let parsedSauce;
-    try {
-      parsedSauce = parseSauce(sauceType, sauce);
-    } catch (e) {
-      setErr(`source parsing: ${e}`);
       return;
     }
 
@@ -115,7 +112,7 @@ export function PostForm({
 
   return (
     <div className="space-y-2">
-      <form onSubmit={formSubmit} className="space-y-2">
+      <form onSubmit={formSubmit} className="space-y-4">
         <h2>Basic Info</h2>
         {editPics && (
           <>
@@ -141,42 +138,56 @@ export function PostForm({
         />
 
         <h2>Auxiliary Info</h2>
-        <TagsList tags={tags} />
-        <TagForm
-          onSubmit={(t) => {
-            const toAdd = { tagCat: t.category, tagName: t.name };
-            if (!tags.includes(toAdd)) {
-              setTags([...tags, toAdd]);
-            }
-          }}
-        />
 
-        <Select onValueChange={(e: typeof sauceType) => setSauceType(e)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={SOURCE_NAME[sauceType]} />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(SOURCE_NAME).map(([val, name]) => (
-              <SelectItem value={val} key={val}>
-                {name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div>
+          <h3>Tags</h3>
+          <TagsList tags={tags} />
+          <TagForm
+            onSubmit={(t) => {
+              const toAdd = { tagCat: t.category, tagName: t.name };
+              if (!tags.includes(toAdd)) {
+                setTags([...tags, toAdd]);
+              }
+            }}
+          />
+        </div>
 
-        {sauceType !== "OC" && (
-          <>
-            <Label htmlFor="source" className="sr-only">
-              Source
-            </Label>
-            <Input
-              id="source"
-              value={sauce}
-              onChange={(e) => setSauce(e.target.value)}
-              placeholder="Source..."
-            />
-          </>
-        )}
+        <div className="space-y-2">
+          <h3>Source</h3>
+          <Select onValueChange={(e: typeof sauceType) => setSauceType(e)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={SOURCE_NAME[sauceType]} />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(SOURCE_NAME).map(([val, name]) => (
+                <SelectItem value={val} key={val}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {sauceType !== "OC" && (
+            <>
+              <Label htmlFor="source" className="sr-only">
+                Source
+              </Label>
+              <Input
+                id="source"
+                value={sauce}
+                onChange={(e) => setSauce(e.target.value)}
+                placeholder="Source..."
+              />
+            </>
+          )}
+          Parsed source:{" "}
+          {displaySrc ? (
+            <Link href={displaySrc[1]} className="hover:underline">
+              {displaySrc[0]}
+            </Link>
+          ) : (
+            "no source detected (or error generating one)."
+          )}
+        </div>
 
         {editVis && (
           <Select onValueChange={(e: Visibility) => setVis(e)}>
@@ -192,11 +203,9 @@ export function PostForm({
             </SelectContent>
           </Select>
         )}
-
         <Button type="submit" className="block">
           {buttonText}
         </Button>
-
         {resetButton && (
           <Button type="reset" className="block" onClick={clearForm}>
             Reset Form
@@ -206,18 +215,22 @@ export function PostForm({
 
       <span className="text-red-600">{err}</span>
 
-      <div>Uploading {pics.length} images</div>
-      {picUrls.map((p, i) => (
-        <Image
-          key={i}
-          src={p}
-          width="0"
-          height="0"
-          sizes="20vw"
-          alt="alt"
-          style={{ width: "10%", height: "10%" }}
-        />
-      ))}
+      {editPics && (
+        <>
+          <div>Uploading {pics.length} images</div>
+          {picUrls.map((p, i) => (
+            <Image
+              key={i}
+              src={p}
+              width="0"
+              height="0"
+              sizes="20vw"
+              alt="alt"
+              style={{ width: "10%", height: "10%" }}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 }
