@@ -1,5 +1,7 @@
 import { ArtSource, Prisma, Visibility } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { Tag } from "@/lib/types";
 
 export function prismaOrder(
   order: "new" | "likes" | "alpha",
@@ -56,13 +58,26 @@ export function searchSourceConv(src: string) {
 
 export function parseSearch(query: string) {
   const splitQ = query.split(/(\s+)/).filter((s) => s);
-  const tags: string[] = [];
+  const tags: (z.infer<typeof Tag> | string)[] = [];
   const other: string[] = [];
   const sources: ArtSource[] = [];
 
   splitQ.forEach((s) => {
     if (s.startsWith("tag:")) {
-      tags.push(s.replace(/^tag:/, ""));
+      s = s.replace(/^tag:/, "");
+      const split = s
+        .toLowerCase()
+        .split(/:(.*)/s)
+        .filter((i) => i);
+      if (split.length === 1) {
+        tags.push(split[0]!);
+      } else if (split.length === 2) {
+        try {
+          tags.push(Tag.parse({ category: split[0]!.toUpperCase(), name: split[1]! }));
+        } catch (e) {
+          tags.push(split[1]!);
+        }
+      }
     } else if (s.startsWith("src:") || s.startsWith("source:")) {
       s = s.replace(/^(src|source):/, "");
       let src = searchSourceConv(s);
