@@ -18,7 +18,7 @@ export default async function PostEditing({ params }: { params: { pid: string } 
   }
 
   return (
-    <div className="space-y-4">
+    <div className="mx-[30%] min-w-[50%] space-y-4">
       <h1>Editing Post #{params.pid}</h1>
       <EditPost pid={params.pid} initPost={serialize(post)} />
       <DeletePost pid={params.pid} />

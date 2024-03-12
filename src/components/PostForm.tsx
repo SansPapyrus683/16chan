@@ -45,6 +45,7 @@ export function PostForm({
   iVis = Visibility.PUBLIC,
   editVis = false,
   buttonText = "Submit",
+  resetButton = false,
   onSubmit,
 }: {
   iPics?: File[];
@@ -55,6 +56,7 @@ export function PostForm({
   iVis?: Visibility;
   editVis?: boolean;
   buttonText?: string;
+  resetButton?: boolean;
   onSubmit: (pd: PostData) => any;
 }) {
   const [pics, setPics] = useState<File[]>(iPics);
@@ -185,14 +187,16 @@ export function PostForm({
           {buttonText}
         </Button>
 
-        <Button type="reset" className="block" onClick={clearForm}>
-          Reset Form
-        </Button>
+        {resetButton && (
+          <Button type="reset" className="block" onClick={clearForm}>
+            Reset Form
+          </Button>
+        )}
       </form>
 
       <span className="text-red-600">{err}</span>
 
-      <div>There are {pics.length} images</div>
+      <div>Uploading {pics.length} images</div>
       {pics.map((p, i) => (
         <Image
           key={i}

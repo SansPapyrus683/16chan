@@ -34,6 +34,7 @@ export function CreatePost() {
         });
       }}
       editVis
+      resetButton
       buttonText={buttonText}
     />
   );
