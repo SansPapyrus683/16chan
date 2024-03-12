@@ -5,7 +5,6 @@ import { AlbumList } from "@/components/AlbumList";
 import { FollowButton } from "@/components/FollowButton";
 import { auth } from "@clerk/nextjs/server";
 import { serialize, serverFetch } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import smartcrop from "smartcrop";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +29,6 @@ export default async function Account({
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const posts = await api.user.userPosts({ user: profile.id, cursor });
-  const isFollowing = await api.user.isFollowing(profile.id);
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
@@ -41,16 +39,15 @@ export default async function Account({
           <AvatarFallback>`${profile.username}`</AvatarFallback>
         </Avatar>
         <div className="text-size-10 items-center">{profile.username}</div>
-        {profile.id !== userId && (
-          <FollowButton uid={profile.id} isFollowing={isFollowing} />
-        )}
-        <Button className="w-40 rounded-md border-2 p-0.5 text-center">
-          <a href={`/account/${params.handle}/likes`}>Liked Posts</a>
-        </Button>
+        {profile.id !== userId && <FollowButton uid={profile.id} />}
+        <a href={`/account/${params.handle}/likes`}>
+          <div className="w-40 rounded-md border-2 p-0.5 text-center">Liked Posts</div>
+        </a>
+
         <div>
           {userId === profile.id && <CreateAlbum />}
           <br />
-          Albums
+          <p className="underline">Albums</p>
           <AlbumList initAlbums={albums} uid={profile.id} />
         </div>
       </div>

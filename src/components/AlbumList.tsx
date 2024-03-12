@@ -25,20 +25,37 @@ export function AlbumList({
       <ul>
         {(albums ?? []).map((v) => (
           <li key={v.id}>
-            <a href={`/album/${v.id}`}>{v.name}</a> | {v.id}
+            <a className="hover:underline" href={`/album/${v.id}`}>
+              {v.name}
+            </a>{" "}
+            | {v.id}
           </li>
         ))}
       </ul>
-      <div className="flex">
-        <Button onClick={() => setAt(prevCursor)} disabled={prevCursor === undefined}>
-          prev
+      <div>
+        <Button
+          onClick={async (e) => {
+            e.preventDefault();
+            setAt(prevCursor);
+          }}
+          disabled={prevCursor === undefined}
+          className="border-4 p-1"
+        >
+          Prev Page
         </Button>
         <Button
-          onClick={() => setAt(nextCursor)}
+          onClick={async (e) => {
+            console.assert(
+              nextCursor !== undefined && !isPlaceholderData,
+              "what the hell?",
+            );
+            e.preventDefault();
+            setAt(nextCursor);
+          }}
+          className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
-          className="ml-3"
         >
-          next
+          Next Page
         </Button>
       </div>
     </>
