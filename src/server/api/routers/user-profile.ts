@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import {
   albumPages,
   findUser,
+  isMod,
   likePages,
   PageSize,
   postPages,
@@ -41,6 +42,9 @@ export const userProfileRouter = createRouter({
       }
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: String(e) });
     }
+  }),
+  isMod: publicProcedure.input(z.string().optional()).query(async ({ ctx, input }) => {
+    return isMod(ctx, input);
   }),
   userPosts: publicProcedure
     .input(

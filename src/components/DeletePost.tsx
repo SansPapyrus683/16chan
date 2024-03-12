@@ -17,7 +17,7 @@ export function DeletePost({ pid }: { pid: string }) {
       }}
       className="bg-red-600"
     >
-      delete
+      Delete
     </Button>
   );
 }

@@ -2,7 +2,7 @@ import { api } from "@/trpc/server";
 import Image from "next/image";
 import { AddToAlbum } from "@/components/AddToAlbum";
 import Link from "next/link";
-import { sauceUrl, serverFetch } from "@/lib/utils";
+import { cn, sauceUrl, serverFetch } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { CommentInput, CommentList } from "@/components/Comment";
 import {
@@ -18,6 +18,7 @@ import {
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { TagCategory } from "@prisma/client";
+import { DeletePost } from "@/components/DeletePost";
 
 export default async function PostView({ params }: { params: { pid: string } }) {
   const ret = await serverFetch(async () => await api.post.get(params.pid));
@@ -29,6 +30,7 @@ export default async function PostView({ params }: { params: { pid: string } }) 
   const { userId } = auth();
 
   const author = post.userId && (await api.user.profileByUid(post.userId));
+  const isMod = await api.user.isMod();
   const src = sauceUrl(post.src, post.artId);
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
@@ -94,15 +96,18 @@ export default async function PostView({ params }: { params: { pid: string } }) 
       <ResizableHandle />
       {/* why the hell do i have to pass overflow-y-auto in both */}
       <ResizablePanel className="overflow-y-auto p-5" style={{ overflow: "y-auto" }}>
-        <h1>
-          {post.title}
-          {post.userId == userId && (
+        <div
+          className={cn("flex items-center", { "space-x-4": post.userId !== userId })}
+        >
+          <h1>{post.title}</h1>
+          {post.userId === userId && (
             <Button variant="link">
               <Link href={`/post/${params.pid}/edit`}>edit</Link>
             </Button>
           )}
-        </h1>
-        <div className="flex space-x-2">
+          {post.userId !== userId && isMod && <DeletePost pid={params.pid} />}
+        </div>
+        <div className="mt-2 flex space-x-2">
           {post.images.map((u, ind) => (
             <Image
               key={u.id}
