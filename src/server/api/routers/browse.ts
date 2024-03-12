@@ -21,7 +21,7 @@ export const browseRouter = createRouter({
 
       const tagQueries = tags.map((t) => {
         // god i hate typescript so much
-        if (typeof t === "string") {
+        if (typeof t === "string" || t instanceof String) {
           return { tagName: t as string };
         } else {
           const tag = t as z.infer<typeof Tag>;
