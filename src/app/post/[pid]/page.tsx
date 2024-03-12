@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { DeletePost } from "@/components/DeletePost";
 import { AddTagForm } from "@/components/TagForm";
 import { TagList } from "@/components/TagList";
+import { LikeButton } from "@/components/LikeButton";
 
 export default async function PostView({
   params: { pid },
@@ -36,6 +37,7 @@ export default async function PostView({
 
   const author = post.userId && (await api.user.profileByUid(post.userId));
   const isMod = await api.user.isMod();
+  const liked = await api.post.isLiked(pid);
   const src = sauceUrl(post.src, post.artId);
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
@@ -113,6 +115,7 @@ export default async function PostView({
               <Link href={`/post/${pid}/edit`}>edit</Link>
             </Button>
           )}
+          <LikeButton pid={pid} liked={liked} />
           {post.userId !== userId && isMod && <DeletePost pid={pid} />}
         </div>
         <div className="mt-2 grid grid-cols-3 gap-4 space-x-2">

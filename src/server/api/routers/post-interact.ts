@@ -19,6 +19,13 @@ export const postInteractRouter = createRouter({
       update: {},
     });
   }),
+  isLiked: protectedProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
+    return (
+      (await ctx.db.userLikes.findUnique({
+        where: { liking: { postId: input, userId: ctx.auth.userId! } },
+      })) !== null
+    );
+  }),
   unlike: protectedProcedure
     .input(z.string().uuid())
     .mutation(async ({ ctx, input }) => {
