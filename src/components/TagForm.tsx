@@ -1,21 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
+import { z } from "zod";
+import { Tag } from "@/lib/types";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Visibility } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -23,61 +21,75 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TagCategory } from "@prisma/client";
 import { toTitleCase } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
-export function CreateAlbum() {
+export function AddTagForm({
+  pid,
+  buttonText = "Add Tag",
+}: {
+  pid: string;
+  buttonText?: string;
+}) {
   const router = useRouter();
-  const create = api.album.create.useMutation({
-    onSuccess: (data) => {
-      setButtonText("Created!");
-      router.push(`/album/${data.id}`);
-    },
-  });
-  const [name, setName] = useState("New Album");
-  const [vis, setVis] = useState<Visibility>(Visibility.PUBLIC);
-  const [buttonText, setButtonText] = useState("Create");
-
-  const createAlbum = () => {
-    setButtonText("Creating...");
-    create.mutate({
-      name,
-      visibility: vis,
-    });
-  };
-
+  const addTag = api.post.tag.useMutation({ onSuccess: () => router.refresh() });
   return (
-    <Dialog onOpenChange={() => setButtonText("Create")}>
+    <TagForm
+      buttonText={buttonText}
+      onSubmit={(t) => addTag.mutate({ post: pid, tags: [t] })}
+    />
+  );
+}
+
+export function TagForm({
+  buttonText = "Add Tag",
+  initCat = TagCategory.CHARACTER,
+  initContent = "",
+  onSubmit = () => {},
+}: {
+  buttonText?: string;
+  initCat?: TagCategory;
+  initContent?: string;
+  onSubmit?: (t: z.infer<typeof Tag>) => any;
+}) {
+  const [cat, setCat] = useState<TagCategory>(initCat);
+  const [name, setName] = useState(initContent);
+
+  const submitTag = () => onSubmit(Tag.parse({ category: cat, name }));
+  return (
+    <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Album</Button>
+        <Button variant="outline">{buttonText}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create Album</DialogTitle>
-          <DialogDescription>Make a collection of posts.</DialogDescription>
+          <DialogTitle>Tag</DialogTitle>
         </DialogHeader>
         <div className="grid flex-1 gap-2">
           <Label htmlFor="name" className="sr-only">
-            Album Name
+            Tag Name
           </Label>
           <Input
-            // id="name"
+            id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                createAlbum();
+                console.log("submit tag");
               }
             }}
           />
         </div>
         <div className="grid flex-1 gap-2">
-          <Select onValueChange={(e: Visibility) => setVis(e)}>
+          <Select onValueChange={(e: TagCategory) => setCat(e)}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={toTitleCase(vis)} />
+              <SelectValue placeholder={toTitleCase(cat)} />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(Visibility).map((v) => (
+              {Object.keys(TagCategory).map((v) => (
                 <SelectItem value={v} key={v}>
                   {toTitleCase(v)}
                 </SelectItem>
@@ -86,7 +98,7 @@ export function CreateAlbum() {
           </Select>
         </div>
         <DialogFooter className="sm:justify-between">
-          <Button onClick={createAlbum}>{buttonText}</Button>
+          <Button onClick={submitTag}>Submit Tag</Button>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
               Close

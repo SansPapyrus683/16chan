@@ -36,9 +36,9 @@ export function TagForm({
   tagType: string;
   tagContent: string;
   tagNumber: number;
-  onTypeChange: (tagIndex: number, newType: string) => void;
-  onContentChange: (tagIndex: number, newContent: string) => void;
-  onDelete: (tagIndex: number) => void;
+  onTypeChange: (tagIndex: number, newType: string) => any;
+  onContentChange: (tagIndex: number, newContent: string) => any;
+  onDelete: (tagIndex: number) => any;
 }) {
   return (
     <div>
@@ -87,7 +87,7 @@ export function PostForm({
   iVis?: Visibility;
   editVis?: boolean;
   buttonText?: string;
-  onSubmit: (pd: PostData) => void;
+  onSubmit: (pd: PostData) => any;
 }) {
   const [pics, setPics] = useState<File[]>(iPics);
   const [title, setTitle] = useState(iTitle);

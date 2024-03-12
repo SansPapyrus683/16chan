@@ -19,9 +19,14 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { TagCategory } from "@prisma/client";
 import { DeletePost } from "@/components/DeletePost";
+import { AddTagForm } from "@/components/TagForm";
 
-export default async function PostView({ params }: { params: { pid: string } }) {
-  const ret = await serverFetch(async () => await api.post.get(params.pid));
+export default async function PostView({
+  params: { pid },
+}: {
+  params: { pid: string };
+}) {
+  const ret = await serverFetch(async () => await api.post.get(pid));
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
@@ -80,17 +85,20 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           </div>
           <CollapsibleContent>
             <TagsList tags={post.tags} />
+            <div className="ml-2">
+              Don't see a tag? <AddTagForm pid={pid} buttonText="Add it!" />
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
         <div>
           <h1>Add to Album</h1>
-          {userId && <AddToAlbum pid={params.pid} />}
+          {userId && <AddToAlbum pid={pid} />}
         </div>
         <div>
           <h1>Comments</h1>
           <CommentList comments={post.comments} />
-          {userId && <CommentInput pid={params.pid} />}
+          {userId && <CommentInput pid={pid} />}
         </div>
       </ResizablePanel>
       <ResizableHandle />
@@ -102,10 +110,10 @@ export default async function PostView({ params }: { params: { pid: string } }) 
           <h1>{post.title}</h1>
           {post.userId === userId && (
             <Button variant="link">
-              <Link href={`/post/${params.pid}/edit`}>edit</Link>
+              <Link href={`/post/${pid}/edit`}>edit</Link>
             </Button>
           )}
-          {post.userId !== userId && isMod && <DeletePost pid={params.pid} />}
+          {post.userId !== userId && isMod && <DeletePost pid={pid} />}
         </div>
         <div className="mt-2 flex space-x-2">
           {post.images.map((u, ind) => (
