@@ -31,7 +31,7 @@ export default async function Account({
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
-    <div className="flex space-y-4">
+    <div className="flex space-x-10 space-y-4">
       <div>
         <Avatar className="h-40 w-40">
           <AvatarImage src={profile.imageUrl} className="object-cover" />

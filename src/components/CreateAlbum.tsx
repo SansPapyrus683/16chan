@@ -49,7 +49,12 @@ export function CreateAlbum() {
   return (
     <Dialog onOpenChange={() => setButtonText("Create")}>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Album</Button>
+        <Button
+          className="w-40 rounded-md border-2 p-0.5 text-center"
+          variant="outline"
+        >
+          Create Album
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
