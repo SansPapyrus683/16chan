@@ -6,9 +6,6 @@ import { FollowButton } from "@/components/FollowButton";
 import { auth } from "@clerk/nextjs/server";
 import { serialize, serverFetch } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import smartcrop from "smartcrop";
-import Image from "next/image";
-import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function Account({
@@ -37,7 +34,7 @@ export default async function Account({
     <div className="flex space-y-4">
       <div>
         <Avatar className="h-40 w-40">
-          <AvatarImage src={profile.imageUrl} />
+          <AvatarImage src={profile.imageUrl} className="object-cover" />
           <AvatarFallback>`${profile.username}`</AvatarFallback>
         </Avatar>
         <div className="text-size-10 items-center">{profile.username}</div>
