@@ -60,7 +60,12 @@ export function TagForm({
 
   const submitTag = () => onSubmit(Tag.parse({ category: cat, name }));
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={() => {
+        setCat(TagCategory.CHARACTER);
+        setName("");
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">{buttonText}</Button>
       </DialogTrigger>
