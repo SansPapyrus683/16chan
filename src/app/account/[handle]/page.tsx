@@ -32,22 +32,28 @@ export default async function Account({
 
   return (
     <div className="flex space-x-10 space-y-4">
-      <div>
-        <Avatar className="h-40 w-40">
-          <AvatarImage src={profile.imageUrl} className="object-cover" />
-          <AvatarFallback>`${profile.username}`</AvatarFallback>
-        </Avatar>
-        <div className="text-size-10 items-center">{profile.username}</div>
+      <div className="space-y-4">
+        <div>
+          <Avatar className="h-40 w-40 align-middle">
+            <AvatarImage src={profile.imageUrl} className="object-cover" />
+            <AvatarFallback>`${profile.username}`</AvatarFallback>
+          </Avatar>
+
+          <div className="text-size-10 mt-3">{profile.username}</div>
+        </div>
+
         {profile.id !== userId && (
           <FollowButton uid={profile.id} isFollowing={isFollowing} />
         )}
+
         <Button className="w-40 rounded-md border-2 p-0.5 text-center">
           <a href={`/account/${params.handle}/likes`}>Liked Posts</a>
         </Button>
+
+        {userId === profile.id && <CreateAlbum />}
+
         <div>
-          {userId === profile.id && <CreateAlbum />}
-          <br />
-          Albums
+          <h2>Albums</h2>
           <AlbumList initAlbums={albums} uid={profile.id} />
         </div>
       </div>
