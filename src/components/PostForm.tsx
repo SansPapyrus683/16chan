@@ -115,7 +115,7 @@ export function PostForm({
           accept="image/*"
           multiple
           onChange={(e) => {
-            setPics([...pics, ...Array.from(e.target.files!)]);
+            setPics(Array.from(e.target.files!));
           }}
         />
 
@@ -134,7 +134,7 @@ export function PostForm({
           onSubmit={(t) => {
             const toAdd = { tagCat: t.category, tagName: t.name };
             if (!tags.includes(toAdd)) {
-              setTags([...tags]);
+              setTags([...tags, toAdd]);
             }
           }}
         />

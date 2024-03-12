@@ -13,17 +13,18 @@ export function CreatePost() {
   const [buttonText, setButtonText] = useState("Create");
   const createPost = api.post.create.useMutation({
     onSuccess: (data) => {
-      setButtonText("success!");
+      setButtonText("Success!");
       router.push(`/post/${data.id}`);
     },
     onError: () => {
-      setButtonText("error...");
+      setButtonText("Error...");
     },
   });
 
   return (
     <PostForm
       onSubmit={async (pd) => {
+        setButtonText("Creating...");
         createPost.mutate({
           title: pd.title,
           tags: pd.tags,
@@ -53,9 +54,7 @@ export function EditPost({
       setButtonText("Success!");
       router.push(`/post/${data.id}`);
     },
-    onError: () => {
-      setButtonText("Error...");
-    },
+    onError: () => setButtonText("Error..."),
   });
 
   const [buttonText, setButtonText] = useState("Change");
@@ -67,6 +66,7 @@ export function EditPost({
         iTagNames={post.tags.map((t) => t.tagName)}
         iSauce={{ src: post.src, id: post.artId }}
         onSubmit={async (pd) => {
+          setButtonText("Changing...");
           editPost.mutate({
             pid: pid,
             title: pd.title,
