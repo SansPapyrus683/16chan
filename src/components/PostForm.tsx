@@ -1,12 +1,14 @@
 "use client";
 
-import { type FormEvent, Fragment, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { parseSauce, Sauce, Tag } from "@/lib/types";
 import { TagCategory, Visibility } from "@prisma/client";
 import { sauceUrl, toTitleCase } from "@/lib/utils";
 import Image from "next/image";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { TagsList } from "@/components/TagList";
+import { TagForm } from "@/components/TagForm";
 
 const SOURCE_NAME = {
   DA: "DeviantArt",
@@ -25,64 +27,21 @@ type PostData = {
   vis: Visibility;
 };
 
-export function TagForm({
-  tagType,
-  tagContent,
-  tagNumber,
-  onTypeChange,
-  onContentChange,
-  onDelete,
-}: {
-  tagType: string;
-  tagContent: string;
-  tagNumber: number;
-  onTypeChange: (tagIndex: number, newType: string) => any;
-  onContentChange: (tagIndex: number, newContent: string) => any;
-  onDelete: (tagIndex: number) => any;
-}) {
-  return (
-    <div>
-      Tag #{tagNumber}
-      <button className="block border-2 p-0.5" onClick={() => onDelete(tagNumber)}>
-        Delete Tag
-      </button>
-      {Object.keys(TagCategory).map((t) => (
-        <Fragment key={t}>
-          <input
-            type="radio"
-            id={t}
-            name={`tag${tagNumber}`}
-            checked={tagType === t}
-            onChange={() => onTypeChange(tagNumber, t)}
-          />
-          <label htmlFor={t}>{toTitleCase(t)}</label>
-        </Fragment>
-      ))}
-      <input
-        value={tagContent}
-        onChange={(e) => onContentChange(tagNumber, e.target.value)}
-        placeholder="tag content... "
-        className="block border-2"
-      />
-    </div>
-  );
-}
-
 export function PostForm({
   iPics = [],
   iTitle = "",
-  iTagTypes = [],
-  iTagContents = [],
+  iTagCats = [],
+  iTagNames = [],
   iSauce = { src: "OTHER", id: "" },
   iVis = Visibility.PUBLIC,
   editVis = false,
   buttonText = "submit",
-  onSubmit, // why the hell is next js giving warnings on these two
+  onSubmit,
 }: {
   iPics?: File[];
   iTitle?: string;
-  iTagTypes?: string[];
-  iTagContents?: string[];
+  iTagCats?: TagCategory[];
+  iTagNames?: string[];
   iSauce?: z.infer<typeof Sauce>;
   iVis?: Visibility;
   editVis?: boolean;
@@ -91,8 +50,9 @@ export function PostForm({
 }) {
   const [pics, setPics] = useState<File[]>(iPics);
   const [title, setTitle] = useState(iTitle);
-  const [tagTypes, setTagTypes] = useState<string[]>(iTagTypes);
-  const [tagContents, setTagContents] = useState<string[]>(iTagContents);
+  const [tags, setTags] = useState<{ tagName: string; tagCat: TagCategory }[]>(
+    iTagCats.map((t, i) => ({ tagCat: t, tagName: iTagNames[i]! })),
+  );
   const [sauce, setSauce] = useState(iSauce.id);
   const sourceType = sauceUrl(iSauce.src, iSauce.id) === null ? "AUTO" : iSauce.src;
   const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>(sourceType);
@@ -104,8 +64,8 @@ export function PostForm({
     // this is so cursed omg
     let goodTags: z.infer<typeof Tag>[] = [];
     try {
-      for (let i = 0; i < tagTypes.length; i++) {
-        goodTags.push(Tag.parse({ category: tagTypes[i], name: tagContents[i] }));
+      for (const t of tags) {
+        goodTags.push(Tag.parse({ category: t.tagCat, name: t.tagName }));
       }
     } catch (e) {
       setErr(`tag parsing: ${e}`);
@@ -132,29 +92,10 @@ export function PostForm({
   function clearForm() {
     setPics([]);
     setTitle("");
-    setTagTypes([]);
-    setTagContents([]);
+    setTags([]);
     setSauce("");
     setVis(Visibility.PUBLIC);
     setSauceType("AUTO");
-  }
-
-  function onTagTypeChange(tagIndex: number, newType: string) {
-    setTagTypes(tagTypes.map((t, i) => (i !== tagIndex ? t : newType)));
-  }
-
-  function onTagContentChange(tagIndex: number, newContent: string) {
-    setTagContents(tagContents.map((t, i) => (i !== tagIndex ? t : newContent)));
-  }
-
-  function onTagDelete(tagIndex: number) {
-    setTagContents(tagContents.filter((_, i) => i !== tagIndex));
-    setTagTypes(tagTypes.filter((_, i) => i !== tagIndex));
-  }
-
-  function onTagAdd() {
-    setTagContents([...tagContents, ""]);
-    setTagTypes([...tagTypes, "CHARACTER"]);
   }
 
   return (
@@ -176,20 +117,15 @@ export function PostForm({
           className="block border-2"
         />
 
-        {tagTypes.map((t, i) => (
-          <TagForm
-            key={i}
-            tagType={t}
-            tagContent={tagContents[i]!}
-            tagNumber={i}
-            onTypeChange={onTagTypeChange}
-            onContentChange={onTagContentChange}
-            onDelete={onTagDelete}
-          />
-        ))}
-        <button type="button" className="block border-2 p-0.5" onClick={onTagAdd}>
-          Add Tag #{tagTypes.length}
-        </button>
+        <TagsList tags={tags} />
+        <TagForm
+          onSubmit={(t) => {
+            const toAdd = { tagCat: t.category, tagName: t.name };
+            if (!tags.includes(toAdd)) {
+              setTags([...tags]);
+            }
+          }}
+        />
 
         <select
           value={sauceType}

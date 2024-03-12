@@ -17,9 +17,9 @@ import {
 } from "@/components/ui/collapsible";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import { TagCategory } from "@prisma/client";
 import { DeletePost } from "@/components/DeletePost";
 import { AddTagForm } from "@/components/TagForm";
+import { TagsList } from "@/components/TagList";
 
 export default async function PostView({
   params: { pid },
@@ -133,51 +133,5 @@ export default async function PostView({
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
-  );
-}
-
-function TagsList({
-  tags,
-}: {
-  tags: { postId: string; taggedAt: Date; tagName: string; tagCat: string }[];
-}) {
-  const tagsMap: { [key: string]: string[] } = {};
-  for (const cat of Object.keys(TagCategory)) {
-    tagsMap[cat] = [];
-  }
-  tags.forEach(({ tagCat, tagName }) => tagsMap[tagCat]!.push(tagName));
-
-  return (
-    <div className="m-2">
-      {Object.entries(tagsMap).map(
-        ([cat, tags]) =>
-          tags.length > 0 && (
-            <Collapsible defaultOpen key={cat}>
-              <CollapsibleTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-auto px-2 py-0 text-base text-gray-500"
-                >
-                  {cat}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <ul className="mb-2 ml-4">
-                  {tagsMap[cat]!.map((t: string) => (
-                    <li key={t}>
-                      <Link
-                        href={`/?${new URLSearchParams([["q", `tag:${t}`]])}`}
-                        className="hover:underline"
-                      >
-                        {t}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
-          ),
-      )}
-    </div>
   );
 }

@@ -98,7 +98,9 @@ export function TagForm({
           </Select>
         </div>
         <DialogFooter className="sm:justify-between">
-          <Button onClick={submitTag}>Submit Tag</Button>
+          <DialogClose asChild>
+            <Button onClick={submitTag}>Submit Tag</Button>
+          </DialogClose>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
               Close

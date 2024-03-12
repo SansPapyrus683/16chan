@@ -63,8 +63,8 @@ export function EditPost({
     post && (
       <PostForm
         iTitle={post.title}
-        iTagTypes={post.tags.map((t) => t.tagCat)}
-        iTagContents={post.tags.map((t) => t.tagName)}
+        iTagCats={post.tags.map((t) => t.tagCat)}
+        iTagNames={post.tags.map((t) => t.tagName)}
         iSauce={{ src: post.src, id: post.artId }}
         onSubmit={async (pd) => {
           editPost.mutate({
