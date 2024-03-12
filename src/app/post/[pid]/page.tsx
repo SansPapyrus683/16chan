@@ -97,7 +97,8 @@ export default async function PostView({
           <h1>Add to Album</h1>
           {userId && <AddToAlbum pid={pid} />}
         </div>
-        <div>
+
+        <div className="space-y-3">
           <h1>Comments</h1>
           <CommentList comments={post.comments} />
           {userId && <CommentInput pid={pid} />}
