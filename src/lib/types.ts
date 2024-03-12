@@ -22,7 +22,7 @@ export function parseSauce(
   mode: ArtSource | "AUTO",
   sauce: string,
 ): z.infer<typeof Sauce> {
-  if (mode === "AUTO" || !sauce) {
+  if (mode === "AUTO" || (mode !== "OC" && !sauce)) {
     return autoParse(sauce);
   }
 
