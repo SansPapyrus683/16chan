@@ -62,6 +62,7 @@ export function EditPost({
   return (
     post && (
       <PostForm
+        editPics={false}
         iTitle={post.title}
         iTagCats={post.tags.map((t) => t.tagCat)}
         iTagNames={post.tags.map((t) => t.tagName)}

@@ -38,6 +38,7 @@ type PostData = {
 
 export function PostForm({
   iPics = [],
+  editPics = true,
   iTitle = "",
   iTagCats = [],
   iTagNames = [],
@@ -49,6 +50,7 @@ export function PostForm({
   onSubmit,
 }: {
   iPics?: File[];
+  editPics?: boolean;
   iTitle?: string;
   iTagCats?: TagCategory[];
   iTagNames?: string[];
@@ -112,14 +114,16 @@ export function PostForm({
   return (
     <div className="space-y-2">
       <form onSubmit={formSubmit} className="space-y-2">
-        <Input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => {
-            setPics(Array.from(e.target.files!));
-          }}
-        />
+        {editPics && (
+          <Input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              setPics(Array.from(e.target.files!));
+            }}
+          />
+        )}
 
         <Label htmlFor="title" className="sr-only">
           Post Title
