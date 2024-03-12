@@ -34,8 +34,6 @@ export function CreatePost() {
           visibility: pd.vis,
         });
       }}
-      editVis
-      resetButton
       buttonText={buttonText}
     />
   );
@@ -64,10 +62,8 @@ export function EditPost({
   return (
     post && (
       <PostForm
-        editPics={false}
         iTitle={post.title}
-        iTagCats={post.tags.map((t) => t.tagCat)}
-        iTagNames={post.tags.map((t) => t.tagName)}
+        iTags={post.tags}
         iSauce={{ src: post.src, id: post.artId }}
         onSubmit={async (pd) => {
           setButtonText("Changing...");
@@ -79,6 +75,11 @@ export function EditPost({
           });
         }}
         buttonText={buttonText}
+        fields={{
+          pics: false,
+          vis: false,
+          resetButton: false,
+        }}
       />
     )
   );

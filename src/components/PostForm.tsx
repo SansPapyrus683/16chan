@@ -39,34 +39,43 @@ type PostData = {
 
 export function PostForm({
   iPics = [],
-  editPics = true,
   iTitle = "",
-  iTagCats = [],
-  iTagNames = [],
+  iTags = [],
   iSauce = { src: "OTHER", id: "" },
   iVis = Visibility.PUBLIC,
-  editVis = false,
   buttonText = "Submit",
-  resetButton = false,
   onSubmit,
+  fields = {},
 }: {
   iPics?: File[];
-  editPics?: boolean;
   iTitle?: string;
-  iTagCats?: TagCategory[];
-  iTagNames?: string[];
+  iTags?: { tagCat: TagCategory; tagName: string }[];
   iSauce?: z.infer<typeof Sauce>;
   iVis?: Visibility;
-  editVis?: boolean;
   buttonText?: string;
-  resetButton?: boolean;
   onSubmit: (pd: PostData) => any;
+  fields?: {
+    pics?: boolean;
+    title?: boolean;
+    tags?: boolean;
+    sauce?: boolean;
+    vis?: boolean;
+    resetButton?: boolean;
+  };
 }) {
+  fields = {
+    pics: true,
+    title: true,
+    tags: true,
+    sauce: true,
+    vis: true,
+    resetButton: true,
+    ...fields,
+  };
+
   const [pics, setPics] = useState<File[]>(iPics);
   const [title, setTitle] = useState(iTitle);
-  const [tags, setTags] = useState<{ tagName: string; tagCat: TagCategory }[]>(
-    iTagCats.map((t, i) => ({ tagCat: t, tagName: iTagNames[i]! })),
-  );
+  const [tags, setTags] = useState<{ tagCat: TagCategory; tagName: string }[]>(iTags);
   const [sauce, setSauce] = useState(iSauce.id);
   const sourceType = sauceUrl(iSauce.src, iSauce.id) === null ? "AUTO" : iSauce.src;
   const [sauceType, setSauceType] = useState<keyof typeof SOURCE_NAME>(sourceType);
@@ -114,7 +123,7 @@ export function PostForm({
     <div className="space-y-2">
       <form onSubmit={formSubmit} className="space-y-4">
         <h2>Basic Info</h2>
-        {editPics && (
+        {fields.pics && (
           <>
             <Input
               type="file"
@@ -127,69 +136,77 @@ export function PostForm({
           </>
         )}
 
-        <Label htmlFor="title" className="sr-only">
-          Post Title
-        </Label>
-        <Input
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title..."
-        />
+        {fields.title && (
+          <>
+            <Label htmlFor="title" className="sr-only">
+              Post Title
+            </Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title..."
+            />
+          </>
+        )}
 
         <h2>Auxiliary Info</h2>
 
-        <div>
-          <h3>Tags</h3>
-          <TagsList tags={tags} />
-          <TagForm
-            onSubmit={(t) => {
-              const toAdd = { tagCat: t.category, tagName: t.name };
-              if (!tags.includes(toAdd)) {
-                setTags([...tags, toAdd]);
-              }
-            }}
-          />
-        </div>
+        {fields.tags && (
+          <div>
+            <h3>Tags</h3>
+            <TagsList tags={tags} />
+            <TagForm
+              onSubmit={(t) => {
+                const toAdd = { tagCat: t.category, tagName: t.name };
+                if (!tags.includes(toAdd)) {
+                  setTags([...tags, toAdd]);
+                }
+              }}
+            />
+          </div>
+        )}
 
-        <div className="space-y-2">
-          <h3>Source</h3>
-          <Select onValueChange={(e: typeof sauceType) => setSauceType(e)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={SOURCE_NAME[sauceType]} />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(SOURCE_NAME).map(([val, name]) => (
-                <SelectItem value={val} key={val}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {sauceType !== "OC" && (
-            <>
-              <Label htmlFor="source" className="sr-only">
-                Source
-              </Label>
-              <Input
-                id="source"
-                value={sauce}
-                onChange={(e) => setSauce(e.target.value)}
-                placeholder="Source..."
-              />
-            </>
-          )}
-          Parsed source:{" "}
-          {displaySrc ? (
-            <Link href={displaySrc[1]} className="hover:underline">
-              {displaySrc[0]}
-            </Link>
-          ) : (
-            "no source detected (or error generating one)."
-          )}
-        </div>
+        {fields.sauce && (
+          <div className="space-y-2">
+            <h3>Source</h3>
+            <Select onValueChange={(e: typeof sauceType) => setSauceType(e)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={SOURCE_NAME[sauceType]} />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(SOURCE_NAME).map(([val, name]) => (
+                  <SelectItem value={val} key={val}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {sauceType !== "OC" && (
+              <>
+                <Label htmlFor="source" className="sr-only">
+                  Source
+                </Label>
+                <Input
+                  id="source"
+                  value={sauce}
+                  onChange={(e) => setSauce(e.target.value)}
+                  placeholder="Source..."
+                />
+              </>
+            )}
+            Parsed source:{" "}
+            {displaySrc ? (
+              <Link href={displaySrc[1]} className="hover:underline">
+                {displaySrc[0]}
+              </Link>
+            ) : (
+              "no source detected (or error generating one)."
+            )}
+          </div>
+        )}
 
-        {editVis && (
+        {fields.vis && (
           <Select onValueChange={(e: Visibility) => setVis(e)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={toTitleCase(vis)} />
@@ -203,10 +220,12 @@ export function PostForm({
             </SelectContent>
           </Select>
         )}
+
         <Button type="submit" className="block">
           {buttonText}
         </Button>
-        {resetButton && (
+
+        {fields.resetButton && (
           <Button type="reset" className="block" onClick={clearForm}>
             Reset Form
           </Button>
@@ -215,20 +234,22 @@ export function PostForm({
 
       <span className="text-red-600">{err}</span>
 
-      {editPics && (
+      {fields.pics && (
         <>
-          <div>Uploading {pics.length} images</div>
-          {picUrls.map((p, i) => (
-            <Image
-              key={i}
-              src={p}
-              width="0"
-              height="0"
-              sizes="20vw"
-              alt="alt"
-              style={{ width: "10%", height: "10%" }}
-            />
-          ))}
+          <h3>Uploading {pics.length} images</h3>
+          <div className="flex justify-between">
+            {picUrls.map((p, i) => (
+              <Image
+                key={i}
+                src={p}
+                width="0"
+                height="0"
+                sizes="20vw"
+                alt="alt"
+                style={{ width: "20%", height: "10%" }}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
