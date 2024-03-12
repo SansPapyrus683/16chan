@@ -64,6 +64,7 @@ export function PaginatedPostList({
   return (
     <>
       <PostList posts={posts} likeButton={likeButton} />
+      <br />
       <div>
         <button
           onClick={async (e) => {

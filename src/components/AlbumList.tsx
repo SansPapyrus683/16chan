@@ -24,7 +24,10 @@ export function AlbumList({
       <ul>
         {(albums ?? []).map((v) => (
           <li key={v.id}>
-            <a href={`/album/${v.id}`}>{v.name}</a> | {v.id}
+            <a className="hover:underline" href={`/album/${v.id}`}>
+              {v.name}
+            </a>{" "}
+            | {v.id}
           </li>
         ))}
       </ul>
@@ -37,7 +40,7 @@ export function AlbumList({
           disabled={prevCursor === undefined}
           className="border-4 p-1"
         >
-          prev page
+          Prev Page
         </button>
         <button
           onClick={async (e) => {
@@ -51,7 +54,7 @@ export function AlbumList({
           className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
         >
-          next page
+          Next Page
         </button>
       </div>
     </>
