@@ -19,7 +19,7 @@ export const Sauce = z
   .optional();
 
 export function parseSauce(mode: ArtSource | "AUTO", sauce: string) {
-  if (mode === "AUTO" && !sauce) {
+  if (mode === "AUTO" || !sauce) {
     return autoParse(sauce);
   }
 
@@ -47,9 +47,9 @@ export function autoParse(url: string): z.infer<typeof Sauce> {
     return Sauce.parse({ src: "OTHER", id: "" });
   }
   const regex = [
-    { test: /https?:\/\/.*deviantart\.com.*\/art\/(.*[0-9])/, src: "DA" },
-    { test: /https?:\/\/.*pixiv\.net.*\/artworks\/([0-9]+)/, src: "PIXIV" },
-    { test: /https?:\/\/.*twitter\.com.+\/status\/([0-9]+)/, src: "TWITTER" },
+    { test: /https?:\/\/.*deviantart\.com.*\/art\/(.*[0-9])\/?/, src: "DA" },
+    { test: /https?:\/\/.*pixiv\.net.*\/artworks\/([0-9]+)\/?/, src: "PIXIV" },
+    { test: /https?:\/\/.*twitter\.com.+\/status\/([0-9]+)\/?/, src: "TWITTER" },
   ];
   for (const { test, src } of regex) {
     const match = url.match(test);

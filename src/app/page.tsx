@@ -26,9 +26,9 @@ export default async function Browsing({
     <>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h1>Results for "{query}"</h1>
+          <h2>Results for "{query}"</h2>
           <div className="flex items-center space-x-1">
-            <h1>Sort By: </h1>
+            <h2>Sort By: </h2>
             <SortMenu options={["new", "likes"]} initVal={sortBy} placeholder={""} />
           </div>
         </div>

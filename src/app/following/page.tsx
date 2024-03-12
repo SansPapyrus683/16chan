@@ -14,7 +14,7 @@ export default async function NewPage({
 
   return (
     <div className="space-y-4">
-      <h1>Following Posts</h1>
+      <h2>Following Posts</h2>
       <div>
         <PaginatedPostList
           initPosts={serialize(posts)}

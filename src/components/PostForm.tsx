@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { parseSauce, Sauce, Tag } from "@/lib/types";
 import { TagCategory, Visibility } from "@prisma/client";
 import { sauceUrl, toTitleCase } from "@/lib/utils";
@@ -72,6 +72,8 @@ export function PostForm({
   const [vis, setVis] = useState<Visibility>(iVis);
   const [err, setErr] = useState("");
 
+  const picUrls = useMemo(() => pics.map((p) => URL.createObjectURL(p)), [pics]);
+
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this is so cursed omg
@@ -114,15 +116,18 @@ export function PostForm({
   return (
     <div className="space-y-2">
       <form onSubmit={formSubmit} className="space-y-2">
+        <h2>Basic Info</h2>
         {editPics && (
-          <Input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              setPics(Array.from(e.target.files!));
-            }}
-          />
+          <>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                setPics(Array.from(e.target.files!));
+              }}
+            />
+          </>
         )}
 
         <Label htmlFor="title" className="sr-only">
@@ -135,6 +140,7 @@ export function PostForm({
           placeholder="Title..."
         />
 
+        <h2>Auxiliary Info</h2>
         <TagsList tags={tags} />
         <TagForm
           onSubmit={(t) => {
@@ -201,10 +207,10 @@ export function PostForm({
       <span className="text-red-600">{err}</span>
 
       <div>Uploading {pics.length} images</div>
-      {pics.map((p, i) => (
+      {picUrls.map((p, i) => (
         <Image
           key={i}
-          src={URL.createObjectURL(p)}
+          src={p}
           width="0"
           height="0"
           sizes="20vw"
