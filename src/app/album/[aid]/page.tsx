@@ -10,9 +10,9 @@ export default async function AlbumView({ params }: { params: { aid: string } })
   }
 
   return (
-    <>
+    <div className="space-y-4">
       <Album aid={params.aid} initAlbum={serialize(ret.val)} />
       <DeleteAlbum aid={params.aid} />
-    </>
+    </div>
   );
 }
