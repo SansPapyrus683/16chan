@@ -32,6 +32,7 @@ export function AlbumList({
           </li>
         ))}
       </ul>
+      <br />
       <div>
         <Button
           onClick={async (e) => {
