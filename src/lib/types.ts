@@ -7,7 +7,7 @@ export function validTag(tag: string) {
 }
 
 export const Tag = z.object({
-  category: z.nativeEnum(TagCategory).catch("OTHER"),
+  category: z.nativeEnum(TagCategory),
   name: z.string().toLowerCase().refine(validTag),
 });
 

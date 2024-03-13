@@ -44,7 +44,7 @@ export function TagList({
                   {tagsMap[cat]!.map((t: string) => (
                     <li key={t} className="flex items-center space-x-4">
                       <Link
-                        href={`/?${new URLSearchParams([["q", `tag:${t}`]])}`}
+                        href={`/?${new URLSearchParams([["q", `tag:${cat.toLowerCase()}:${t}`]])}`}
                         className="hover:underline"
                       >
                         {t}

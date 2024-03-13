@@ -4,6 +4,7 @@ import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function AlbumList({
   initAlbums,
@@ -18,29 +19,32 @@ export function AlbumList({
     { user: uid, cursor: at },
     { placeholderData: (prevRes) => prevRes ?? initAlbums },
   );
-  const { albums, prevCursor, nextCursor } = data || {};
+  let { albums, prevCursor, nextCursor } = data || {};
+  albums = albums ?? []; // cursed tbh
 
   return (
     <>
-      <ul>
-        {(albums ?? []).map((v) => (
-          <li key={v.id}>
-            <a className="hover:underline" href={`/album/${v.id}`}>
-              {v.name}
-            </a>{" "}
-            | {v.id}
-          </li>
-        ))}
-      </ul>
-      <br />
-      <div>
+      {albums.length > 0 ? (
+        <ul>
+          {(albums ?? []).map((v) => (
+            <li key={v.id}>
+              <Link className="hover:underline" href={`/album/${v.id}`}>
+                {v.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+          <br />
+      ) : (
+        <div>No albums...</div>
+      )}
+      <div className="flex space-x-4">
         <Button
           onClick={async (e) => {
             e.preventDefault();
             setAt(prevCursor);
           }}
           disabled={prevCursor === undefined}
-          className="border-4 p-1"
         >
           Prev Page
         </Button>
@@ -53,7 +57,6 @@ export function AlbumList({
             e.preventDefault();
             setAt(nextCursor);
           }}
-          className="ml-3 border-4 p-1"
           disabled={isPlaceholderData || nextCursor === undefined}
         >
           Next Page
