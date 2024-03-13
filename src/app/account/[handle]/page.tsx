@@ -13,6 +13,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import Link from "next/link";
+import { SignedIn } from "@clerk/nextjs";
 
 export default async function Account({
   params,
@@ -33,7 +34,7 @@ export default async function Account({
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const posts = await api.user.userPosts({ user: profile.id, cursor });
-  const isFollowing = await api.user.isFollowing(profile.id);
+  const isFollowing = Boolean(userId && (await api.user.isFollowing(profile.id)));
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
@@ -49,9 +50,11 @@ export default async function Account({
             <div className="text-size-10 mt-3">{profile.username}</div>
           </div>
 
-          {profile.id !== userId && (
-            <FollowButton uid={profile.id} isFollowing={isFollowing} />
-          )}
+          <SignedIn>
+            {profile.id !== userId && (
+              <FollowButton uid={profile.id} isFollowing={isFollowing} />
+            )}
+          </SignedIn>
 
           <div>
             <Button className="w-40 rounded-md border-2 p-0.5 text-center">

@@ -8,6 +8,7 @@ export default authMiddleware({
     "/",
     "/album/(.*)",
     "/account/(.+)",
+    "/post/((?!create).*(?<!/edit)$)",
     "/api/webhooks(.*)",
     "/api/trpc/(.*)",
   ],

@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
-import { useAuth } from "@clerk/nextjs";
+import { SignedIn, useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
 type PostData = RouterOutputs["user"]["userPosts"];
@@ -228,14 +228,16 @@ export function PostList({
                         <p>{`${p.title}`}</p>
                       </div>
                     </div>
-                    <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
-                      {likeButton && (
-                        <LikeButton
-                          pid={p.id}
-                          liked={p.likes!.some((i) => i.userId === userId)}
-                        />
-                      )}
-                    </div>
+                    <SignedIn>
+                      <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
+                        {likeButton && (
+                          <LikeButton
+                            pid={p.id}
+                            liked={p.likes!.some((i) => i.userId === userId)}
+                          />
+                        )}
+                      </div>
+                    </SignedIn>
                   </div>
                 ))}
             </div>

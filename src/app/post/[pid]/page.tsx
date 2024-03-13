@@ -21,6 +21,7 @@ import { DeletePost } from "@/components/DeletePost";
 import { AddTagForm } from "@/components/TagForm";
 import { TagList } from "@/components/TagList";
 import { LikeButton } from "@/components/LikeButton";
+import { SignedIn } from "@clerk/nextjs";
 
 export default async function PostView({
   params: { pid },
@@ -36,8 +37,8 @@ export default async function PostView({
   const { userId } = auth();
 
   const author = post.userId && (await api.user.profileByUid(post.userId));
-  const isMod = await api.user.isMod();
-  const liked = await api.post.isLiked(pid);
+  const isMod = Boolean(userId && (await api.user.isMod()));
+  const liked = Boolean(userId && (await api.post.isLiked(pid)));
   const src = sauceUrl(post.src, post.artId);
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
@@ -87,21 +88,27 @@ export default async function PostView({
           </div>
           <CollapsibleContent>
             <TagList tags={post.tags} />
-            <div className="ml-2">
-              Don't see a tag? <AddTagForm pid={pid} buttonText="Add it!" />
-            </div>
+            <SignedIn>
+              <div className="ml-2">
+                Don't see a tag? <AddTagForm pid={pid} buttonText="Add it!" />
+              </div>
+            </SignedIn>
           </CollapsibleContent>
         </Collapsible>
 
-        <div>
-          <h1>Add to Album</h1>
-          {userId && <AddToAlbum pid={pid} />}
-        </div>
+        <SignedIn>
+          <div>
+            <h1>Add to Album</h1>
+            <AddToAlbum pid={pid} />
+          </div>
+        </SignedIn>
 
         <div className="space-y-3">
           <h1>Comments</h1>
           <CommentList comments={post.comments} />
-          {userId && <CommentInput pid={pid} />}
+          <SignedIn>
+            <CommentInput pid={pid} />
+          </SignedIn>
         </div>
       </ResizablePanel>
       <ResizableHandle />
@@ -116,7 +123,9 @@ export default async function PostView({
               <Link href={`/post/${pid}/edit`}>edit</Link>
             </Button>
           )}
-          <LikeButton pid={pid} liked={liked} />
+          <SignedIn>
+            <LikeButton pid={pid} liked={liked} />
+          </SignedIn>
           {post.userId !== userId && isMod && <DeletePost pid={pid} />}
         </div>
         <div className="mt-2 grid grid-cols-3 gap-4 space-x-2">
