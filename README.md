@@ -8,8 +8,8 @@ upload images, tag images, look at anime girls, what else could you want?
 2. copy paste all the text from 
    [this google doc](https://docs.google.com/document/d/1-8259GSPKIUHJbyqNu5lBagW7aZ1LX_7Uyzuh8ftJCM/edit)
    into that file
-3`npm run dev`
-3. that's it!
+3. `npm run dev`
+4. that's it!
 
 ## ok how does this actually work
 
