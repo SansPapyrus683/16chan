@@ -37,7 +37,6 @@ export function AlbumList({
       ) : (
         <div>No albums...</div>
       )}
-      <br />
       <div className="flex space-x-4">
         <Button
           onClick={async (e) => {

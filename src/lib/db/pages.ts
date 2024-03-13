@@ -165,7 +165,7 @@ export async function albumPages(
     ...params,
     take: -limit - 1,
   });
-  let prevCursor = prevPosts.length >= 1 ? prevPosts[0]!.id : undefined;
+  let prevCursor = prevPosts.length > 1 ? prevPosts[0]!.id : undefined;
 
   return {
     albums,
