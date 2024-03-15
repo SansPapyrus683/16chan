@@ -21,8 +21,7 @@ export default async function userLikes({
   const likes = await api.user.userLikes({ user: profile.id, cursor });
   return (
     <>
-      <div>{profile.username}'s likes</div>
-      <br />
+      <h1>{profile.username}'s likes</h1>
       <div>
         <PaginatedPostList
           getWhat="userLikes"
