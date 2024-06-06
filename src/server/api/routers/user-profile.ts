@@ -16,13 +16,15 @@ import SortOrder = Prisma.SortOrder;
 
 export const userProfileRouter = createRouter({
   profileByUsername: publicProcedure.input(z.string()).query(async ({ input }) => {
-    const userList = await clerkClient.users.getUserList({ username: [input] });
-    if (userList.length === 0) {
+    const { data: userList, totalCount } = await clerkClient.users.getUserList({
+      username: [input],
+    });
+    if (totalCount === 0) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: `no user exists with the handle ${input}`,
       });
-    } else if (userList.length > 1) {
+    } else if (totalCount > 1) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "wth i thought users couldn't share usernames",

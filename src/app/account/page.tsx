@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default async function accountRedirect() {
   const user = await currentUser();
