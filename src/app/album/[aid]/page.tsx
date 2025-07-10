@@ -5,15 +5,16 @@ import { Album } from "@/components/Album";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function AlbumView({
-  params: { aid },
+  params,
 }: {
-  params: { aid: string };
+  params: Promise<{ aid: string }>;
 }) {
+  const aid = (await params).aid;
   const ret = await serverFetch(async () => await api.album.get(aid));
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
-  const { userId } = auth();
+  const { userId } = await auth();
 
   return (
     <div className="space-y-4">

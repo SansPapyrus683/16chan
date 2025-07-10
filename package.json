@@ -51,7 +51,6 @@
     "superjson": "^2.2.2",
     "svix": "^1.69.0",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
     "zod": "^4.0.3"
   },
   "devDependencies": {
@@ -64,6 +63,7 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "prisma": "^6.11.1",
     "tailwindcss": "^4.1.11",
+    "tw-animate-css": "^1.3.5",
     "typescript": "^5.8.3"
   },
   "ct3aMetadata": {

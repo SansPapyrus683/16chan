@@ -4,11 +4,12 @@ import { auth } from "@clerk/nextjs/server";
 import { serialize } from "@/lib/utils";
 
 export default async function NewPage({
-  searchParams: sp,
+  searchParams,
 }: {
-  searchParams: { cursor: string | string[] | undefined };
+  searchParams: Promise<{ cursor: string | string[] | undefined }>;
 }) {
-  const { userId } = auth();
+  const sp = await searchParams;
+  const { userId } = await auth();
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const posts = await api.user.followedPosts({ cursor });
 
