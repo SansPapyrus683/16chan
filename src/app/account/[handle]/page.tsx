@@ -17,20 +17,23 @@ import { SignedIn } from "@clerk/nextjs";
 
 export default async function Account({
   params,
-  searchParams: sp,
+  searchParams,
 }: {
-  params: { handle: string };
-  searchParams: { cursor: string | string[] | undefined };
+  params: Promise<{ handle: string }>;
+  searchParams: Promise<{ cursor: string | string[] | undefined }>;
 }) {
+  const p = await params;
+  const sp = await searchParams;
+
   const ret = await serverFetch(
-    async () => await api.user.profileByUsername(params.handle),
+    async () => await api.user.profileByUsername(p.handle),
   );
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
   const profile = ret.val;
 
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const posts = await api.user.userPosts({ user: profile.id, cursor });
@@ -58,7 +61,7 @@ export default async function Account({
 
           <div>
             <Button className="w-40 rounded-md border-2 p-0.5 text-center">
-              <Link href={`/account/${params.handle}/likes`}>Liked Posts</Link>
+              <Link href={`/account/${p.handle}/likes`}>Liked Posts</Link>
             </Button>
           </div>
 

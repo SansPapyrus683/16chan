@@ -8,18 +8,19 @@ import { SortMenu } from "@/components/SortMenu";
 const SortOrder = z.enum(["new", "likes"]).catch("new");
 
 export default async function Browsing({
-  searchParams: sp,
+  searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     q: string | string[] | undefined;
     sort: string | string[] | undefined;
     cursor: string | string[] | undefined;
-  };
+  }>;
 }) {
-  const { userId } = auth();
-  const query = Array.isArray(sp.q) ? sp.q.join(" ") : sp.q;
-  const sortBy = SortOrder.parse(Array.isArray(sp.sort) ? sp.sort[0] : sp.sort);
-  const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
+  const { userId } = await auth();
+  const { q, sort, cursor: c } = await searchParams;
+  const query = Array.isArray(q) ? q.join(" ") : q;
+  const sortBy = SortOrder.parse(Array.isArray(sort) ? sort[0] : sort);
+  const cursor = Array.isArray(c) ? c[0] : c;
 
   const res = await api.browse.browse({ query, sortBy, cursor });
   return (

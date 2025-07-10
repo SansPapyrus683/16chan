@@ -4,7 +4,7 @@ import { checkPerms, findComment, findPost, isMod } from "@/lib/db";
 
 export const commentRouter = createRouter({
   create: protectedProcedure
-    .input(z.object({ post: z.string().uuid(), text: z.string() }))
+    .input(z.object({ post: z.uuid(), text: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await findPost(ctx, input.post);
       return ctx.db.comment.create({
@@ -16,7 +16,7 @@ export const commentRouter = createRouter({
       });
     }),
   delete: protectedProcedure
-    .input(z.string().uuid())
+    .input(z.uuid())
     .mutation(async ({ ctx, input }) => {
       const comm = await findComment(ctx, input, false);
       if (comm === null) {

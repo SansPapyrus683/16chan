@@ -52,7 +52,7 @@ export const userInteractionRouter = createRouter({
     .input(
       z
         .object({
-          cursor: z.string().uuid().optional(),
+          cursor: z.uuid().optional(),
         })
         .default({}),
     )

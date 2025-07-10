@@ -84,7 +84,7 @@ export const postCrudRouter = createRouter({
 
       return post;
     }),
-  get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
+  get: publicProcedure.input(z.uuid()).query(async ({ ctx, input }) => {
     const post = await findPost(ctx, input, true, {
       images: true,
       comments: true,
@@ -97,7 +97,7 @@ export const postCrudRouter = createRouter({
   edit: protectedProcedure
     .input(
       z.object({
-        pid: z.string().uuid(),
+        pid: z.uuid(),
         title: z.string().optional(),
         sauce: Sauce.optional(),
         tags: Tag.array().optional(),
@@ -136,7 +136,7 @@ export const postCrudRouter = createRouter({
       });
     }),
   delete: protectedProcedure
-    .input(z.string().uuid())
+    .input(z.uuid())
     .mutation(async ({ ctx, input }) => {
       const post = await findPost(ctx, input, false);
       if (post === null) {

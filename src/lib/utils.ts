@@ -15,6 +15,7 @@ export async function serverFetch<T>(
   try {
     return { good: true, val: await func() };
   } catch (e) {
+    console.log(e);
     let err = "something screwed up";
     if (e instanceof TRPCError) {
       if (e.code === "NOT_FOUND") {

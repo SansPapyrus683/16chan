@@ -32,7 +32,7 @@ export const albumRouter = createRouter({
         },
       });
     }),
-  get: publicProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
+  get: publicProcedure.input(z.uuid()).query(async ({ ctx, input }) => {
     const album = await findAlbum(ctx, input, true, {
       images: { take: 1, orderBy: { img: "asc" } },
       likes: { where: { userId: ctx.auth.userId ?? "" } },
@@ -43,7 +43,7 @@ export const albumRouter = createRouter({
   edit: protectedProcedure
     .input(
       z.object({
-        aid: z.string().uuid(),
+        aid: z.uuid(),
         name: z.string().optional(),
       }),
     )
@@ -57,7 +57,7 @@ export const albumRouter = createRouter({
       });
     }),
   delete: protectedProcedure
-    .input(z.string().uuid())
+    .input(z.uuid())
     .mutation(async ({ ctx, input }) => {
       const album = await findAlbum(ctx, input, false);
       if (album === null) {

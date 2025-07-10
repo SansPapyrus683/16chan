@@ -24,17 +24,19 @@ import { LikeButton } from "@/components/LikeButton";
 import { SignedIn } from "@clerk/nextjs";
 
 export default async function PostView({
-  params: { pid },
+  params,
 }: {
-  params: { pid: string };
+  params: Promise<{ pid: string }>;
 }) {
+  const pid = (await params).pid;
+
   const ret = await serverFetch(async () => await api.post.get(pid));
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
   const post = ret.val;
 
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const author = post.userId && (await api.user.profileByUid(post.userId));
   const isMod = Boolean(userId && (await api.user.isMod()));

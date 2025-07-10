@@ -13,7 +13,7 @@ export const browseRouter = createRouter({
       z.object({
         query: z.string().default(""),
         sortBy: z.enum(["new", "likes"]).default("new"),
-        cursor: z.string().uuid().optional(),
+        cursor: z.uuid().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {

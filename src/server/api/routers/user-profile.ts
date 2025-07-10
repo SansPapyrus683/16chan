@@ -1,6 +1,5 @@
 import { createRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
-import { clerkClient } from "@clerk/clerk-sdk-node";
 import { TRPCError } from "@trpc/server";
 import { Prisma } from "@prisma/client";
 import {
@@ -13,10 +12,12 @@ import {
   prismaOrder,
 } from "@/lib/db";
 import SortOrder = Prisma.SortOrder;
+import { clerkClient } from "@clerk/nextjs/server";
 
 export const userProfileRouter = createRouter({
   profileByUsername: publicProcedure.input(z.string()).query(async ({ input }) => {
-    const { data: userList, totalCount } = await clerkClient.users.getUserList({
+    const client = await clerkClient();
+    const { data: userList, totalCount } = await client.users.getUserList({
       username: [input],
     });
     if (totalCount === 0) {
@@ -33,8 +34,9 @@ export const userProfileRouter = createRouter({
     return userList[0]!;
   }),
   profileByUid: publicProcedure.input(z.string()).query(async ({ input }) => {
+    const client = await clerkClient();
     try {
-      return await clerkClient.users.getUser(input);
+      return await client.users.getUser(input);
     } catch (e) {
       if ((e as { status: any })?.status === 404) {
         throw new TRPCError({
@@ -54,7 +56,7 @@ export const userProfileRouter = createRouter({
         user: z.string(),
         sortBy: z.enum(["new", "likes", "alpha"]).default("new"),
         limit: PageSize,
-        cursor: z.string().uuid().optional(),
+        cursor: z.uuid().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -73,7 +75,7 @@ export const userProfileRouter = createRouter({
       z.object({
         user: z.string(),
         limit: PageSize,
-        cursor: z.string().uuid().optional(),
+        cursor: z.uuid().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -101,7 +103,7 @@ export const userProfileRouter = createRouter({
         query: z.string().optional(),
         sortBy: z.enum(["new", "alpha"]).default("new"),
         limit: PageSize,
-        cursor: z.string().uuid().optional(),
+        cursor: z.uuid().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {

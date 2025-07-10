@@ -4,13 +4,16 @@ import { serverFetch } from "@/lib/utils";
 
 export default async function userLikes({
   params,
-  searchParams: sp,
+  searchParams,
 }: {
-  params: { handle: string };
-  searchParams: { cursor: string | string[] | undefined };
+  params: Promise<{ handle: string }>;
+  searchParams: Promise<{ cursor: string | string[] | undefined }>;
 }) {
+  const p = await params;
+  const sp = await searchParams;
+
   const ret = await serverFetch(
-    async () => await api.user.profileByUsername(params.handle),
+    async () => await api.user.profileByUsername(p.handle),
   );
   if (!ret.good) {
     return <div>{ret.err}</div>;
