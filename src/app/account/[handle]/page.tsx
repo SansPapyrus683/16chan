@@ -25,9 +25,7 @@ export default async function Account({
   const p = await params;
   const sp = await searchParams;
 
-  const ret = await serverFetch(
-    async () => await api.user.profileByUsername(p.handle),
-  );
+  const ret = await serverFetch(async () => await api.user.profileByUsername(p.handle));
   if (!ret.good) {
     return <div>{ret.err}</div>;
   }
@@ -41,8 +39,8 @@ export default async function Account({
   const albums = await api.user.userAlbums({ user: profile.id });
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="flex space-x-10 space-y-4">
-      <ResizablePanel defaultSize={20} className="min-w-40 max-w-2xl">
+    <ResizablePanelGroup direction="horizontal" className="flex-1 space-y-4 space-x-10">
+      <ResizablePanel defaultSize={20} className="max-w-2xl min-w-40">
         <div className="space-y-4">
           <div>
             <Avatar className="h-40 w-40 align-middle">
@@ -78,7 +76,8 @@ export default async function Account({
         </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel>
+      {/* this is the second time now, what??? */}
+      <ResizablePanel className="overflow-y-auto" style={{ overflow: "y-auto" }}>
         <div>
           Posts
           <PaginatedPostList
