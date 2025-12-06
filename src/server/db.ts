@@ -1,3 +1,4 @@
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient as BasePrismaClient } from "@prisma/client";
 
 import { env } from "@/env";
@@ -5,9 +6,13 @@ import { s3Delete } from "@/lib/s3";
 
 /** sauce: https://www.answeroverflow.com/m/1122213580608131163 */
 function getPrisma() {
-  return new BasePrismaClient({
+  // what???
+  const adapter = new PrismaNeon({ connectionString: env.DB_URL });
+  const prisma = new BasePrismaClient({
+    adapter,
     log: env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  })
+  });
+  return prisma
     .$extends({
       name: "s3 delete",
       query: {

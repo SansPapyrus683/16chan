@@ -1,0 +1,9 @@
+import type { PrismaConfig } from "prisma";
+import { env } from "prisma/config";
+
+export default {
+  schema: "prisma/schema.prisma",
+  datasource: {
+    url: env("DB_URL"),
+  },
+} satisfies PrismaConfig;

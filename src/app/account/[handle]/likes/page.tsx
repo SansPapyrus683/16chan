@@ -22,13 +22,14 @@ export default async function userLikes({
 
   const cursor = Array.isArray(sp.cursor) ? sp.cursor[0] : sp.cursor;
   const likes = await api.user.userLikes({ user: profile.id, cursor });
+  const clientLikes = JSON.parse(JSON.stringify(likes));
   return (
     <>
       <h1>{profile.username}'s likes</h1>
       <div>
         <PaginatedPostList
           getWhat="userLikes"
-          initPosts={likes}
+          initPosts={clientLikes}
           params={{ user: profile.id, what: "likes", cursor }}
         />
       </div>
