@@ -2,13 +2,17 @@
 
 import { api } from "@/trpc/react";
 import { RouterOutputs } from "@/trpc/shared";
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { useCallback } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LikeButton } from "@/components/LikeButton";
 import { SignedIn, useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+
+const Masonry = dynamic(() => import("masonic").then((mod) => mod.Masonry), {
+  ssr: false,
+});
 
 type PostData = RouterOutputs["user"]["userPosts"];
 
@@ -98,134 +102,68 @@ export function PostList({
   posts: PostData["posts"];
   likeButton?: boolean;
 }) {
-  // hm you'd think this would be undefined for a lil @ the start but it actually isn't
-  const { userId } = useAuth();
-  const [photoRows, setPhotoRows] = useState<
-    { startIndex: number; endIndex: number }[]
-  >([]);
-  const [photoDimensions, setPhotoDimensions] = useState<{
-    [id: string]: { width: number; height: number };
-  }>({});
-  const [waitingMessage, setWaitingMessage] = useState("Loading Images...");
-
-  useEffect(() => {
-    (async () => {
-      const dimensions: {
-        [id: string]: { width: number; height: number };
-      } = {};
-      await Promise.all(
-        posts.map(async (photo) => {
-          let tries = 100;
-          let completed = false;
-          while (tries > 0 && !completed) {
-            try {
-              const img = document.createElement("img");
-              img.src = photo.images[0]!.miniImg;
-              await img.decode();
-              dimensions[photo.id] = {
-                width: img.width,
-                height: img.height,
-              };
-              completed = true;
-            } catch (error) {
-              tries--;
-            }
-          }
-          if (!completed) {
-            dimensions[photo.id] = {
-              width: 500,
-              height: 500,
-            };
-          }
-        }),
-      );
-
-      const MAX_WIDTH = window.innerWidth;
-      const MAX_HEIGHT = 300;
-
-      let currWidth = 0;
-      let start = 0;
-      const rows: { startIndex: number; endIndex: number }[] = [];
-      posts.map((photo, index) => {
-        const width = dimensions[photo.id]!.width;
-        const height = dimensions[photo.id]!.height;
-        const scale = MAX_HEIGHT / height;
-
-        currWidth += width * scale;
-        if (currWidth >= MAX_WIDTH || index == Object.keys(dimensions).length - 1) {
-          const totalScale = MAX_WIDTH / currWidth;
-
-          for (let i = start; i <= index; i++) {
-            const id = posts[i].id;
-            dimensions[id] = {
-              height: dimensions[id]!.height * totalScale,
-              width: dimensions[id]!.width * totalScale,
-            };
-          }
-
-          rows.push({
-            startIndex: start,
-            endIndex: index + 1,
-          });
-          currWidth = 0;
-          start = index + 1;
-        }
-      });
-
-      setPhotoRows(rows);
-      setPhotoDimensions(dimensions);
-
-      const msg = rows.length == 0 ? "No images found." : "";
-      setWaitingMessage(msg);
-    })();
-  }, [posts]);
-
   if (posts.length === 0) {
     return <div>There don't seem to be any posts here...</div>;
   }
 
   return (
     <div>
-      {waitingMessage ? (
-        <div>{waitingMessage}</div>
-      ) : (
-        <div className="grid border-2 border-solid border-black">
-          {photoRows.map((range, index) => (
-            <div className="flex" key={index}>
-              {posts.slice(range.startIndex, range.endIndex).map((p) => (
-                <div key={p.id} className="group relative flex flex-col">
-                  <Link href={`/post/${p.id}`}>
-                    <Image
-                      key={p.id}
-                      src={p.images[0]!.miniImg}
-                      alt="post preview"
-                      width={photoDimensions[p.id]?.width || 250}
-                      height={photoDimensions[p.id]?.height || 250}
-                      className="h-[300px] opacity-100 group-hover:opacity-75"
-                      style={{ width: "auto" }}
-                    />
-                  </Link>
-                  <div className="popup absolute right-0 left-0 opacity-0 group-hover:opacity-100">
-                    <div className="bg-opacity-50 bg-white p-2">
-                      <p>{`${p.title}`}</p>
-                    </div>
-                  </div>
-                  <SignedIn>
-                    <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
-                      {likeButton && (
-                        <LikeButton
-                          pid={p.id}
-                          liked={p.likes!.some((i) => i.userId === userId)}
-                        />
-                      )}
-                    </div>
-                  </SignedIn>
-                </div>
-              ))}
-            </div>
-          ))}
+      <Masonry
+        key={posts[0].id}
+        items={posts}
+        maxColumnCount={7}
+        //@ts-ignore
+        itemKey={p => p.id}
+        render={(p) => (
+          <SinglePost
+            //@ts-ignore i forgot how awful web dev was
+            post={p.data}
+            likeButton={likeButton}
+            className="group relative flex flex-col"
+          />
+        )}
+      />
+    </div>
+  );
+}
+
+function SinglePost({
+  post,
+  className,
+  likeButton,
+}: {
+  post: PostData["posts"][0];
+  className: string;
+  likeButton: boolean;
+}) {
+  // hm you'd think this would be undefined for a lil @ the start but it actually isn't
+  const { userId } = useAuth();
+  return (
+    <div key={post.id} className={className}>
+      <Link href={`/post/${post.id}`}>
+        {/* TODO: HOW DO I USE NEXT JS'S IMAGE HERE WTFFFF */}
+        <img
+          key={post.id}
+          src={post.images[0]!.miniImg}
+          alt="post preview"
+          className="opacity-100 group-hover:opacity-75 w-full"
+        />
+      </Link>
+      <div className="popup absolute right-0 left-0 opacity-0 group-hover:opacity-100">
+        <div className="bg-opacity-50 bg-white p-2">
+          {post.title}
         </div>
-      )}
+      </div>
+      <SignedIn>
+        <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
+          {likeButton && (
+            <LikeButton
+              pid={post.id}
+              liked={post.likes!.some((i) => i.userId === userId)}
+            />
+          )}
+        </div>
+      </SignedIn>
     </div>
   );
 }
