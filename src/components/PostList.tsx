@@ -100,23 +100,19 @@ export function PostList({
 }) {
   // hm you'd think this would be undefined for a lil @ the start but it actually isn't
   const { userId } = useAuth();
-  const [photoRows, setPhotoRows] = useState<{
-    [num: string]: { startIndex?: number; endIndex?: number; height?: number };
-  }>({});
+  const [photoRows, setPhotoRows] = useState<
+    { startIndex: number; endIndex: number }[]
+  >([]);
   const [photoDimensions, setPhotoDimensions] = useState<{
-    [id: string]: { width?: number; height?: number };
+    [id: string]: { width: number; height: number };
   }>({});
   const [waitingMessage, setWaitingMessage] = useState("Loading Images...");
 
   useEffect(() => {
-    const fetchPhotoDimensions = async () => {
+    (async () => {
       const dimensions: {
         [id: string]: { width: number; height: number };
       } = {};
-      const retPhotoRows: {
-        [num: number]: { startIndex?: number; endIndex?: number };
-      } = {};
-
       await Promise.all(
         posts.map(async (photo) => {
           let tries = 100;
@@ -147,56 +143,43 @@ export function PostList({
       const MAX_WIDTH = window.innerWidth;
       const MAX_HEIGHT = 300;
 
-      let currWidthPixelCount = 0;
-      let currHeightPixelCount = 0;
-      let backLog = 0;
-      let rowCount = 0;
+      let currWidth = 0;
       let start = 0;
-      let imagesInRow: string[] = [];
+      const rows: { startIndex: number; endIndex: number }[] = [];
       posts.map((photo, index) => {
-        let width = dimensions[photo.id]!.width;
-        let height = dimensions[photo.id]!.height;
-        let scale_factor: number;
-        scale_factor = MAX_HEIGHT / height;
-        currWidthPixelCount += width * scale_factor;
-        currHeightPixelCount += height * scale_factor;
-        imagesInRow.push(photo.id);
-        backLog++;
-        if (
-          (currWidthPixelCount >= MAX_WIDTH && backLog >= 4) ||
-          index == Object.keys(dimensions).length - 1
-        ) {
-          let widthScaleFactor: number = 0.0;
-          if (currWidthPixelCount <= MAX_WIDTH) {
-            widthScaleFactor = 1.0;
-          } else widthScaleFactor = MAX_WIDTH / currWidthPixelCount;
-          let new_height = widthScaleFactor * (height * scale_factor);
-          imagesInRow.forEach((imageID) => {
-            dimensions[imageID] = {
-              height: new_height,
-              width:
-                dimensions[imageID]!.width *
-                (MAX_HEIGHT / dimensions[imageID]!.height) *
-                widthScaleFactor,
+        const width = dimensions[photo.id]!.width;
+        const height = dimensions[photo.id]!.height;
+        const scale = MAX_HEIGHT / height;
+
+        currWidth += width * scale;
+        if (currWidth >= MAX_WIDTH || index == Object.keys(dimensions).length - 1) {
+          const totalScale = MAX_WIDTH / currWidth;
+
+          for (let i = start; i <= index; i++) {
+            const id = posts[i].id;
+            dimensions[id] = {
+              height: dimensions[id]!.height * totalScale,
+              width: dimensions[id]!.width * totalScale,
             };
-          });
-          retPhotoRows[rowCount] = {
+          }
+
+          rows.push({
             startIndex: start,
-            endIndex: start + backLog,
-          };
-          currWidthPixelCount = 0;
-          currHeightPixelCount = 0;
-          imagesInRow = [];
-          start = start + backLog;
-          backLog = 0;
-          rowCount++;
+            endIndex: index + 1,
+          });
+          currWidth = 0;
+          start = index + 1;
         }
       });
-      setPhotoRows(retPhotoRows);
+
+      setPhotoRows(rows);
       setPhotoDimensions(dimensions);
-      if (Object.keys(retPhotoRows).length == 0) setWaitingMessage("No images found.");
-    };
-    fetchPhotoDimensions();
+
+      console.log("are we done yet");
+
+      const msg = rows.length == 0 ? "No images found." : "";
+      setWaitingMessage(msg);
+    })();
   }, [posts]);
 
   if (posts.length === 0) {
@@ -205,46 +188,45 @@ export function PostList({
 
   return (
     <div>
-      {Object.keys(photoRows).length > 0 && Object.keys(photoDimensions).length > 0 ? (
+      {waitingMessage ? (
+        <div>{waitingMessage}</div>
+      ) : (
         <div className="grid border-2 border-solid border-black">
-          {Object.keys(photoRows).map((index) => (
+          {photoRows.map((range, index) => (
             <div className="flex" key={index}>
-              {posts
-                .slice(photoRows[index]!.startIndex, photoRows[index]!.endIndex)
-                .map((p) => (
-                  <div key={p.id} className="group relative flex flex-col">
-                    <Link href={`/post/${p.id}`}>
-                      <Image
-                        key={p.id}
-                        src={p.images[0]!.miniImg}
-                        alt="post preview"
-                        width={photoDimensions[p.id]?.width || 250}
-                        height={photoDimensions[p.id]?.height || 250}
-                        className="opacity-100 group-hover:opacity-75"
-                      />
-                    </Link>
-                    <div className="popup absolute left-0 right-0 opacity-0 group-hover:opacity-100">
-                      <div className="bg-white bg-opacity-50 p-2">
-                        <p>{`${p.title}`}</p>
-                      </div>
+              {posts.slice(range.startIndex, range.endIndex).map((p) => (
+                <div key={p.id} className="group relative flex flex-col">
+                  <Link href={`/post/${p.id}`}>
+                    <Image
+                      key={p.id}
+                      src={p.images[0]!.miniImg}
+                      alt="post preview"
+                      width={photoDimensions[p.id]?.width || 250}
+                      height={photoDimensions[p.id]?.height || 250}
+                      className="h-[300px] opacity-100 group-hover:opacity-75"
+                      style={{ width: "auto" }}
+                    />
+                  </Link>
+                  <div className="popup absolute right-0 left-0 opacity-0 group-hover:opacity-100">
+                    <div className="bg-opacity-50 bg-white p-2">
+                      <p>{`${p.title}`}</p>
                     </div>
-                    <SignedIn>
-                      <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
-                        {likeButton && (
-                          <LikeButton
-                            pid={p.id}
-                            liked={p.likes!.some((i) => i.userId === userId)}
-                          />
-                        )}
-                      </div>
-                    </SignedIn>
                   </div>
-                ))}
+                  <SignedIn>
+                    <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
+                      {likeButton && (
+                        <LikeButton
+                          pid={p.id}
+                          liked={p.likes!.some((i) => i.userId === userId)}
+                        />
+                      )}
+                    </div>
+                  </SignedIn>
+                </div>
+              ))}
             </div>
           ))}
         </div>
-      ) : (
-        <p>{`${waitingMessage}`}</p>
       )}
     </div>
   );
