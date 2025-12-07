@@ -11,6 +11,7 @@ export function CreatePost() {
   const router = useRouter();
 
   const [buttonText, setButtonText] = useState("Create");
+  const [disabled, setDisabled] = useState(false);
   const createPost = api.post.create.useMutation({
     onSuccess: (data) => {
       setButtonText("Success!");
@@ -19,12 +20,14 @@ export function CreatePost() {
     },
     onError: () => {
       setButtonText("Error...");
+      setDisabled(false);
     },
   });
 
   return (
     <PostForm
       onSubmit={async (pd) => {
+        setDisabled(true);
         setButtonText("Creating...");
         createPost.mutate({
           title: pd.title,
@@ -35,6 +38,7 @@ export function CreatePost() {
         });
       }}
       buttonText={buttonText}
+      disabled={disabled}
     />
   );
 }

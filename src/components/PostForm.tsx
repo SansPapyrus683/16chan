@@ -44,6 +44,7 @@ export function PostForm({
   iSauce = { src: "OTHER", id: "" },
   iVis = Visibility.PUBLIC,
   buttonText = "Submit",
+  disabled = false,
   onSubmit,
   fields = {},
 }: {
@@ -54,6 +55,7 @@ export function PostForm({
   iVis?: Visibility;
   buttonText?: string;
   onSubmit: (pd: PostData) => any;
+  disabled?: boolean;
   fields?: {
     pics?: boolean;
     title?: boolean;
@@ -224,7 +226,7 @@ export function PostForm({
           </Select>
         )}
 
-        <Button type="submit" className="block">
+        <Button type="submit" className="block" disabled={disabled}>
           {buttonText}
         </Button>
 
