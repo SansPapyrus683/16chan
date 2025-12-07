@@ -175,8 +175,6 @@ export function PostList({
       setPhotoRows(rows);
       setPhotoDimensions(dimensions);
 
-      console.log("are we done yet");
-
       const msg = rows.length == 0 ? "No images found." : "";
       setWaitingMessage(msg);
     })();
