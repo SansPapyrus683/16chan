@@ -7,13 +7,13 @@ export function validTag(tag: string) {
 }
 
 export const Tag = z.object({
-  category: z.nativeEnum(TagCategory),
+  category: z.enum(TagCategory),
   name: z.string().toLowerCase().refine(validTag),
 });
 
 export const Sauce = z
   .object({
-    src: z.nativeEnum(ArtSource),
+    src: z.enum(ArtSource),
     id: z.string(),
   })
   .optional();

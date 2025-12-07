@@ -27,7 +27,7 @@ export const postCrudRouter = createRouter({
           .array()
           .min(1)
           .max(4),
-        visibility: z.nativeEnum(Visibility).optional(),
+        visibility: z.enum(Visibility).optional(),
         sauce: Sauce,
         tags: Tag.array().default([]),
       }),

@@ -9,7 +9,7 @@ export const albumRouter = createRouter({
       z
         .object({
           name: z.string().optional(),
-          visibility: z.nativeEnum(Visibility).optional(),
+          visibility: z.enum(Visibility).optional(),
         })
         .default({}),
     )
