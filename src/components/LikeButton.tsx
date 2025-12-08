@@ -21,24 +21,24 @@ export function LikeButton({ pid, liked }: { pid: string; liked: boolean }) {
   return (
     <div className="p-1">
       <Button
-        onClick={async (e) => {
+        onClick={(e) => {
           e.preventDefault();
           (liked ? unlikePost : likePost).mutate(pid);
         }}
         className={cn(
-          "rounded-l-full rounded-r-full p-2 transition duration-500 hover:bg-red-600",
+          "duration-020 group/like rounded-l-full rounded-r-full p-2 transition hover:bg-red-600",
           { "bg-red-600": liked },
         )}
         disabled={disabled}
         variant="outline"
       >
-        <div className="flex items-center text-black transition duration-300 hover:text-white">
-          {liked ? (
-            <ThumbsUpIcon fill={liked ? "red" : "white"} className="mr-2" />
-          ) : (
-            <ThumbsUpIcon className="mr-2" />
+        <div
+          className={cn(
+            "duration-020 flex items-center text-black transition group-hover/like:text-white",
+            { "text-white": liked },
           )}
-          Like
+        >
+          <ThumbsUpIcon />
         </div>
       </Button>
     </div>
