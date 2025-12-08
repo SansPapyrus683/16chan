@@ -113,13 +113,13 @@ export function PostList({
         items={posts}
         maxColumnCount={7}
         //@ts-ignore
-        itemKey={p => p.id}
+        itemKey={(p) => p.id}
         render={(p) => (
           <SinglePost
             //@ts-ignore i forgot how awful web dev was
             post={p.data}
             likeButton={likeButton}
-            className="group relative flex flex-col"
+            className="group relative mx-1 my-1 flex flex-col"
           />
         )}
       />
@@ -146,13 +146,11 @@ function SinglePost({
           key={post.id}
           src={post.images[0]!.miniImg}
           alt="post preview"
-          className="opacity-100 group-hover:opacity-75 w-full"
+          className="w-full rounded-md opacity-100 group-hover:opacity-75"
         />
       </Link>
-      <div className="popup absolute right-0 left-0 opacity-0 group-hover:opacity-100">
-        <div className="bg-opacity-50 bg-white p-2">
-          {post.title}
-        </div>
+      <div className="popup absolute right-0 left-0 border-black bg-gray-300 p-2 opacity-0 group-hover:opacity-100 rounded-t-md">
+        {post.title}
       </div>
       <SignedIn>
         <div className="popup absolute bottom-0 left-0 opacity-0 group-hover:opacity-100">
